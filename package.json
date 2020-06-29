@@ -1,0 +1,50 @@
+{
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-transform-runtime": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "autoprefixer": "^9.8.4",
+    "chrome-store-update": "^0.2.5",
+    "cssnano": "^4.1.10",
+    "fs-extra": "^9.0.1",
+    "html-minifier": "^4.0.0",
+    "postcss": "^7.0.32",
+    "prettier": "^2.0.5",
+    "recursive-readdir": "^2.2.2",
+    "semistandard": "^14.2.2",
+    "ssri": "^8.0.0",
+    "stylelint": "^13.6.1",
+    "stylelint-config-ccb": "^1.1.0",
+    "terser": "^4.8.0",
+    "web-ext": "^4.3.0",
+    "zip-self": "^0.2.4"
+  },
+  "name": "youtube-like-dislike-shortcut",
+  "version": "1.0.1",
+  "description": "Like videos with Shift+Plus, dislike with Shift+Minus.",
+  "repository": "avi12/youtube-like-dislike-shortcut",
+  "author": {
+    "name": "avi12",
+    "email": "avi6106@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://avi12.com",
+  "bugs": {
+    "email": "avi6106@gmail.com"
+  },
+  "scripts": {
+    "build": "node build",
+    "build-minify": "node build --minify",
+    "pack": "web-ext build --overwrite-dest --artifacts-dir dist_packed --source-dir dist",
+    "pack-self": "zip-self -o dist_packed/youtube-like-dislike-shortcut-{version}-source.zip",
+    "pack-opera": "yarn run pack && yarn run pack-stores -s opera",
+    "pack-firefox": "yarn run pack && yarn run pack-stores -s firefox",
+    "deploy-chrome": "chrome-store-update -e fcphghnknhkimeagdglkljinmpbagone -cp {home}/.chrome-publish-credentials.json -pp dist_packed/youtube-like-dislike-shortcut-{version}.zip",
+    "build-pack": "yarn run build-minify && yarn run pack && yarn run pack-self",
+    "deploy": "yarn run pack-stores & yarn run pack-self & yarn run deploy-chrome",
+    "run-browser": "web-ext run --no-config-discovery --start-url https://www.youtube.com/watch?v=dQw4w9WgXcQ --source-dir dist --verbose --target",
+    "run-firefox": "yarn run-browser firefox-desktop",
+    "run-firefox-android": "yarn run-browser firefox-android",
+    "run-chromium": "yarn run-browser chromium"
+  }
+}
