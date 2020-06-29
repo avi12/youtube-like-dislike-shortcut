@@ -39,7 +39,7 @@
     "pack-self": "zip-self -o dist_packed/youtube-like-dislike-shortcut-{version}-source.zip",
     "pack-opera": "yarn run pack && yarn run pack-stores -s opera",
     "pack-firefox": "yarn run pack && yarn run pack-stores -s firefox",
-    "deploy-chrome": "chrome-store-update -e fcphghnknhkimeagdglkljinmpbagone -cp {home}/.chrome-publish-credentials.json -pp dist_packed/youtube-like-dislike-shortcut-{version}.zip",
+    "deploy-chrome": "chrome-store-update -e fdkpkpelkkdkjhpacficichkfifijipc -cp {home}/.chrome-publish-credentials.json -pp dist_packed/youtube-like-dislike-shortcut-{version}.zip",
     "build-pack": "yarn run build-minify && yarn run pack && yarn run pack-self",
     "deploy": "yarn run pack-stores & yarn run pack-self & yarn run deploy-chrome",
     "run-browser": "web-ext run --no-config-discovery --start-url https://www.youtube.com/watch?v=dQw4w9WgXcQ --source-dir dist --verbose --target",
