@@ -1,9 +1,13 @@
 # YouTube Like-Dislike Shortcut
 Basically copies the like/dislike shortcut from YouTube Music, which means:  
-Shift+Plus (on the number row) to like a video,  
-Shift+Minus (on the number row) to dislike,  
-Numpad Plus to like,  
-Numpad Minus to dislike
+* Shift+Plus (on the number row) to like a video
+* Shift+Minus (on the number row) to dislike
+* Numpad Plus to like
+* Numpad Minus to dislike
+
+Additionally:
+* Shift+0 (on the number row) to remove your like/dislike
+* Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 
 Officially published for [Chrome Web Store](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) and [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/youtube-like-dislike-shortcut).  
 Made by [avi12](https://avi12.com).
