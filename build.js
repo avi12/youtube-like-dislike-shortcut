@@ -16,9 +16,9 @@ const cssnano = require("cssnano")({
     {
       zindex: false,
       svgo: false,
-      autoprefixer: true,
-    },
-  ],
+      autoprefixer: true
+    }
+  ]
 });
 
 const isMinify = process.argv.includes("--minify");
@@ -36,15 +36,15 @@ const srcDir = "src";
 function mutateFile(file, method) {
   return fs
     .readFile(file, "utf8")
-    .then((fileContent) => method(fileContent))
-    .then((result) => fs.writeFile(file, result, "utf8"));
+    .then(fileContent => method(fileContent))
+    .then(result => fs.writeFile(file, result, "utf8"));
 }
 
 function getSsri(filePath) {
   const fileData = fs.readFileSync(filePath, "utf8");
   return ssri
     .fromData(fileData, {
-      algorithms: ["sha384"],
+      algorithms: ["sha384"]
     })
     .toString();
 }
@@ -94,13 +94,13 @@ async function processHtml(fileContent) {
     removeTagWhitespace: false,
     sortAttributes: true,
     sortClassName: true,
-    useShortDoctype: true,
+    useShortDoctype: true
   });
 }
 
 function processAndMutate(files, ext, func) {
-  const matchedFiles = files.filter((file) => file.endsWith(ext));
-  const promises = matchedFiles.map((file) => {
+  const matchedFiles = files.filter(file => file.endsWith(ext));
+  const promises = matchedFiles.map(file => {
     return mutateFile(file, func);
   });
   return Promise.all(promises);
@@ -108,23 +108,26 @@ function processAndMutate(files, ext, func) {
 
 function processJs(fileContent) {
   const js = babel.transformSync(fileContent, {
-    cwd: distDir,
+    cwd: distDir
   }).code;
 
   if (!isMinify) {
     return js;
   }
-  return Terser.minify(js).code;
+  return Terser.minify(js, {
+    output: {
+      comments: false
+    },
+    toplevel: true
+  }).code;
 }
 
 function processCss(fileContent) {
   return postcssProcess
     .process(fileContent, {
-      from: undefined,
+      from: undefined
     })
-    .then(function (result) {
-      return result.css;
-    });
+    .then(result => result.css);
 }
 
 function processJson(fileContent) {
@@ -144,7 +147,7 @@ async function processFiles() {
   Promise.all([
     processAndMutate(files, ".js", processJs),
     processAndMutate(files, ".css", processCss),
-    processAndMutate(files, ".json", processJson),
+    processAndMutate(files, ".json", processJson)
   ]).then(() => processAndMutate(files, ".html", processHtml));
 }
 
