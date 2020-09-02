@@ -9,7 +9,7 @@
     "fs-extra": "^9.0.1",
     "html-minifier": "^4.0.0",
     "postcss": "^7.0.32",
-    "prettier": "^2.0.5",
+    "prettier": "^2.1.1",
     "recursive-readdir": "^2.2.2",
     "semistandard": "^14.2.2",
     "ssri": "^8.0.0",
@@ -20,7 +20,7 @@
     "zip-self": "^0.2.4"
   },
   "name": "youtube-like-dislike-shortcut",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Like videos with Shift+Plus, dislike with Shift+Minus.",
   "repository": "avi12/youtube-like-dislike-shortcut",
   "author": {
@@ -31,6 +31,10 @@
   "homepage": "https://avi12.com",
   "bugs": {
     "email": "avi6106@gmail.com"
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "trailingComma": "none"
   },
   "scripts": {
     "build": "node build",
