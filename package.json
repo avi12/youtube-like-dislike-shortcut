@@ -1,26 +1,6 @@
 {
-  "devDependencies": {
-    "@babel/core": "^7.10.3",
-    "@babel/plugin-transform-runtime": "^7.10.3",
-    "@babel/preset-env": "^7.10.3",
-    "autoprefixer": "^9.8.4",
-    "chrome-store-update": "^0.2.5",
-    "cssnano": "^4.1.10",
-    "fs-extra": "^9.0.1",
-    "html-minifier": "^4.0.0",
-    "postcss": "^7.0.32",
-    "prettier": "^2.1.1",
-    "recursive-readdir": "^2.2.2",
-    "semistandard": "^14.2.2",
-    "ssri": "^8.0.0",
-    "stylelint": "^13.6.1",
-    "stylelint-config-ccb": "^1.1.0",
-    "terser": "^4.8.0",
-    "web-ext": "^4.3.0",
-    "zip-self": "^0.2.4"
-  },
   "name": "youtube-like-dislike-shortcut",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Like videos with Shift+Plus, dislike with Shift+Minus.",
   "repository": "avi12/youtube-like-dislike-shortcut",
   "author": {
@@ -49,5 +29,25 @@
     "run-firefox": "yarn run-browser firefox-desktop",
     "run-firefox-android": "yarn run-browser firefox-android",
     "run-chromium": "yarn run-browser chromium"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-transform-runtime": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "autoprefixer": "^9.8.4",
+    "chrome-store-update": "^0.2.5",
+    "cssnano": "^4.1.10",
+    "fs-extra": "^9.0.1",
+    "html-minifier": "^4.0.0",
+    "postcss": "^7.0.32",
+    "prettier": "^2.1.1",
+    "recursive-readdir": "^2.2.2",
+    "semistandard": "^14.2.2",
+    "ssri": "^8.0.0",
+    "stylelint": "^13.6.1",
+    "stylelint-config-ccb": "^1.1.0",
+    "terser": "^4.8.0",
+    "web-ext": "^4.3.0",
+    "zip-self": "^0.2.4"
   }
 }
