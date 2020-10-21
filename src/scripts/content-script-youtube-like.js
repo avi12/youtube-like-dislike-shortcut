@@ -33,39 +33,42 @@ function hitButtonIfNeeded(e, btnLike, btnDislike) {
 
   switch (key) {
     case "+": // Numpad + AND Shift + =
-      // We want to prevent the default behavior, which in this case is increase the CC size
-      e.preventDefault();
       if (!getIsActive(btnLike)) {
         btnLike.click();
+        btnLike.blur();
       }
+      // We want to stop the event propagation, which will stop the default behavior - increase the CC size, in this case
+      e.stopPropagation();
       break;
 
     case "-": // Numpad -
       // The user may press the "-" in the Numpad or in the number row; we want to account for both
       if (code.includes("Numpad") || shiftKey) {
-        // We want to prevent the default behavior, which in this case is decrease the CC size
-        e.preventDefault();
+        // We want to stop the event propagation, which in this case is decrease the CC size
         if (!getIsActive(btnDislike)) {
           btnDislike.click();
+          btnDislike.blur();
         }
+        e.stopPropagation();
       }
       break;
 
     case "_": // Shift + -
-      // We want to prevent the default behavior, which in this case is decrease the CC size
-      e.preventDefault();
       if (!getIsActive(btnDislike)) {
         btnDislike.click();
+        btnDislike.blur();
       }
+      // We want to stop the event propagation, which will stop the default behavior - decrease the CC size, in this case
+      e.stopPropagation();
       break;
 
     case ")": // Shift + 0
-      // We want to prevent the default behavior, which in this case is seeking to 0% (beginning of the video)
-      e.preventDefault();
       const btnActive = document.querySelector(".style-default-active");
       if (btnActive) {
         btnActive.click();
         btnActive.blur();
       }
+      // We want to stop the event propagation, which will stop the default behavior - seeking to 0% (beginning of the video), in this case
+      e.stopPropagation();
   }
 }
