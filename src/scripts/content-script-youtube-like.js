@@ -13,7 +13,7 @@ document.addEventListener(
     }
 
     const [btnLike, btnDislike] = document.querySelectorAll(
-      "#top-level-buttons > ytd-toggle-button-renderer"
+      "#top-level-buttons > ytd-toggle-button-renderer.force-icon-button"
     );
     hitButtonIfNeeded(e, btnLike, btnDislike);
   },
