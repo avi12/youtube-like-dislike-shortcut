@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b9a720cf-d0e3-455c-ba90-3c75c827efe8" name="Default Changelist" comment="Fixed the query selector" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="jetbrains-json-problem" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1e1t423iRipCn4V26VOvIY8O3Lr" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="js.last.introduce.type" value="CONST" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.stylelint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.stylelint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.stylelint" value="C:\repositories\extensions\youtube-like-dislike-shortcut\node_modules\stylelint" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_interpreter_path" value="node" />
+    <property name="nodejs_package_manager_path" value="pnpm" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="C:\repositories\extensions\youtube-like-dislike-shortcut\node_modules\prettier" />
+    <property name="settings.editor.selected.configurable" value="JavaScript.Libraries" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected="npm.dev">
+    <configuration name="embed.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:64673/youtube-like-dislike-shortcut/tests/embed.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.embed.html" />
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.dev" />
+        <item itemvalue="JavaScript Debug.embed.html" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b9a720cf-d0e3-455c-ba90-3c75c827efe8" name="Default Changelist" comment="" />
+      <created>1593500731344</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1593500731344</updated>
+      <workItem from="1593500732631" duration="1652000" />
+      <workItem from="1594504539357" duration="1128000" />
+      <workItem from="1599060915291" duration="624000" />
+      <workItem from="1599062976605" duration="9089000" />
+      <workItem from="1603261775904" duration="2546000" />
+      <workItem from="1603657222216" duration="1228000" />
+      <workItem from="1609143174948" duration="10302000" />
+    </task>
+    <task id="LOCAL-00001" summary="Now the query selector is more accurate and should work 100% of the time">
+      <created>1594504951412</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1594504951412</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Incremented version to 1.0.2">
+      <created>1594505051096</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1594505051096</updated>
+    </task>
+    <task id="LOCAL-00003" summary="- Incremented version to 1.0.3&#10;- Added Prettier &amp; some rules">
+      <created>1599078097828</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1599078097828</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Incremented version to 1.0.3">
+      <created>1599078111381</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1599078111381</updated>
+    </task>
+    <task id="LOCAL-00005" summary="- Slightly changed formatting&#10;- Updated behavior">
+      <created>1599078144912</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1599078144912</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added Prettier">
+      <created>1599078154609</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1599078154609</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Slightly changed behavior:&#10;When pressing a shortcut, the corresponding button will be clicked only if the button isn't already active&#10;Otherwise, it will do nothing&#10;&#10;Additionally, added Shift+0 for undoing the rating&#10;&#10;Also, updated some comments">
+      <created>1599078295718</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1599078295718</updated>
+    </task>
+    <task id="LOCAL-00008" summary="- Applied Prettier rules&#10;- Now applying some Terser compression rules">
+      <created>1599078366621</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1599078366621</updated>
+    </task>
+    <task id="LOCAL-00009" summary="- Incremented version to 1.0.4&#10;- Moved &quot;devDependencies&quot; to the bottom as it makes more sense to me that way">
+      <created>1603264333897</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1603264333897</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Incremented version to 1.0.4">
+      <created>1603264349820</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1603264349820</updated>
+    </task>
+    <task id="LOCAL-00011" summary="- Changed &quot;e.preventDefault()&quot; to &quot;e.stopPropagation()&quot;&#10;- Updated comments">
+      <created>1603264439288</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1603264439288</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Incremented version to 1.0.5">
+      <created>1603659711376</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1603659711376</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Fixed the query selector">
+      <created>1603659771623</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1603659771623</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Now the query selector is more accurate and should work 100% of the time" />
+    <MESSAGE value="Incremented version to 1.0.2" />
+    <MESSAGE value="- Incremented version to 1.0.3&#10;- Added Prettier &amp; some rules" />
+    <MESSAGE value="Incremented version to 1.0.3" />
+    <MESSAGE value="- Slightly changed formatting&#10;- Updated behavior" />
+    <MESSAGE value="Added Prettier" />
+    <MESSAGE value="Slightly changed behavior:&#10;When pressing a shortcut, the corresponding button will be clicked only if the button isn't already active&#10;Otherwise, it will do nothing&#10;&#10;Additionally, added Shift+0 for undoing the rating&#10;&#10;Also, updated some comments" />
+    <MESSAGE value="- Applied Prettier rules&#10;- Now applying some Terser compression rules" />
+    <MESSAGE value="- Incremented version to 1.0.4&#10;- Moved &quot;devDependencies&quot; to the bottom as it makes more sense to me that way" />
+    <MESSAGE value="Incremented version to 1.0.4" />
+    <MESSAGE value="- Changed &quot;e.preventDefault()&quot; to &quot;e.stopPropagation()&quot;&#10;- Updated comments" />
+    <MESSAGE value="Updated some packages" />
+    <MESSAGE value="Incremented version to 1.0.5" />
+    <MESSAGE value="Fixed the query selector" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed the query selector" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
