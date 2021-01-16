@@ -18,7 +18,5 @@ node_modules
 .tmp
 
 # Distribution
-/dist_packed-edge
 /dist_packed
-/dist-edge
-/dist
+/dist/build
