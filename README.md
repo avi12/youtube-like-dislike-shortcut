@@ -9,26 +9,34 @@ Additionally:
 * Shift+0 (on the number row) to remove your like/dislike
 * Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 
-Officially published for [Chrome Web Store](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) and [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/youtube-like-dislike-shortcut).  
+Available for [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) and [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/youtube-like-dislike-shortcut).  
 Made by [avi12](https://avi12.com).
 
-## Do you want to contribute?
-Feel free to!  
-If you want to fork, just make sure to credit me and link this repository and [my website](https://avi12.com).
+## Requirements for setting up
+Install [Node.js](https://nodejs.org) and [PNPM](https://pnpm.js.org/en/installation).
 
-## Install dependencies
+## Download dev dependencies:
+```shell script
+pnpm i
 ```
-yarn
+## Start Rollup for development
+```shell script
+pnpm dev
+````
+## Running
+### Chromium/Chrome
+```shell script
+pnpm run-chromium
 ```
-## Build
+### Firefox
+```shell script
+pnpm run-firefox
 ```
-yarn run build-minify
-```
-## Pack
-```
-yarn run pack && yarn run pack-self
-```
-## Shorthand for build & pack
-```
-yarn run build-pack
-```
+### Other browsers
+1. Open the extensions page in your browser.
+1. Enable the developer tools (top-right corner usually).
+1. Either drag-drop the `dist` folder onto the browser or click "Load unpacked extension" and choose it.
+
+## Contribution
+Feel free to contribute! Keep in mind that the license I chose is [GPL v3](/LICENSE).  
+If you want to fork, make sure to credit [avi12](https://avi12.com) and link to this repository.
