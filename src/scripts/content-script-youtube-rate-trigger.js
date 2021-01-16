@@ -1,3 +1,7 @@
+"use strict";
+
+import { rateVideo } from "./content-script-youtube-rate-buttons";
+
 document.addEventListener(
   "keydown",
   e => {
@@ -5,26 +9,20 @@ document.addEventListener(
       document.activeElement.matches("input") ||
       document.activeElement.getAttribute("contenteditable") === "true"; // A comment field
 
-    const isVideoPage = location.pathname === "/watch";
+    const isVideoPage = location.pathname.match(/^\/(?:watch|embed)/);
+
     // We want the + / - keys to apply only when no text fields is focused,
     // as well as when we're in a video page
     if (isFocusedOnInput || !isVideoPage) {
       return;
     }
 
-    const [btnLike, btnDislike] = document.querySelectorAll(
-      "#top-level-buttons > ytd-toggle-button-renderer.force-icon-button"
-    );
-    hitButtonIfNeeded(e, btnLike, btnDislike);
+    rateIfNeeded(e);
   },
   { capture: true } // Thanks to capturing, e.preventDefault() is able to prevent the CC-related increase/decrease
 );
 
-function getIsActive(button) {
-  return button.classList.contains("style-default-active");
-}
-
-function hitButtonIfNeeded(e, btnLike, btnDislike) {
+function rateIfNeeded(e) {
   const { code, key, shiftKey } = e;
   const isHittingLikeOrDislike = key.match(/[+_)-]/);
   if (!isHittingLikeOrDislike) {
@@ -33,10 +31,7 @@ function hitButtonIfNeeded(e, btnLike, btnDislike) {
 
   switch (key) {
     case "+": // Numpad + AND Shift + =
-      if (!getIsActive(btnLike)) {
-        btnLike.click();
-        btnLike.blur();
-      }
+      rateVideo(true);
       // We want to stop the event propagation, which will stop the default behavior - increase the CC size, in this case
       e.stopPropagation();
       break;
@@ -45,30 +40,19 @@ function hitButtonIfNeeded(e, btnLike, btnDislike) {
       // The user may press the "-" in the Numpad or in the number row; we want to account for both
       if (code.includes("Numpad") || shiftKey) {
         // We want to stop the event propagation, which in this case is decrease the CC size
-        if (!getIsActive(btnDislike)) {
-          btnDislike.click();
-          btnDislike.blur();
-        }
+        rateVideo(false);
         e.stopPropagation();
       }
       break;
 
     case "_": // Shift + -
-      if (!getIsActive(btnDislike)) {
-        btnDislike.click();
-        btnDislike.blur();
-      }
-      // We want to stop the event propagation, which will stop the default behavior - decrease the CC size, in this case
+      rateVideo(false);
       e.stopPropagation();
       break;
 
     case ")": // Shift + 0
-      const btnActive = document.querySelector(".style-default-active");
-      if (btnActive) {
-        btnActive.click();
-        btnActive.blur();
-      }
-      // We want to stop the event propagation, which will stop the default behavior - seeking to 0% (beginning of the video), in this case
+      rateVideo(null);
       e.stopPropagation();
+      break;
   }
 }
