@@ -5,14 +5,24 @@ function getIsActive(button) {
 }
 
 /**
+ * @returns {HTMLElement[]}
+ */
+function getLikeButtons() {
+  // noinspection CssInvalidHtmlTagReference
+  const elButtons = document.querySelectorAll(
+    "#top-level-buttons > ytd-toggle-button-renderer.force-icon-button"
+  );
+  return [...elButtons].filter(
+    elButton => elButton.offsetWidth > 0 && elButton.offsetHeight > 0
+  );
+}
+
+/**
  * Rates/un-rates a video on YouTUbe.com
  * @param {boolean|null} isLike
  */
 export function rateVideo(isLike) {
-  // noinspection CssInvalidHtmlTagReference
-  const [btnLike, btnDislike] = document.querySelectorAll(
-    "#top-level-buttons > ytd-toggle-button-renderer.force-icon-button"
-  );
+  const [btnLike, btnDislike] = getLikeButtons();
   if (isLike) {
     if (!getIsActive(btnLike)) {
       btnLike.click();
@@ -21,7 +31,8 @@ export function rateVideo(isLike) {
   } else if (isLike === false && !getIsActive(btnDislike)) {
     btnDislike.click();
     btnDislike.blur();
-  } else { // isLike === null
+  } else {
+    // isLike === null
     // Un-rate a video
     const btnActive = document.querySelector(".style-default-active");
     if (btnActive) {
