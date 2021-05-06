@@ -9,7 +9,12 @@ Additionally:
 * Shift+0 (on the number row) to remove your like/dislike
 * Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 
-Available for [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) and [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/youtube-like-dislike-shortcut).  
+Available for:
+- [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?color=white&label=users&style=flat-square)
+- [Mozilla Firefox](https://addons.mozilla.org/addon/youtube-like-dislike-shortcut) ![Mozilla Add-on](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=users&style=flat-square)
+- [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/pdoiddhhpjkclobjlomfkgfldjoggfig)
+- [Opera](https://addons.opera.com/en/extensions/details/youtube-like-dislike-shortcut)
+
 Made by [avi12](https://avi12.com).
 
 ## Requirements for setting up
@@ -39,4 +44,4 @@ pnpm run-firefox
 
 ## Contribution
 Feel free to contribute! Keep in mind that the license I chose is [GPL v3](/LICENSE).  
-If you want to fork, make sure to credit [avi12](https://avi12.com) and link to this repository.
+If you want to fork, make sure to credit [avi12](https://avi12.com) and link to [this repository](https://github.com/avi12/youtube-like-dislike-shortcut).
