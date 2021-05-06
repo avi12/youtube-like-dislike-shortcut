@@ -1,6 +1,6 @@
 {
   "name": "youtube-like-dislike-shortcut",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Like videos with Shift+Plus, dislike with Shift+Minus.",
   "repository": "avi12/youtube-like-dislike-shortcut",
   "author": {
@@ -23,19 +23,18 @@
     "pack-self": "zip-self -o dist_packed/youtube-like-dislike-shortcut-{version}-source.zip",
     "build-pack": "pnpm run build && pnpm run pack && pnpm run pack-self",
     "set-version": "set-json-version -f package.json dist/manifest.json -v",
-    "validate": "svelte-check",
     "run-browser": "web-ext run --no-config-discovery --start-url https://www.youtube.com/watch?v=dQw4w9WgXcQ --source-dir dist --verbose --target",
     "run-firefox": "pnpm run-browser firefox-desktop",
     "run-chromium": "pnpm run-browser chromium",
-    "run-edge-windows": "\"\"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"\" https://www.youtube.com/watch?v=dQw4w9WgXcQ --load-extension=%cd%\\dist",
-    "run-opera-windows": "\"\"%LocalAppData%\\Programs\\Opera\\launcher.exe\"\" https://www.youtube.com/watch?v=dQw4w9WgXcQ --load-extension=%cd%\\dist"
+    "run-edge-windows": "\"\"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"\" https://www.youtube.com/watch?v=dQw4w9WgXcQ --load-extension=%cd%\\dist"
   },
   "devDependencies": {
     "prettier": "^2.2.1",
     "rollup": "^2.36.2",
     "rollup-plugin-terser": "^7.0.2",
     "set-json-version": "^1.0.4",
-    "web-ext": "^5.5.0",
+    "web-ext": "^6.0.0",
+    "web-ext-deploy": "^0.7.2",
     "zip-self": "^0.2.5"
   }
 }
