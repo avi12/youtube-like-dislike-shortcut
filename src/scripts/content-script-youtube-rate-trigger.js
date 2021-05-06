@@ -9,7 +9,7 @@ document.addEventListener(
       document.activeElement.matches("input") ||
       document.activeElement.getAttribute("contenteditable") === "true"; // A comment field
 
-    const isVideoPage = location.pathname.match(/^\/(?:watch|embed)/);
+    const isVideoPage = location.pathname === "/watch";
 
     // We want the + / - keys to apply only when no text fields is focused,
     // as well as when we're in a video page
@@ -19,7 +19,7 @@ document.addEventListener(
 
     rateIfNeeded(e);
   },
-  { capture: true } // Thanks to capturing, e.preventDefault() is able to prevent the CC-related increase/decrease
+  { capture: true } // Thanks to capturing, e.stopPropagation() is able to prevent the CC-related increase/decrease
 );
 
 function rateIfNeeded(e) {
