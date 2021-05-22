@@ -10,7 +10,7 @@ function getIsActive(button) {
 function getLikeButtons() {
   // noinspection CssInvalidHtmlTagReference
   const elButtons = document.querySelectorAll(
-    "#top-level-buttons > ytd-toggle-button-renderer.force-icon-button"
+    "#top-level-buttons-computed > ytd-toggle-button-renderer"
   );
   return [...elButtons].filter(
     elButton => elButton.offsetWidth > 0 && elButton.offsetHeight > 0
