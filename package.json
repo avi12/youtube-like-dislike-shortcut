@@ -1,6 +1,6 @@
 {
   "name": "youtube-like-dislike-shortcut",
-  "version": "1.0.8",
+  "version": "1.0.8.15",
   "description": "Like videos with Shift+Plus, dislike with Shift+Minus.",
   "repository": "avi12/youtube-like-dislike-shortcut",
   "author": {
@@ -33,7 +33,7 @@
     "rollup": "^2.36.2",
     "rollup-plugin-terser": "^7.0.2",
     "set-json-version": "^1.0.4",
-    "web-ext": "^6.0.0",
+    "web-ext": "^6.1.0",
     "zip-self": "^0.2.5"
   }
 }
