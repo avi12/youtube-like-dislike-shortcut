@@ -50,7 +50,9 @@ function rateIfNeeded(e) {
       e.stopPropagation();
       break;
 
-    case ")": // Shift + 0
+    case ")":
+    case "(":
+      // Shift + 0
       rateVideo(null);
       e.stopPropagation();
       break;
