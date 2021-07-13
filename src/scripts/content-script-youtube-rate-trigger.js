@@ -24,7 +24,7 @@ document.addEventListener(
 
 function rateIfNeeded(e) {
   const { code, key, shiftKey } = e;
-  const isHittingLikeOrDislike = key.match(/[+_)-]/);
+  const isHittingLikeOrDislike = key.match(/[+_()-]/);
   if (!isHittingLikeOrDislike) {
     return;
   }
