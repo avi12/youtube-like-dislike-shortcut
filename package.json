@@ -26,11 +26,11 @@
   },
   "devDependencies": {
     "adm-zip": "^0.5.9",
-    "rollup": "^2.56.3",
+    "rollup": "^2.60.2",
     "rollup-plugin-terser": "^7.0.2",
-    "set-json-version": "^1.0.6",
-    "web-ext": "^6.3.0",
-    "yargs": "^17.2.1",
-    "zip-self": "^0.4.0"
+    "set-json-version": "^1.0.7",
+    "web-ext": "^6.6.0",
+    "yargs": "^17.3.0",
+    "zip-self": "^0.4.3"
   }
 }
