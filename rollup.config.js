@@ -1,18 +1,17 @@
 import { terser } from "rollup-plugin-terser";
+import typescript from "@rollup/plugin-typescript";
 
 const isProduction = !process.env.ROLLUP_WATCH;
 
 function createConfig(filename) {
   return {
-    input: `src/scripts/${filename}.js`,
+    input: `src/scripts/${filename}.ts`,
     output: {
-      format: "iife",
+      format: "cjs",
       file: `dist/build/${filename}.js`
     },
-    plugins: [isProduction && terser()]
+    plugins: [typescript(), isProduction && terser()]
   };
 }
 
-export default [
-  createConfig("content-script-youtube-rate-trigger")
-];
+export default [createConfig("content-script-youtube-rate-trigger")];
