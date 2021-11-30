@@ -1,17 +1,18 @@
 {
-  "manifest_version": 2,
   "name": "YouTube Like-Dislike Shortcut",
   "short_name": "YT Like Btn",
-  "description": "Shift+Plus to like, Shift+Minus to dislike. Can't get any simpler.",
-  "version": "1.0.10",
+  "description": "Shift+Plus or Number Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
+  "version": "1.1.0",
+  "author": "avi12",
+  "developer": {
+    "name": "avi12",
+    "url": "https://avi12.com/youtube-like-dislike-shortcut"
+  },
+  "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": [
-        "https://www.youtube.com/*"
-      ],
-      "js": [
-        "build/content-script-youtube-rate-trigger.js"
-      ]
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["build/content-script-youtube-rate-trigger.js"]
     }
   ],
   "icons": {
@@ -25,11 +26,7 @@
     "96": "images/icon-96.png",
     "128": "images/icon-128.png"
   },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "youtube-like-dislike-shortcut@avi12.com"
-    }
-  },
+  "offline_enabled": true,
   "applications": {
     "gecko": {
       "id": "youtube-like-dislike-shortcut@avi12.com"
