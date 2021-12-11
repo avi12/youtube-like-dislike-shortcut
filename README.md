@@ -67,13 +67,13 @@ pnpm run-edge-windows
 pnpm build-pack
 ```
 
-## Build for Firefox (first run `pnpm build-pack`)
+### Build for Firefox (first run `pnpm build-pack`)
 
 ```shell
 pnpm build-for-firefox
 ```
 
-## Build for Opera (first run `pnpm build-pack`)
+### Build for Opera (first run `pnpm build-pack`)
 
 ```shell
 pnpm build-for-opera
