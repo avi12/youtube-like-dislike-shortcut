@@ -12,7 +12,8 @@ Additionally:
 - Shift+0 (on the number row) to remove your like/dislike
 - Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 
-<div style="margin-bottom: 40px;"><b>This extension does not reveal the videos' dislike counters.</b></div>
+**This extension does not reveal the videos' dislike counters.**
+<p>&nbsp;</p>
 
 Available for:
 
