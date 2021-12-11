@@ -12,6 +12,8 @@ Additionally:
 - Shift+0 (on the number row) to remove your like/dislike
 - Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 
+<div style="margin-bottom: 40px;"><b>This extension does not reveal the videos' dislike counters.</b></div>
+
 Available for:
 
 - [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?color=white&label=users&style=flat-square)
@@ -25,7 +27,7 @@ Made by [avi12](https://avi12.com).
 
 Install [Node.js](https://nodejs.org) and [PNPM](https://pnpm.js.org/en/installation).
 
-## Download dev dependencies:
+## Install dependencies
 
 ```shell script
 pnpm i
@@ -45,37 +47,37 @@ pnpm dev
 pnpm run-chromium
 ```
 
-### Firefox
+### Edge on Windows 10/11
 
-```shell script
-pnpm run-firefox
+```shell
+pnpm run-edge-windows
 ```
 
-### Other browsers
+### Browsers that don't support Manifest v3
 
-1. Open the extensions page in your browser.
-2. Enable the developer tools (top-right corner usually).
-3. Either drag-drop the `dist` folder onto the browser or click "Load unpacked extension" and choose it.
+1. Build the extension for Firefox/Opera (see below).
+2. Open the extensions page in that browser.
+3. Enable the developer tools (top-right corner usually).
+4. Either drag-drop the browser-compatible ZIP onto the browser or click "Load unpacked extension" and choose it.
 
 ## Build & pack
 
-```bash
+```shell
 pnpm build-pack
 ```
 
 ## Build for Firefox (first run `pnpm build-pack`)
 
-```bash
+```shell
 pnpm build-for-firefox
 ```
 
 ## Build for Opera (first run `pnpm build-pack`)
 
-```bash
+```shell
 pnpm build-for-opera
 ```
 
-## Contribution
+## Do you want to contribute?
 
-Feel free to contribute! Keep in mind that the license I chose is [GPL v3](/LICENSE).  
-If you want to fork, make sure to credit [avi12](https://avi12.com) and link to [this repository](https://github.com/avi12/youtube-like-dislike-shortcut).
+Feel free to! Make sure to comply with the license, [GPL v3](https://github.com/avi12/skillshare-player-control/blob/main/LICENSE).
