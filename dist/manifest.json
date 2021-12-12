@@ -2,7 +2,7 @@
   "name": "YouTube Like-Dislike Shortcut",
   "short_name": "YT Like Btn",
   "description": "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
-  "version": "1.0.11",
+  "version": "1.1.0",
   "manifest_version": 3,
   "author": "avi12",
   "developer": {
@@ -22,8 +22,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["build/content-script-youtube-rate-trigger.js"]
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "build/content-script-youtube-rate-trigger.js"
+      ]
     }
   ],
   "offline_enabled": true,

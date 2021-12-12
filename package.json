@@ -1,6 +1,6 @@
 {
   "name": "youtube-like-dislike-shortcut",
-  "version": "1.0.11",
+  "version": "1.1.0",
   "description": "Like videos with Shift+Plus or Numpad Plus, dislike with Shift+Minus or Numpad Minus.",
   "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
   "license": "GPL-3.0-or-later",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.0",
-    "@types/chrome": "^0.0.169",
+    "@types/chrome": "^0.0.170",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
     "adm-zip": "^0.5.9",

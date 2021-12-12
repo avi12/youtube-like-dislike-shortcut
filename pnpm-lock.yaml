@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@rollup/plugin-typescript': ^8.3.0
-  '@types/chrome': ^0.0.169
+  '@types/chrome': ^0.0.170
   '@typescript-eslint/eslint-plugin': ^5.5.0
   '@typescript-eslint/parser': ^5.5.0
   adm-zip: ^0.5.9
@@ -22,7 +22,7 @@ specifiers:
 
 devDependencies:
   '@rollup/plugin-typescript': 8.3.0_rollup@2.60.2+typescript@4.5.2
-  '@types/chrome': 0.0.169
+  '@types/chrome': 0.0.170
   '@typescript-eslint/eslint-plugin': 5.5.0_7dce1c1998d507f579fc8c88aa3ea163
   '@typescript-eslint/parser': 5.5.0_eslint@8.4.1+typescript@4.5.2
   adm-zip: 0.5.9
@@ -218,8 +218,8 @@ packages:
       defer-to-connect: 1.1.3
     dev: true
 
-  /@types/chrome/0.0.169:
-    resolution: {integrity: sha512-KbdSspfRAHKcBcbi2gIYLf9wPnoWkzu0k8Wy4J2dfmFxfwvwv+pEq35eeXc7rTxKJaF4CpI2QZAePIGIIsfQkg==}
+  /@types/chrome/0.0.170:
+    resolution: {integrity: sha512-X6IKLdc/fJyCKxGlCUauL3OKmnhzS29Q2NnlErAiLC3voxvSVG1ISG+l24Q3kFZXmnc543KzElIjDQRvQ/yEBQ==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.8
