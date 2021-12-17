@@ -37,7 +37,7 @@ function rateIfNeeded(e: KeyboardEvent) {
     return;
   }
 
-  const isDisliked = (key === "-" && !shiftKey) || (key === "_" && shiftKey);
+  const isDisliked = (code === "NumpadSubtract") || (key === "_" && shiftKey);
   if (isDisliked) {
     rateVideo(false);
 
