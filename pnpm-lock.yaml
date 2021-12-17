@@ -18,7 +18,7 @@ specifiers:
   web-ext: ^6.6.0
   webext-store-incompat-fixer: ^0.1.37
   yargs: ^17.3.0
-  zip-self: ^0.4.3
+  zip-self: ^0.4.5
 
 devDependencies:
   '@rollup/plugin-typescript': 8.3.0_rollup@2.60.2+typescript@4.5.2
@@ -38,7 +38,7 @@ devDependencies:
   web-ext: 6.6.0
   webext-store-incompat-fixer: 0.1.37
   yargs: 17.3.0
-  zip-self: 0.4.3
+  zip-self: 0.4.5
 
 packages:
 
@@ -4010,8 +4010,8 @@ packages:
       jszip: 3.7.1
     dev: true
 
-  /zip-self/0.4.3:
-    resolution: {integrity: sha512-n4QjeiG9uCIQmudQ7NOCwOwuLaD1oZPnVNRbfRwogmVdOSqfWzmMMLGHcphj1c4r1iOGhMyZKazjBJBYNJC27g==}
+  /zip-self/0.4.5:
+    resolution: {integrity: sha512-XbYKs/wbOuOvLUXsFt92iilEi8W4dLXyPOfNAm+drZFHrnT0B3qa433ELqZU0toYl8jM4cUqzTLWSp3GmA8gCA==}
     engines: {node: '>=8.0.0'}
     hasBin: true
     dependencies:
