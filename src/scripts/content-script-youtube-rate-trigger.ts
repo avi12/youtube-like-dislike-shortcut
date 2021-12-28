@@ -9,11 +9,8 @@ document.addEventListener(
       document.activeElement.matches("input") ||
       document.activeElement.getAttribute("contenteditable") === "true"; // A comment field
 
-    const isVideoPage = location.pathname === "/watch";
-
     // We want the + / - keys to apply only when no text fields is focused,
-    // and of course when we're on a video page
-    if (isFocusedOnInput || !isVideoPage) {
+    if (isFocusedOnInput) {
       return;
     }
 

@@ -6,7 +6,7 @@ function getIsActive(elButton: HTMLElement): boolean {
 
 function getLikeButtons(): HTMLButtonElement[] {
   const elButtons = document.querySelectorAll(
-    "#top-level-buttons-computed > ytd-toggle-button-renderer"
+    "#top-level-buttons-computed > ytd-toggle-button-renderer, ytd-like-button-renderer > ytd-toggle-button-renderer"
   );
   return [...elButtons].filter(
     (elButton: HTMLButtonElement) => elButton.offsetWidth > 0 && elButton.offsetHeight > 0
