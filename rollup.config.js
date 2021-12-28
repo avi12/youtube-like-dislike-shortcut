@@ -10,7 +10,10 @@ function createConfig(filename) {
       format: "cjs",
       file: `dist/build/${filename}.js`
     },
-    plugins: [typescript(), isProduction && terser()]
+    plugins: [typescript(), isProduction && terser()],
+    watch: {
+      clearScreen: true
+    }
   };
 }
 
