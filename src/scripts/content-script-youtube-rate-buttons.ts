@@ -4,13 +4,21 @@ function getIsActive(elButton: HTMLElement): boolean {
   return elButton.classList.contains("style-default-active");
 }
 
+function getIsInViewport(element: HTMLElement): boolean {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= document.documentElement.clientHeight &&
+    rect.right <= document.documentElement.clientWidth
+  );
+}
+
 function getLikeButtons(): HTMLButtonElement[] {
   const elButtons = document.querySelectorAll(
     "#top-level-buttons-computed > ytd-toggle-button-renderer, ytd-like-button-renderer > ytd-toggle-button-renderer"
   );
-  return [...elButtons].filter(
-    (elButton: HTMLButtonElement) => elButton.offsetWidth > 0 && elButton.offsetHeight > 0
-  ) as HTMLButtonElement[];
+  return [...elButtons].filter(getIsInViewport) as HTMLButtonElement[];
 }
 
 /**
