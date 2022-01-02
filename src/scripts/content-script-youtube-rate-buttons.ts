@@ -14,11 +14,17 @@ function getIsInViewport(element: HTMLElement): boolean {
   );
 }
 
+function getIsVisible(element: HTMLElement): boolean {
+  return element.offsetWidth > 0 && element.offsetHeight > 0;
+}
+
 function getLikeButtons(): HTMLButtonElement[] {
   const elButtons = document.querySelectorAll(
     "#top-level-buttons-computed > ytd-toggle-button-renderer, ytd-like-button-renderer > ytd-toggle-button-renderer"
   );
-  return [...elButtons].filter(getIsInViewport) as HTMLButtonElement[];
+  return [...elButtons].filter(
+    location.pathname.startsWith("/shorts/") ? getIsInViewport : getIsVisible
+  ) as HTMLButtonElement[];
 }
 
 /**
