@@ -16,7 +16,7 @@
     "pack-self": "zip-self -o dist_packed/youtube-like-dislike-shortcut-{version}-source.zip",
     "build-pack": "pnpm run build && pnpm run pack && pnpm run webext-incompat-fix && pnpm run pack-self",
     "build-for-firefox": "build-for-browser --i dist_packed/youtube-like-dislike-shortcut-{version}.zip --browser=firefox --source",
-    "build-for-opera": "build-for-browser --i dist_packed/youtube-like-dislike-shortcut-{version}.zip --browser=opera --source",
+    "build-for-opera": "build-for-browser --i dist_packed/youtube-like-dislike-shortcut-{version}.zip --browser=opera",
     "webext-incompat-fix": "webext-store-incompat-fixer -i dist_packed/youtube-like-dislike-shortcut-{version}.zip -s chrome,edge,firefox,opera",
     "set-version": "set-json-version -f package.json dist/manifest.json -v",
     "run-browser": "web-ext run --no-config-discovery --start-url https://www.youtube.com/watch?v=dQw4w9WgXcQ --source-dir dist --verbose --target",
