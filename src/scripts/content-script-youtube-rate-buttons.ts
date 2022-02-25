@@ -24,9 +24,11 @@ function getIsVisible(element: HTMLElement): boolean {
   return element.offsetWidth > 0 && element.offsetHeight > 0;
 }
 
-function getLikeButtons(): HTMLButtonElement[] {
+function getRateButtons(): HTMLButtonElement[] {
+  const selToggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer";
+  const selToggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer";
   const elButtons = document.querySelectorAll(
-    "#top-level-buttons-computed > ytd-toggle-button-renderer, ytd-like-button-renderer > ytd-toggle-button-renderer"
+    `${selToggleButtonsNormalVideo}, ${selToggleButtonsShortsVideo}`
   );
   return [...elButtons].filter(
     getIsShorts() ? getIsInViewport : getIsVisible
