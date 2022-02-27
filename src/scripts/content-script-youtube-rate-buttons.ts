@@ -3,7 +3,6 @@
 import { svgs } from "./icons";
 
 const gSelBezel = ".ytp-bezel";
-const gSelBezelIcon = ".ytp-bezel-icon";
 let gLastRating: "like" | "dislike";
 
 function getIsActive(elButton: HTMLElement): boolean {
@@ -43,9 +42,17 @@ function showIndicator(isRated = true): void {
   if (!getIsShorts()) {
     const elBezelContainer = getBezelContainer();
     const elBezel = elBezelContainer.querySelector<HTMLDivElement>(gSelBezel);
-    const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(gSelBezelIcon);
+    const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-icon");
+    const elBezelTextWrapperContainer = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-text-wrapper").parentElement;
+
     const iconName = isRated ? gLastRating : `un${gLastRating}`;
     elBezelIcon.innerHTML = svgs[iconName];
+
+    const classNameHider = "ytp-bezel-text-hide";
+    if (!elBezelTextWrapperContainer.classList.contains(classNameHider)) {
+      elBezelTextWrapperContainer.classList.add(classNameHider);
+    }
+
     elBezelContainer.style.display = "";
     elBezel.ariaLabel = "";
   }
