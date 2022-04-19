@@ -7,8 +7,7 @@
     DataTableCell,
     DataTableRow,
     Icon,
-    MaterialApp,
-    Tooltip
+    MaterialApp
   } from "svelte-materialify/dist";
   import { mdiClose, mdiHeart, mdiRestart } from "@mdi/js";
   import type { ButtonTrigger, ButtonTriggers, Modifier, RecordingType, SupportedActions } from "../../types";
@@ -77,7 +76,7 @@
         secondary:
           numpadAliases[
             `${this.#modifierKeys.map(key => modifierToKeyDisplay[key]).join(" + ")} + ${lastKey}`
-          ]
+            ]
       };
     }
   }
@@ -221,12 +220,10 @@
           <DataTableCell class="pt-4 pb-4 label">{actionNameMapper[type]}</DataTableCell>
           <DataTableCell class="pt-4 pb-4">
             <div class="mb-2">
-              <Button
-                outlined={theme === "dark"}
-                class={"text-none " + (recordingAction === type ? colorActiveButton : "")}
-                disabled={recordingAction !== null && recordingAction !== type}
-                on:click={() => toggleRecording(type)}
-              >
+              <Button outlined={theme === "dark"}
+                      class={"text-none " + (recordingAction === type ? colorActiveButton : "")}
+                      disabled={recordingAction !== null && recordingAction !== type}
+                      on:click={() => toggleRecording(type)}>
                 {#if recordingAction === type}
                   {recordingKeys || getJoinedModifiers(buttonTriggers[type])}
                 {:else}
@@ -248,24 +245,17 @@
               </div>
             {:else if numpadAliases[getJoinedModifiers(buttonTriggers[type])]}
               <div class="mt-3">
-                <Checkbox
-                  disabled={recordingAction !== null && recordingAction !== type}
-                  checked={buttonTriggers[type].secondary}
-                  on:change={e => setAlias(e, type)}
-                >
+                <Checkbox disabled={recordingAction !== null && recordingAction !== type}
+                          checked={buttonTriggers[type].secondary}
+                          on:change={e => setAlias(e, type)}>
                   Also use
                   {numpadAliases[getJoinedModifiers(buttonTriggers[type])]}
                 </Checkbox>
               </div>
             {/if}
             {#if recordingAction !== type}
-              <Button
-                outlined
-                disabled={getJoinedModifiers(buttonTriggers[type]) ===
-                  getJoinedModifiers(initial.buttonTriggers[type])}
-                on:click={() => reset(type)}
-                class="mt-3"
-              >
+              <Button outlined disabled={getJoinedModifiers(buttonTriggers[type]) ===
+                  getJoinedModifiers(initial.buttonTriggers[type])} on:click={() => reset(type)} class="mt-3">
                 <Icon class="mr-2" path={mdiRestart} />
                 Reset
               </Button>
@@ -276,10 +266,7 @@
       <DataTableRow>
         <DataTableCell />
         <DataTableCell class="pt-4 pb-4">
-          <Button
-            outlined={theme === "dark"}
-            on:click={() => chrome.tabs.create({ url: "https://paypal.me/avi12" })}
-          >
+          <Button outlined={theme === "dark"} on:click={() => chrome.tabs.create({ url: "https://paypal.me/avi12" })}>
             <Icon class="mr-2" path={mdiHeart} />
             Donate
           </Button>
@@ -290,58 +277,58 @@
 </MaterialApp>
 
 <style>
-  /* Chromium browsers */
-  :global(::-webkit-scrollbar) {
-    width: 0;
-  }
+    /* Chromium browsers */
+    :global(::-webkit-scrollbar) {
+        width: 0;
+    }
 
-  /* Firefox */
-  :global(html) {
-    /*noinspection CssUnknownProperty*/
-    scrollbar-width: none;
+    /* Firefox */
+    :global(html) {
+        /*noinspection CssUnknownProperty*/
+        scrollbar-width: none;
 
-    /* Necessary to not keep any whitespace in the bottom part of the popup */
-    height: unset !important;
-  }
+        /* Necessary to not keep any whitespace in the bottom part of the popup */
+        height: unset !important;
+    }
 
-  :global(body) {
-    overflow: hidden;
-    box-sizing: border-box;
-    margin: auto;
-    width: 400px;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 1rem;
-  }
+    :global(body) {
+        overflow: hidden;
+        box-sizing: border-box;
+        margin: auto;
+        width: 400px;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 1rem;
+    }
 
-  /* Correcting the line height */
+    /* Correcting the line height */
 
-  :global(.extension-popup > body) {
-    line-height: 1.2;
-  }
+    :global(.extension-popup > body) {
+        line-height: 1.2;
+    }
 
-  :global(.text-none.text-none .s-btn__content) {
-    text-transform: none;
-  }
+    :global(.text-none.text-none .s-btn__content) {
+        text-transform: none;
+    }
 
-  :global(.s-app) {
-    text-align: center;
-    padding: 16px 16px 4px;
-  }
+    :global(.s-app) {
+        text-align: center;
+        padding: 16px 16px 4px;
+    }
 
-  :global(.s-tbl) {
-    text-align: left;
-    display: flex !important;
-    border: none !important;
-  }
+    :global(.s-tbl) {
+        text-align: left;
+        display: flex !important;
+        border: none !important;
+    }
 
-  :global(.s-btn.text-none) {
-    white-space: normal;
-    display: block;
-    height: unset !important;
-    padding: 10px !important;
-  }
+    :global(.s-btn.text-none) {
+        white-space: normal;
+        display: block;
+        height: unset !important;
+        padding: 10px !important;
+    }
 
-  :global(.s-tbl-cell.label) {
-    vertical-align: top;
-  }
+    :global(.s-tbl-cell.label) {
+        vertical-align: top;
+    }
 </style>
