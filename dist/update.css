@@ -1,0 +1,12 @@
+body {
+  text-align: center;
+  font-size: 1rem;
+  padding-top: 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+    color: white;
+  }
+}
