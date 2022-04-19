@@ -301,7 +301,7 @@
     scrollbar-width: none;
 
     /* Necessary to not keep any whitespace in the bottom part of the popup */
-    height: unset;
+    height: unset !important;
   }
 
   :global(body) {
