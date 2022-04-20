@@ -8,7 +8,7 @@ let gLastTrigger: ButtonTriggers;
 
 async function init(): Promise<void> {
   try {
-    gLastTrigger = ((await getStorage("local", "buttonTrigger")) ?? initial.buttonTriggers) as ButtonTriggers;
+    gLastTrigger = ((await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers) as ButtonTriggers;
   } catch {
     gLastTrigger = initial.buttonTriggers;
   }
@@ -53,6 +53,7 @@ function getActionPressed(e: KeyboardEvent): SupportedActions | null {
 }
 
 function rateIfNeeded(e: KeyboardEvent): void {
+  console.log(e, getActionPressed(e));
   switch (getActionPressed(e)) {
     case "like":
       e.stopPropagation();
