@@ -53,7 +53,6 @@ function getActionPressed(e: KeyboardEvent): SupportedActions | null {
 }
 
 function rateIfNeeded(e: KeyboardEvent): void {
-  console.log(e, getActionPressed(e));
   switch (getActionPressed(e)) {
     case "like":
       e.stopPropagation();
