@@ -4,13 +4,13 @@ import { rateVideo } from "./content-script-youtube-rate-buttons";
 import { ButtonTrigger, ButtonTriggers, SupportedActions } from "../types";
 import { getStorage, initial } from "../utils-initials";
 
-let gLastTrigger: ButtonTriggers;
+let gLastTriggers: ButtonTriggers;
 
 async function init(): Promise<void> {
   try {
-    gLastTrigger = ((await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers) as ButtonTriggers;
+    gLastTriggers = ((await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers) as ButtonTriggers;
   } catch {
-    gLastTrigger = initial.buttonTriggers;
+    gLastTriggers = initial.buttonTriggers;
   }
 }
 
@@ -18,7 +18,7 @@ init();
 
 chrome.storage.onChanged.addListener(async changes => {
   if (changes.buttonTriggers) {
-    gLastTrigger = changes.buttonTriggers.newValue as ButtonTriggers;
+    gLastTriggers = changes.buttonTriggers.newValue as ButtonTriggers;
   }
 });
 
@@ -40,9 +40,9 @@ document.addEventListener(
 );
 
 function getActionPressed(e: KeyboardEvent): SupportedActions | null {
-  for (const actionTypeRaw in gLastTrigger) {
+  for (const actionTypeRaw in gLastTriggers) {
     const actionType = <SupportedActions>actionTypeRaw;
-    const action = <ButtonTrigger>gLastTrigger[actionType];
+    const action = <ButtonTrigger>gLastTriggers[actionType];
     const isPressedSecondary = e.code !== "" && action.secondary === e.code;
     const isPressedPrimary = action.primary === e.code && action.modifiers.every(modifier => e[modifier]);
     if (isPressedPrimary || isPressedSecondary) {
