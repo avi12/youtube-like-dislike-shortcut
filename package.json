@@ -31,7 +31,7 @@
     "@rollup/plugin-typescript": "^8.3.1",
     "@sveltejs/eslint-config": "github:sveltejs/eslint-config",
     "@tsconfig/svelte": "^3.0.0",
-    "@types/chrome": "^0.0.179",
+    "@types/chrome": "^0.0.181",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
     "build-for-browser": "github:avi12/build-for-browser",

@@ -7,7 +7,7 @@ specifiers:
   '@rollup/plugin-typescript': ^8.3.1
   '@sveltejs/eslint-config': github:sveltejs/eslint-config
   '@tsconfig/svelte': ^3.0.0
-  '@types/chrome': ^0.0.179
+  '@types/chrome': ^0.0.181
   '@typescript-eslint/eslint-plugin': ^5.12.1
   '@typescript-eslint/parser': ^5.12.1
   build-for-browser: github:avi12/build-for-browser
@@ -39,7 +39,7 @@ devDependencies:
   '@rollup/plugin-typescript': 8.3.1_rollup@2.68.0+typescript@4.5.5
   '@sveltejs/eslint-config': github.com/sveltejs/eslint-config/8a67624e4080bd7997606eb34981aa3346bc8de2_f2dbc05a166488ec0c4542f102a68f9c
   '@tsconfig/svelte': 3.0.0
-  '@types/chrome': 0.0.179
+  '@types/chrome': 0.0.181
   '@typescript-eslint/eslint-plugin': 5.12.1_27a0c788acac7d65514027b167e3b3f6
   '@typescript-eslint/parser': 5.12.1_eslint@8.10.0+typescript@4.5.5
   build-for-browser: github.com/avi12/build-for-browser/f7a591563ab9aeddc20052c0ddd6678d4b08e093
@@ -285,8 +285,8 @@ packages:
     resolution: {integrity: sha512-pYrtLtOwku/7r1i9AMONsJMVYAtk3hzOfiGNekhtq5tYBGA7unMve8RvUclKLMT3PrihvJqUmzsRGh0RP84hKg==}
     dev: true
 
-  /@types/chrome/0.0.179:
-    resolution: {integrity: sha512-60zloNApIf88RwiG3Q7E+4NBG+znchhWmcaEVAAhUZahQbft5LWBzij4sinsfpAwbTtuWdFfUSpZsFhXTEFPVw==}
+  /@types/chrome/0.0.181:
+    resolution: {integrity: sha512-34Ln9YVVC8a195ruqWeaty3pouFdCLr9L5kPcbRflQcxnbXQnHor9uETof8OhDf8JLDytSRDiuDsRXYQYQ+9FA==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.8
