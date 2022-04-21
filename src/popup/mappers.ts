@@ -4,7 +4,7 @@ export const modifierToKeyDisplay = {
   shiftKey: "Shift",
   ctrlKey: "Ctrl",
   altKey: "Alt",
-  metaKey: navigator.userAgent.includes("Windows") ? "Windows" : "Command"
+  metaKey: navigator.userAgent.match(/Windows/)?.[0] ?? "Command"
 } as const;
 
 export const modifierToKeyButton = {
@@ -26,6 +26,8 @@ export const numpadAliases = {
   "Shift + Period": "NumpadDecimal"
 } as const;
 
+const ctrlOrOption = navigator.userAgent.includes("Windows") ? "Ctrl" : "Alt";
+
 // The values are only for the code readers to understand what the buttons are doing
 export const buttonTriggersYouTube = {
   KeyK: "Play",
@@ -35,8 +37,8 @@ export const buttonTriggersYouTube = {
   "Shift + KeyN": "Next video",
   Comma: "Previous frame",
   Period: "Next frame",
-  "Ctrl + ArrowLeft": "Previous chapter",
-  "Ctrl + ArrowRight": "Next chapter",
+  [`${ctrlOrOption} + ArrowLeft`]: "Previous chapter",
+  [`${ctrlOrOption} + ArrowRight`]: "Next chapter",
   KeyF: "Fullscreen",
   KeyT: "Theater",
   KeyM: "Mute",
