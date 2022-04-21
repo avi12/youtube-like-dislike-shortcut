@@ -6,9 +6,9 @@
   },
   "rules": {
     "arrow-parens": ["warn", "as-needed"],
+    "prefer-const": "warn",
     "no-async-promise-executor": "off",
     "semi": "warn",
-    "prefer-const": "warn",
     "quotes": [
       "warn",
       "double",
@@ -24,17 +24,25 @@
       }
     ],
     "no-unused-vars": "warn",
-    "@typescript-eslint/no-unused-vars": "warn",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-var-requires": "off",
-    "comma-dangle": "warn"
+    "@typescript-eslint/no-unused-vars": ["warn"],
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "quote-props": ["warn", "as-needed"]
   },
+  "overrides": [
+    {
+      "files": ["*.svelte"],
+      "processor": "svelte3/svelte3"
+    }
+  ],
   "env": {
     "es6": true,
     "browser": true,
     "node": true,
     "webextensions": true
   },
-  "plugins": ["@typescript-eslint"],
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"]
+  "plugins": ["svelte3", "@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "settings": {
+    "svelte3/typescript": true
+  }
 }

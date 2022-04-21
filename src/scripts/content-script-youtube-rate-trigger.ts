@@ -1,6 +1,26 @@
 "use strict";
 
 import { rateVideo } from "./content-script-youtube-rate-buttons";
+import { ButtonTrigger, ButtonTriggers, SupportedActions } from "../types";
+import { getStorage, initial } from "../utils-initials";
+
+let gLastTriggers: ButtonTriggers;
+
+async function init(): Promise<void> {
+  try {
+    gLastTriggers = ((await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers) as ButtonTriggers;
+  } catch {
+    gLastTriggers = initial.buttonTriggers;
+  }
+}
+
+init();
+
+chrome.storage.onChanged.addListener(async changes => {
+  if (changes.buttonTriggers) {
+    gLastTriggers = changes.buttonTriggers.newValue as ButtonTriggers;
+  }
+});
 
 document.addEventListener(
   "keydown",
@@ -9,43 +29,44 @@ document.addEventListener(
       document.activeElement.matches("input") ||
       document.activeElement.getAttribute("contenteditable") === "true"; // A comment field
 
-    // We want the + / - keys to apply only when no text fields is focused,
+    // We want the shortcut keys to apply only when no text field is focused
     if (isFocusedOnInput) {
       return;
     }
 
     rateIfNeeded(e);
   },
-  { capture: true } // Thanks to capturing, e.stopPropagation() is able to prevent the CC-related increase/decrease
+  { capture: true }
 );
 
-function rateIfNeeded(e: KeyboardEvent) {
-  const { code, key, shiftKey } = e;
-  const isHittingLikeOrDislike = key.match(/[+_-]/) || code === "Digit0";
-  if (!isHittingLikeOrDislike) {
-    return;
+function getActionPressed(e: KeyboardEvent): SupportedActions | null {
+  for (const actionTypeRaw in gLastTriggers) {
+    const actionType = <SupportedActions>actionTypeRaw;
+    const action = <ButtonTrigger>gLastTriggers[actionType];
+    const isPressedSecondary = e.code !== "" && action.secondary === e.code;
+    const isPressedPrimary = action.primary === e.code && action.modifiers.every(modifier => e[modifier]);
+    if (isPressedPrimary || isPressedSecondary) {
+      return actionType;
+    }
   }
+  return null;
+}
 
-  const isLiked = key === "+";
-  if (isLiked) {
-    rateVideo(true);
-    // We want to stop the event propagation, which will stop the default behavior - increase the CC size, in this case
-    e.stopPropagation();
-    return;
-  }
+function rateIfNeeded(e: KeyboardEvent): void {
+  switch (getActionPressed(e)) {
+    case "like":
+      e.stopPropagation();
+      rateVideo(true);
+      break;
 
-  const isDisliked = code === "NumpadSubtract" || (key === "_" && shiftKey);
-  if (isDisliked) {
-    rateVideo(false);
+    case "dislike":
+      e.stopPropagation();
+      rateVideo(false);
+      break;
 
-    // We want to stop the event propagation, which will stop the default behavior - decrease the CC size, in this case
-    e.stopPropagation();
-    return;
-  }
-
-  const isUnrated = code === "Digit0" && shiftKey;
-  if (isUnrated) {
-    rateVideo(null);
-    e.stopPropagation();
+    case "unrate":
+      e.stopPropagation();
+      rateVideo(null);
+      break;
   }
 }
