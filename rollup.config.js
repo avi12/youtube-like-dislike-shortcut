@@ -37,22 +37,7 @@ function createConfig(filename, useSvelte = false) {
   };
 }
 
-function createBackgroundConfig() {
-  return {
-    input: "src/scripts/background.ts",
-    output: {
-      format: "cjs",
-      file: "dist/build/scripts/background.js"
-    },
-    plugins: [typescript(), isProduction && terser()],
-    watch: {
-      clearScreen: true
-    }
-  };
-}
-
 export default [
   createConfig("scripts/content-script-youtube-rate-trigger"),
-  createConfig("popup/popup", true),
-  createBackgroundConfig()
+  createConfig("popup/popup", true)
 ];
