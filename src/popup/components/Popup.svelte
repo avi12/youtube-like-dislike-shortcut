@@ -64,6 +64,12 @@
     border: none !important;
   }
 
+  /*noinspection CssUnusedSymbol*/
+  :global(.s-tbl-row:last-child) {
+      /*noinspection CssUnresolvedCustomProperty*/
+      border-bottom: 1px solid var(--theme-dividers);
+  }
+
   /* Making sure the table spans the whole width */
 
   :global(table) {
