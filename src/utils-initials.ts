@@ -1,9 +1,17 @@
-import { ButtonTriggers } from "./types";
+import type { ButtonTriggers } from "./types";
 
 export async function getStorage(storageArea: "local" | "sync", key: string): Promise<unknown> {
-  return new Promise(resolve =>
-    chrome.storage[storageArea].get(key, result => resolve(result[key]))
-  );
+  return new Promise(resolve => chrome.storage[storageArea].get(key, result => resolve(result[key])));
+}
+
+export enum Selectors {
+  video = "video",
+  adSkipIn = ".ytp-ad-preview-text",
+  adSkipNow = ".ytp-ad-skip-button-text",
+  live = ".ytp-live-badge",
+  percentageWatched = ".ytr-percentage",
+  toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
+  toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer"
 }
 
 export const initial = {
@@ -23,5 +31,16 @@ export const initial = {
       modifiers: ["shiftKey"],
       secondary: ""
     }
-  } as ButtonTriggers
-} as const;
+  } as ButtonTriggers,
+  isAutoLike: false,
+  autoLikeThreshold: 0.7
+};
+
+function isElementVisible(element: HTMLElement): boolean {
+  return element?.offsetWidth > 0 && element?.offsetHeight > 0;
+}
+
+export function getVisibleElement<T extends HTMLElement>(selector: string): T {
+  const elements = [...document.querySelectorAll(selector)] as T[];
+  return [...elements].find(isElementVisible);
+}
