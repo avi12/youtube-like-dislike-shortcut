@@ -3,10 +3,9 @@
 import { svgs } from "./icons";
 import { Selectors } from "../utils-initials";
 
-const gSelBezel = ".ytp-bezel";
 let gLastRating: "like" | "dislike";
 
-function getIsActive(elButton: HTMLElement): boolean {
+export function getIsActive(elButton: HTMLElement): boolean {
   return elButton.classList.contains("style-default-active");
 }
 
@@ -24,7 +23,7 @@ function getIsVisible(element: HTMLElement): boolean {
   return element.offsetWidth > 0 && element.offsetHeight > 0;
 }
 
-function getRateButtons(): HTMLButtonElement[] {
+export function getRateButtons(): HTMLButtonElement[] {
   const { toggleButtonsNormalVideo, toggleButtonsShortsVideo, percentageWatched } = Selectors;
   const elButtons = document.querySelectorAll(
     `${toggleButtonsNormalVideo}:not(${percentageWatched}),
@@ -43,7 +42,7 @@ function showIndicator(isRated: boolean): void {
   }
 
   const elBezelContainer = getBezelContainer();
-  const elBezel = elBezelContainer.querySelector<HTMLDivElement>(gSelBezel);
+  const elBezel = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezel);
   const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-icon");
   const { parentElement: elBezelTextWrapperContainer } =
     elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-text-wrapper");
@@ -60,7 +59,7 @@ function showIndicator(isRated: boolean): void {
 }
 
 function getBezelContainer(): HTMLDivElement {
-  return document.querySelector(gSelBezel).parentElement as HTMLDivElement;
+  return document.querySelector(Selectors.bezel).parentElement as HTMLDivElement;
 }
 
 function clearAnimationOnEnd(): void {

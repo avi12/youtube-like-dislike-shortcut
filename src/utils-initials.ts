@@ -11,7 +11,8 @@ export enum Selectors {
   live = ".ytp-live-badge",
   percentageWatched = ".ytr-percentage",
   toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
-  toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer"
+  toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer",
+  bezel = ".ytp-bezel",
 }
 
 export const initial = {
@@ -33,14 +34,14 @@ export const initial = {
     }
   } as ButtonTriggers,
   isAutoLike: false,
-  autoLikeThreshold: 0.7
+  autoLikeThreshold: 70
 };
 
-function isElementVisible(element: HTMLElement): boolean {
+export function getIsElementVisible(element: HTMLElement): boolean {
   return element?.offsetWidth > 0 && element?.offsetHeight > 0;
 }
 
 export function getVisibleElement<T extends HTMLElement>(selector: string): T {
   const elements = [...document.querySelectorAll(selector)] as T[];
-  return [...elements].find(isElementVisible);
+  return [...elements].find(getIsElementVisible);
 }
