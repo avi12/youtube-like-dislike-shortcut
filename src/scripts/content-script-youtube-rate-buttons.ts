@@ -1,6 +1,7 @@
 "use strict";
 
 import { svgs } from "./icons";
+import { Selectors } from "../utils-initials";
 
 const gSelBezel = ".ytp-bezel";
 let gLastRating: "like" | "dislike";
@@ -24,45 +25,45 @@ function getIsVisible(element: HTMLElement): boolean {
 }
 
 function getRateButtons(): HTMLButtonElement[] {
-  const selToggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer";
-  const selToggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer";
+  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo, percentageWatched } = Selectors;
   const elButtons = document.querySelectorAll(
-    `${selToggleButtonsNormalVideo}, ${selToggleButtonsShortsVideo}`
+    `${toggleButtonsNormalVideo}:not(${percentageWatched}),
+    ${toggleButtonsShortsVideo}:not(${percentageWatched})`
   );
-  return [...elButtons].filter(
-    getIsShorts() ? getIsInViewport : getIsVisible
-  ) as HTMLButtonElement[];
+  return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
 }
 
-function getIsShorts() {
+function getIsShorts(): boolean {
   return location.pathname.startsWith("/shorts/");
 }
 
-function showIndicator(isRated = true): void {
-  if (!getIsShorts()) {
-    const elBezelContainer = getBezelContainer();
-    const elBezel = elBezelContainer.querySelector<HTMLDivElement>(gSelBezel);
-    const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-icon");
-    const elBezelTextWrapperContainer = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-text-wrapper").parentElement;
-
-    const iconName = isRated ? gLastRating : `un${gLastRating}`;
-    elBezelIcon.innerHTML = svgs[iconName];
-
-    const classNameHider = "ytp-bezel-text-hide";
-    if (!elBezelTextWrapperContainer.classList.contains(classNameHider)) {
-      elBezelTextWrapperContainer.classList.add(classNameHider);
-    }
-
-    elBezelContainer.style.display = "";
-    elBezel.ariaLabel = "";
+function showIndicator(isRated: boolean): void {
+  if (getIsShorts()) {
+    return;
   }
+
+  const elBezelContainer = getBezelContainer();
+  const elBezel = elBezelContainer.querySelector<HTMLDivElement>(gSelBezel);
+  const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-icon");
+  const { parentElement: elBezelTextWrapperContainer } =
+    elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-text-wrapper");
+  const iconName = isRated ? gLastRating : `un${gLastRating}`;
+  elBezelIcon.innerHTML = svgs[iconName];
+
+  const classNameHider = "ytp-bezel-text-hide";
+  if (!elBezelTextWrapperContainer.classList.contains(classNameHider)) {
+    elBezelTextWrapperContainer.classList.add(classNameHider);
+  }
+
+  elBezelContainer.style.display = "";
+  elBezel.ariaLabel = "";
 }
 
 function getBezelContainer(): HTMLDivElement {
   return document.querySelector(gSelBezel).parentElement as HTMLDivElement;
 }
 
-function clearAnimationOnEnd() {
+function clearAnimationOnEnd(): void {
   const elBezelContainer = getBezelContainer();
   elBezelContainer.addEventListener(
     "animationend",
@@ -73,6 +74,10 @@ function clearAnimationOnEnd() {
   );
 }
 
+export function getActiveButton(): HTMLButtonElement {
+  return document.querySelector(".style-default-active");
+}
+
 /**
  * Rates/un-rates a video on YouTube.com
  */
@@ -80,9 +85,10 @@ export function rateVideo(isLike: boolean | null): void {
   const [elLike, elDislike] = getRateButtons();
   clearAnimationOnEnd();
 
+  window.ytrUserInteracted = true;
   if (isLike) {
     gLastRating = "like";
-    showIndicator();
+    showIndicator(true);
 
     if (!getIsActive(elLike)) {
       elLike.click();
@@ -90,7 +96,7 @@ export function rateVideo(isLike: boolean | null): void {
     }
   } else if (isLike === false) {
     gLastRating = "dislike";
-    showIndicator();
+    showIndicator(true);
 
     if (!getIsActive(elDislike)) {
       elDislike.click();
@@ -99,7 +105,7 @@ export function rateVideo(isLike: boolean | null): void {
   } else {
     // isLike === null
     // Un-rate a video
-    const elBtnActive = document.querySelector(".style-default-active") as HTMLElement;
+    const elBtnActive = getActiveButton();
 
     if (!gLastRating) {
       gLastRating = elBtnActive === elDislike ? "dislike" : "like";
