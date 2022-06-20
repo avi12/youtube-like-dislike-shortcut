@@ -24,7 +24,7 @@
     {
       "matches": ["https://www.youtube.com/*"],
       "js": ["build/scripts/content-script-youtube-rate-trigger.js"],
-      "css": ["build/styles/content-script-youtube-rate-style.min.css"]
+      "css": ["build/styles/styles-youtube-rate.min.css"]
     }
   ],
   "permissions": ["storage"],
