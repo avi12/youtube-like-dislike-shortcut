@@ -29,7 +29,7 @@ export function getRateButtons(): HTMLButtonElement[] {
   return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
 }
 
-function getIsShorts(): boolean {
+export function getIsShorts(): boolean {
   return location.pathname.startsWith("/shorts/");
 }
 

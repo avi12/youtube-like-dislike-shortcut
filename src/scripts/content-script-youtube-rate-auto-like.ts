@@ -1,4 +1,4 @@
-import { getActiveButton, getRateButtons, rateVideo } from "./content-script-youtube-rate-buttons";
+import { getActiveButton, getIsShorts, getRateButtons, rateVideo } from "./content-script-youtube-rate-buttons";
 import { getIsElementVisible, getVisibleElement, Selectors } from "../utils-initials";
 
 const observerOptions: MutationObserverInit = { childList: true, subtree: true };
@@ -67,10 +67,12 @@ function autoLikeWhenNeeded(e: Event): void {
   // Counting the watch time regardless if the user has enabled the option or not,
   // so that if the user decides to enable during the video, the video will be auto-liked if passed the threshold
   window.ytrPercentageWatched = (gTimeCounter / elVideo.duration) * 100 || 0;
-  setPercentageWatched({
-    percentage: window.ytrPercentageWatched,
-    isVisible: window.ytrAutoLikeEnabled
-  });
+  if (!getIsShorts()) {
+    setPercentageWatched({
+      percentage: window.ytrPercentageWatched,
+      isVisible: window.ytrAutoLikeEnabled
+    });
+  }
 
   if (!window.ytrAutoLikeEnabled) {
     return;
