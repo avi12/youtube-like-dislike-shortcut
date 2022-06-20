@@ -1,0 +1,13 @@
+.ytr-percentage {
+  align-self: center;
+  padding-right: var(--yt-button-icon-padding, 8px);
+  margin-bottom: 3px;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+html[dark="true"] .ytr-percentage {
+  color: var(--yt-spec-text-primary, white);
+}
