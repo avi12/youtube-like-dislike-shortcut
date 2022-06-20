@@ -1,7 +1,7 @@
 <script type="ts">
   import { Checkbox } from "svelte-materialify";
   import { buttonTriggers, recordingAction } from "../stores";
-  import { ButtonTrigger, SupportedActions } from "../../types";
+  import type { ButtonTrigger, SupportedActions } from "../../types";
   import { numpadAliases } from "../mappers";
   import { getJoinedModifiers } from "../utils";
 
