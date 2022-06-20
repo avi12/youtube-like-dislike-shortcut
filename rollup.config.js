@@ -5,6 +5,7 @@ import { terser } from "rollup-plugin-terser";
 import css from "rollup-plugin-css-only";
 import typescript from "@rollup/plugin-typescript";
 import sveltePreprocess from "svelte-preprocess";
+import scss from "rollup-plugin-scss";
 
 const isProduction = !process.env.ROLLUP_WATCH;
 
@@ -31,13 +32,29 @@ function createConfig(filename, useSvelte = false) {
       commonjs(),
       isProduction && terser()
     ],
-    watch: {
-      clearScreen: true
-    }
+    watch: { clearScreen: true }
+  };
+}
+
+function createConfigCss(filename) {
+  const destForRollup = `dist/build/styles/${filename}.css`;
+  return {
+    input: `src/styles/${filename}.scss`,
+    output: {
+      file: destForRollup
+    },
+    plugins: [
+      scss({
+        output: `dist/build/styles/${filename}.min.css`,
+        outputStyle: "compressed"
+      })
+    ],
+    watch: { clearScreen: true }
   };
 }
 
 export default [
   createConfig("scripts/content-script-youtube-rate-trigger"),
-  createConfig("popup/popup", true)
+  createConfig("popup/popup", true),
+  createConfigCss("styles-youtube-rate")
 ];
