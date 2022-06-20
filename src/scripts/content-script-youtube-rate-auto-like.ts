@@ -10,8 +10,7 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
   stopTracking(elVideo);
 
   const elLiveBadge = document.querySelector<HTMLDivElement>(Selectors.live);
-  const rateButtons = getRateButtons();
-  const [, elDislike] = rateButtons;
+  const [, elDislike] = getRateButtons();
   if (!elVideo || !elDislike || !elLiveBadge) {
     return;
   }
