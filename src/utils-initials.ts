@@ -12,7 +12,12 @@ export enum Selectors {
   percentageWatched = ".ytr-percentage",
   toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
   toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer",
+  activeButton = ".style-default-active",
+  // Bezel classes
   bezel = ".ytp-bezel",
+  bezelIcon = ".ytp-bezel-icon",
+  bezelTextWrapper = ".ytp-bezel-text-wrapper",
+  bezelTextHide = ".ytp-bezel-text-hide"
 }
 
 export const initial = {

@@ -6,7 +6,7 @@ import { Selectors } from "../utils-initials";
 let gLastRating: "like" | "dislike";
 
 export function getIsActive(elButton: HTMLElement): boolean {
-  return elButton.classList.contains("style-default-active");
+  return elButton.classList.contains(Selectors.activeButton.substring(1));
 }
 
 function getIsInViewport(element: HTMLElement): boolean {
@@ -24,11 +24,8 @@ function getIsVisible(element: HTMLElement): boolean {
 }
 
 export function getRateButtons(): HTMLButtonElement[] {
-  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo, percentageWatched } = Selectors;
-  const elButtons = document.querySelectorAll(
-    `${toggleButtonsNormalVideo}:not(${percentageWatched}),
-    ${toggleButtonsShortsVideo}:not(${percentageWatched})`
-  );
+  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = Selectors;
+  const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
   return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
 }
 
@@ -43,16 +40,14 @@ function showIndicator(isRated: boolean): void {
 
   const elBezelContainer = getBezelContainer();
   const elBezel = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezel);
-  const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-icon");
-  const { parentElement: elBezelTextWrapperContainer } =
-    elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-text-wrapper");
+  const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezelIcon);
+  const { parentElement: elBezelTextWrapperContainer } = elBezelContainer.querySelector<HTMLDivElement>(
+    Selectors.bezelTextWrapper
+  );
   const iconName = isRated ? gLastRating : `un${gLastRating}`;
   elBezelIcon.innerHTML = svgs[iconName];
 
-  const classNameHider = "ytp-bezel-text-hide";
-  if (!elBezelTextWrapperContainer.classList.contains(classNameHider)) {
-    elBezelTextWrapperContainer.classList.add(classNameHider);
-  }
+  elBezelTextWrapperContainer.className = Selectors.bezelTextHide.substring(1);
 
   elBezelContainer.style.display = "";
   elBezel.ariaLabel = "";
@@ -74,7 +69,7 @@ function clearAnimationOnEnd(): void {
 }
 
 export function getActiveButton(): HTMLButtonElement {
-  return document.querySelector(".style-default-active");
+  return document.querySelector(Selectors.activeButton);
 }
 
 /**

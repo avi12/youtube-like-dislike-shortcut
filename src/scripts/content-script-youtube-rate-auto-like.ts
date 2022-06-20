@@ -7,9 +7,12 @@ let gUrlLast = location.href;
 
 const gPlayerObserver = new MutationObserver((_, observer) => {
   const elVideo = getVisibleElement<HTMLVideoElement>(Selectors.video);
+  stopTracking(elVideo);
+
   const elLiveBadge = document.querySelector<HTMLDivElement>(Selectors.live);
-  const [elLike] = getRateButtons();
-  if (!elVideo || !elLike || !elLiveBadge) {
+  const rateButtons = getRateButtons();
+  const [, elDislike] = rateButtons;
+  if (!elVideo || !elDislike || !elLiveBadge) {
     return;
   }
 
@@ -22,7 +25,6 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
   }
 
   gTimeCurrentLast = elVideo.currentTime;
-  stopTracking(elVideo);
   startTracking(elVideo);
 });
 
@@ -60,12 +62,12 @@ function autoLikeWhenNeeded(e: Event): void {
   if (tempDelta > 0 && tempDelta < 1) {
     gTimeDelta = tempDelta;
   }
-  gTimeCounter += isNaN(gTimeDelta) ? 0 : gTimeDelta;
+  gTimeCounter += gTimeDelta || 0;
   gTimeCurrentLast = elVideo.currentTime;
 
   // Counting the watch time regardless if the user has enabled the option or not,
   // so that if the user decides to enable during the video, the video will be auto-liked if passed the threshold
-  window.ytrPercentageWatched = (gTimeCounter / elVideo.duration) * 100;
+  window.ytrPercentageWatched = (gTimeCounter / elVideo.duration) * 100 || 0;
   setPercentageWatched({
     percentage: window.ytrPercentageWatched,
     isVisible: window.ytrAutoLikeEnabled
@@ -88,18 +90,25 @@ export function setPercentageWatched({
   percentage: number;
   isVisible: boolean;
 }): void {
-  const { percentageWatched, toggleButtonsNormalVideo } = Selectors;
-  const container = getVisibleElement(`${toggleButtonsNormalVideo}:not(${percentageWatched})`);
-  const { parentElement: elContainer } = container;
+  const [{ parentElement: elContainer }] = getRateButtons();
   if (!elContainer) {
     return;
   }
 
-  const elIndicatorFound = elContainer.querySelector(percentageWatched);
-  const elIndicator = elIndicatorFound || document.createElement("ytd-toggle-button-renderer");
+  const createPercentageWatchedIndicator = (): HTMLElement => {
+    const elPercentageWatched = document.createElement("div");
+    elPercentageWatched.className = Selectors.percentageWatched.substring(1);
+    elPercentageWatched.textContent = "0%";
+    return elPercentageWatched;
+  };
 
-  const classNames = [percentageWatched.substring(1), !isVisible ? "hidden" : ""];
-  elIndicator.className = classNames.join(" ");
+  const elIndicatorFound = elContainer.querySelector(Selectors.percentageWatched);
+  const elIndicator = elIndicatorFound || createPercentageWatchedIndicator();
+  if (!isVisible) {
+    elIndicator.classList.add("hidden");
+  } else {
+    elIndicator.classList.remove("hidden");
+  }
   elIndicator.textContent = `${percentage.toFixed(2)}%`;
 
   if (!elIndicatorFound) {
