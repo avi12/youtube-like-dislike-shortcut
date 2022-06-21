@@ -19,7 +19,7 @@
   }
 </script>
 
-<section class="pl-3 pr-5">
+<section class="pl-3 pr-5" class:is-auto-like={isAutoLike}>
   <Switch class="pt-5 mb-6" on:change={e => (isAutoLike = e.target.checked)} checked={isAutoLike}>
     Auto-like videos
   </Switch>

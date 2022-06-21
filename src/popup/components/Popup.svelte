@@ -54,7 +54,12 @@
   /*noinspection CssUnusedSymbol*/
   :global(.s-app) {
     text-align: center;
-    padding: 16px 16px 0;
+    padding: 16px;
+  }
+
+  /*noinspection CssUnusedSymbol*/
+  :global(.s-app .is-auto-like) {
+    padding-bottom: 0;
   }
 
   /*noinspection CssUnusedSymbol*/
@@ -66,8 +71,8 @@
 
   /*noinspection CssUnusedSymbol*/
   :global(.s-tbl-row:last-child) {
-      /*noinspection CssUnresolvedCustomProperty*/
-      border-bottom: 1px solid var(--theme-dividers);
+    /*noinspection CssUnresolvedCustomProperty*/
+    border-bottom: 1px solid var(--theme-dividers);
   }
 
   /* Making sure the table spans the whole width */
