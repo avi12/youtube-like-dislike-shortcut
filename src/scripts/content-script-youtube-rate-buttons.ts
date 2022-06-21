@@ -1,12 +1,12 @@
 "use strict";
 
 import { svgs } from "./icons";
+import { Selectors } from "../utils-initials";
 
-const gSelBezel = ".ytp-bezel";
 let gLastRating: "like" | "dislike";
 
-function getIsActive(elButton: HTMLElement): boolean {
-  return elButton.classList.contains("style-default-active");
+export function getIsActive(elButton: HTMLElement): boolean {
+  return elButton.classList.contains(Selectors.activeButton.substring(1));
 }
 
 function getIsInViewport(element: HTMLElement): boolean {
@@ -23,46 +23,41 @@ function getIsVisible(element: HTMLElement): boolean {
   return element.offsetWidth > 0 && element.offsetHeight > 0;
 }
 
-function getRateButtons(): HTMLButtonElement[] {
-  const selToggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer";
-  const selToggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer";
-  const elButtons = document.querySelectorAll(
-    `${selToggleButtonsNormalVideo}, ${selToggleButtonsShortsVideo}`
-  );
-  return [...elButtons].filter(
-    getIsShorts() ? getIsInViewport : getIsVisible
-  ) as HTMLButtonElement[];
+export function getRateButtons(): HTMLButtonElement[] {
+  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = Selectors;
+  const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
+  return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
 }
 
-function getIsShorts() {
+export function getIsShorts(): boolean {
   return location.pathname.startsWith("/shorts/");
 }
 
-function showIndicator(isRated = true): void {
-  if (!getIsShorts()) {
-    const elBezelContainer = getBezelContainer();
-    const elBezel = elBezelContainer.querySelector<HTMLDivElement>(gSelBezel);
-    const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-icon");
-    const elBezelTextWrapperContainer = elBezelContainer.querySelector<HTMLDivElement>(".ytp-bezel-text-wrapper").parentElement;
-
-    const iconName = isRated ? gLastRating : `un${gLastRating}`;
-    elBezelIcon.innerHTML = svgs[iconName];
-
-    const classNameHider = "ytp-bezel-text-hide";
-    if (!elBezelTextWrapperContainer.classList.contains(classNameHider)) {
-      elBezelTextWrapperContainer.classList.add(classNameHider);
-    }
-
-    elBezelContainer.style.display = "";
-    elBezel.ariaLabel = "";
+function showIndicator(isRated: boolean): void {
+  if (getIsShorts()) {
+    return;
   }
+
+  const elBezelContainer = getBezelContainer();
+  const elBezel = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezel);
+  const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezelIcon);
+  const { parentElement: elBezelTextWrapperContainer } = elBezelContainer.querySelector<HTMLDivElement>(
+    Selectors.bezelTextWrapper
+  );
+  const iconName = isRated ? gLastRating : `un${gLastRating}`;
+  elBezelIcon.innerHTML = svgs[iconName];
+
+  elBezelTextWrapperContainer.className = Selectors.bezelTextHide.substring(1);
+
+  elBezelContainer.style.display = "";
+  elBezel.ariaLabel = "";
 }
 
 function getBezelContainer(): HTMLDivElement {
-  return document.querySelector(gSelBezel).parentElement as HTMLDivElement;
+  return document.querySelector(Selectors.bezel).parentElement as HTMLDivElement;
 }
 
-function clearAnimationOnEnd() {
+function clearAnimationOnEnd(): void {
   const elBezelContainer = getBezelContainer();
   elBezelContainer.addEventListener(
     "animationend",
@@ -73,6 +68,10 @@ function clearAnimationOnEnd() {
   );
 }
 
+export function getActiveButton(): HTMLButtonElement {
+  return document.querySelector(Selectors.activeButton);
+}
+
 /**
  * Rates/un-rates a video on YouTube.com
  */
@@ -80,9 +79,10 @@ export function rateVideo(isLike: boolean | null): void {
   const [elLike, elDislike] = getRateButtons();
   clearAnimationOnEnd();
 
+  window.ytrUserInteracted = true;
   if (isLike) {
     gLastRating = "like";
-    showIndicator();
+    showIndicator(true);
 
     if (!getIsActive(elLike)) {
       elLike.click();
@@ -90,7 +90,7 @@ export function rateVideo(isLike: boolean | null): void {
     }
   } else if (isLike === false) {
     gLastRating = "dislike";
-    showIndicator();
+    showIndicator(true);
 
     if (!getIsActive(elDislike)) {
       elDislike.click();
@@ -99,7 +99,7 @@ export function rateVideo(isLike: boolean | null): void {
   } else {
     // isLike === null
     // Un-rate a video
-    const elBtnActive = document.querySelector(".style-default-active") as HTMLElement;
+    const elBtnActive = getActiveButton();
 
     if (!gLastRating) {
       gLastRating = elBtnActive === elDislike ? "dislike" : "like";

@@ -1,24 +1,69 @@
 "use strict";
 
 import { rateVideo } from "./content-script-youtube-rate-buttons";
-import { ButtonTrigger, ButtonTriggers, SupportedActions } from "../types";
+import type { ButtonTrigger, ButtonTriggers, SupportedActions } from "../types";
 import { getStorage, initial } from "../utils-initials";
+import {
+  getIsPassedThreshold,
+  prepareToAutoLike,
+  setPercentageWatched
+} from "./content-script-youtube-rate-auto-like";
+
+declare global {
+  interface Window {
+    ytrUserInteracted: boolean;
+    ytrAutoLikeEnabled: boolean;
+    ytrAutoLikeThreshold: number;
+    ytrPercentageWatched: number;
+  }
+}
 
 let gLastTriggers: ButtonTriggers;
 
 async function init(): Promise<void> {
   try {
-    gLastTriggers = ((await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers) as ButtonTriggers;
+    gLastTriggers = ((await getStorage("local", "buttonTriggers")) ??
+      initial.buttonTriggers) as ButtonTriggers;
+
+    const { isAutoLike = initial.isAutoLike, autoLikeThreshold = initial.autoLikeThreshold } =
+      await new Promise(resolve => chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve));
+    window.ytrAutoLikeEnabled = isAutoLike;
+    window.ytrAutoLikeThreshold = autoLikeThreshold;
   } catch {
     gLastTriggers = initial.buttonTriggers;
+    window.ytrAutoLikeEnabled = initial.isAutoLike;
+    window.ytrAutoLikeThreshold = initial.autoLikeThreshold;
   }
+
+  prepareToAutoLike();
 }
 
 init();
 
 chrome.storage.onChanged.addListener(async changes => {
-  if (changes.buttonTriggers) {
-    gLastTriggers = changes.buttonTriggers.newValue as ButtonTriggers;
+  if ("buttonTriggers" in changes) {
+    gLastTriggers = changes.buttonTriggers.newValue;
+    return;
+  }
+
+  if ("isAutoLike" in changes) {
+    window.ytrAutoLikeEnabled = changes.isAutoLike.newValue;
+    setPercentageWatched({
+      percentage: window.ytrPercentageWatched,
+      isVisible: window.ytrAutoLikeEnabled
+    });
+    if (window.ytrAutoLikeEnabled && getIsPassedThreshold()) {
+      rateVideo(true);
+    }
+    return;
+  }
+
+  if ("autoLikeThreshold" in changes) {
+    window.ytrAutoLikeThreshold = changes.autoLikeThreshold.newValue;
+    if (getIsPassedThreshold()) {
+      rateVideo(true);
+    }
+    return;
   }
 });
 

@@ -1,14 +1,12 @@
 <script lang="ts">
-  import {
-    DataTable,
-    DataTableBody,
-    DataTableCell,
-    DataTableRow,
-    MaterialApp
-  } from "svelte-materialify/dist";
-  import Donate from "./Donate.svelte";
+  import { DataTable, DataTableBody, MaterialApp } from "svelte-materialify/dist";
   import { theme } from "../stores";
   import ButtonCustomization from "./ButtonCustomization.svelte";
+  import AutoLike from "./AutoLike.svelte";
+  import { initial } from "../../utils-initials";
+
+  export let isAutoLike = initial.isAutoLike;
+  export let autoLikeThreshold = initial.autoLikeThreshold;
 </script>
 
 <MaterialApp theme={$theme}>
@@ -16,14 +14,9 @@
   <DataTable class="align-start mt-4">
     <DataTableBody>
       <ButtonCustomization />
-      <DataTableRow>
-        <DataTableCell />
-        <DataTableCell class="pt-4 pb-4">
-          <Donate />
-        </DataTableCell>
-      </DataTableRow>
     </DataTableBody>
   </DataTable>
+  <AutoLike {isAutoLike} {autoLikeThreshold} />
 </MaterialApp>
 
 <style>
@@ -33,7 +26,7 @@
   }
 
   /* Firefox */
-  :global(html) {
+  :global(html, body) {
     /*noinspection CssUnknownProperty*/
     scrollbar-width: none;
 
@@ -52,8 +45,8 @@
 
   /* Correcting the line height */
 
-  :global(.extension-popup > body) {
-    line-height: 1.2;
+  :global(body) {
+    line-height: 1.2 !important;
   }
 
   /* Other styling */
@@ -61,7 +54,7 @@
   /*noinspection CssUnusedSymbol*/
   :global(.s-app) {
     text-align: center;
-    padding: 16px 16px 4px;
+    padding: 16px 16px 0;
   }
 
   /*noinspection CssUnusedSymbol*/
@@ -69,6 +62,12 @@
     text-align: left;
     display: flex !important;
     border: none !important;
+  }
+
+  /*noinspection CssUnusedSymbol*/
+  :global(.s-tbl-row:last-child) {
+      /*noinspection CssUnresolvedCustomProperty*/
+      border-bottom: 1px solid var(--theme-dividers);
   }
 
   /* Making sure the table spans the whole width */

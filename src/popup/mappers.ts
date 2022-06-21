@@ -1,10 +1,12 @@
 "use strict";
 
+const isMac = navigator.platform.includes("Mac");
+
 export const modifierToKeyDisplay = {
   shiftKey: "Shift",
   ctrlKey: "Ctrl",
-  altKey: "Alt",
-  metaKey: navigator.userAgent.match(/Windows/)?.[0] ?? "Command"
+  altKey: isMac ? "Option" : "Alt",
+  metaKey: isMac ? "Windows" : "Cmd"
 } as const;
 
 export const modifierToKeyButton = {
@@ -26,7 +28,7 @@ export const numpadAliases = {
   "Shift + Period": "NumpadDecimal"
 } as const;
 
-const ctrlOrOption = navigator.userAgent.includes("Windows") ? "Ctrl" : "Alt";
+const ctrlOrOption = isMac ? "Option" : "Ctrl";
 
 // The values are only for the code readers to understand what the buttons are doing
 export const buttonTriggersYouTube = {

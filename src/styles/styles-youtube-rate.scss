@@ -1,0 +1,17 @@
+.ytr-percentage {
+  align-self: center;
+  padding-right: var(--yt-button-icon-padding, 8px);
+  position: relative;
+  bottom: 2px;
+  font-size: var(--ytd-tab-system-font-size);
+  font-weight: var(--ytd-tab-system-font-weight);
+  letter-spacing: var(--ytd-tab-system-letter-spacing);
+
+  &.hidden {
+    display: none;
+  }
+}
+
+html[dark="true"] .ytr-percentage {
+  color: var(--yt-spec-text-primary, white);
+}

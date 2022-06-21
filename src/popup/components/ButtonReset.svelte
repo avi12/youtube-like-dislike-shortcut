@@ -2,7 +2,7 @@
   import { Button, Icon } from "svelte-materialify";
   import { getJoinedModifiers } from "../utils";
   import { buttonTriggers } from "../stores";
-  import { RecordingType } from "../../types";
+  import type { RecordingType } from "../../types";
   import { initial } from "../../utils-initials";
   import { mdiRestart } from "@mdi/js";
 

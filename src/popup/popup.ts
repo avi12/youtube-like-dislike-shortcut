@@ -3,7 +3,7 @@
 import Popup from "./components/Popup.svelte";
 import { getStorage, initial } from "../utils-initials";
 import { buttonTriggers, theme } from "./stores";
-import { ButtonTriggers } from "../types";
+import type { ButtonTriggers } from "../types";
 
 function setDarkMode(): void {
   const instanceDarkMode = matchMedia("(prefers-color-scheme: dark)");
@@ -18,7 +18,17 @@ async function init(): Promise<void> {
   const buttonTriggersStorage = (await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers;
   buttonTriggers.set(buttonTriggersStorage as ButtonTriggers);
 
-  new Popup({ target: document.body });
+  const { isAutoLike, autoLikeThreshold } = await new Promise(resolve =>
+    chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve)
+  );
+
+  new Popup({
+    target: document.body,
+    props: {
+      isAutoLike,
+      autoLikeThreshold
+    }
+  });
 }
 
 init();

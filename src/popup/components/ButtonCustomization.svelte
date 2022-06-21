@@ -9,7 +9,7 @@
     numpadAliases
   } from "../mappers";
   import { buttonTriggers, recordingAction } from "../stores";
-  import { ButtonTrigger, Modifier } from "../../types";
+  import type { ButtonTrigger, Modifier } from "../../types";
   import ButtonShortcut from "./ButtonShortcut.svelte";
   import { getJoinedModifiers } from "../utils";
   import Alias from "./Alias.svelte";
@@ -84,6 +84,7 @@
   }
 
   buttonTriggers.subscribe(buttonTriggers => {
+    // noinspection TypeScriptUnresolvedFunction
     chrome.storage.local.set({ buttonTriggers });
   });
 
