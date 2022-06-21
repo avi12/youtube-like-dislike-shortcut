@@ -43,7 +43,7 @@ devDependencies:
   '@types/chrome': 0.0.190
   '@typescript-eslint/eslint-plugin': 5.28.0_py5roj3ykd3sga4gtxlmfvv4pa
   '@typescript-eslint/parser': 5.28.0_b5e7v2qnwxfo6hmiq56u52mz3e
-  build-for-browser: github.com/avi12/build-for-browser/7889833a66b5eee5682aa34fd0996bc56943149a
+  build-for-browser: github.com/avi12/build-for-browser/b0995379a340fff16c8f609257ad067f9681e0ca
   eslint: 8.18.0
   eslint-config-prettier: 8.5.0_eslint@8.18.0
   eslint-plugin-import: 2.26.0_6lykrgsjl6r2vncmjcievjkgyy
@@ -5257,8 +5257,8 @@ packages:
       readable-stream: 3.6.0
     dev: true
 
-  github.com/avi12/build-for-browser/7889833a66b5eee5682aa34fd0996bc56943149a:
-    resolution: {tarball: https://codeload.github.com/avi12/build-for-browser/tar.gz/7889833a66b5eee5682aa34fd0996bc56943149a}
+  github.com/avi12/build-for-browser/b0995379a340fff16c8f609257ad067f9681e0ca:
+    resolution: {tarball: https://codeload.github.com/avi12/build-for-browser/tar.gz/b0995379a340fff16c8f609257ad067f9681e0ca}
     name: build-for-browser
     version: 0.0.1
     hasBin: true
