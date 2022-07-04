@@ -1,7 +1,17 @@
-import { getActiveButton, getIsShorts, getRateButtons, rateVideo } from "./content-script-youtube-rate-buttons";
-import { getIsElementVisible, getVisibleElement, Selectors } from "../utils-initials";
+import {
+  getActiveButton,
+  getIsShorts,
+  getRateButtons,
+  rateVideo
+} from "./content-script-youtube-rate-buttons";
+import {
+  getElementByMutationObserver,
+  getIsElementVisible,
+  getVisibleElement,
+  observerOptions,
+  Selectors
+} from "../utils-initials";
 
-const observerOptions: MutationObserverInit = { childList: true, subtree: true };
 let gTitleLast = document.title;
 let gUrlLast = location.href;
 
@@ -135,13 +145,16 @@ function addTemporaryBodyListener(): void {
   gPlayerObserver.observe(document, observerOptions);
 }
 
-function addGlobalEventListenerOnDesktop(): void {
+async function addGlobalEventListener(): Promise<void> {
   // Fires when navigating to another page
-  new MutationObserver(addTemporaryBodyListener).observe(document.querySelector("title"), observerOptions);
+  const elTItle =
+    document.documentElement.querySelector(Selectors.title) ||
+    (await getElementByMutationObserver(Selectors.title));
+  new MutationObserver(addTemporaryBodyListener).observe(elTItle, observerOptions);
 }
 
 export function prepareToAutoLike(): void {
-  addGlobalEventListenerOnDesktop();
+  addGlobalEventListener();
 
   // Runs only on /watch & /shorts pages
   if (location.pathname.match(REGEX_SUPPORTED_PAGES)) {

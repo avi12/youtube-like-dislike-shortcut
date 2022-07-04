@@ -17,7 +17,8 @@ export enum Selectors {
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",
   bezelTextWrapper = ".ytp-bezel-text-wrapper",
-  bezelTextHide = ".ytp-bezel-text-hide"
+  bezelTextHide = ".ytp-bezel-text-hide",
+  title = "title"
 }
 
 export const initial = {
@@ -42,6 +43,8 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
+export const observerOptions: MutationObserverInit = { childList: true, subtree: true };
+
 export function getIsElementVisible(element: HTMLElement): boolean {
   return element?.offsetWidth > 0 && element?.offsetHeight > 0;
 }
@@ -49,4 +52,16 @@ export function getIsElementVisible(element: HTMLElement): boolean {
 export function getVisibleElement<T extends HTMLElement>(selector: string): T {
   const elements = [...document.querySelectorAll(selector)] as T[];
   return [...elements].find(getIsElementVisible);
+}
+
+export async function getElementByMutationObserver(selector: Selectors): Promise<HTMLElement> {
+  return new Promise(resolve => {
+    new MutationObserver((_, observer) => {
+      const element = document.documentElement.querySelector<HTMLElement>(selector);
+      if (element) {
+        observer.disconnect();
+        resolve(element);
+      }
+    }).observe(document, observerOptions);
+  });
 }
