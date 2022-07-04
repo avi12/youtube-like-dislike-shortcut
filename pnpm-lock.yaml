@@ -30,7 +30,7 @@ specifiers:
   svelte-preprocess: ^4.10.7
   typescript: ^4.7.4
   web-ext: ^7.1.0
-  webext-store-incompat-fixer: ^0.2.0
+  webext-store-incompat-fixer: ^0.1.42
   zip-self: ^0.5.2
 
 devDependencies:
@@ -63,7 +63,7 @@ devDependencies:
   svelte-preprocess: 4.10.7_jfsn2ouic3rv74qrghhpkjlaui
   typescript: 4.7.4
   web-ext: 7.1.0
-  webext-store-incompat-fixer: 0.2.0
+  webext-store-incompat-fixer: 0.1.42
   zip-self: 0.5.2
 
 packages:
@@ -5070,8 +5070,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /webext-store-incompat-fixer/0.2.0:
-    resolution: {integrity: sha512-yKjKMraGNzu+cN5RTqxNgGwstuWR/+VoqWEpey5NX0nRd0qv3evm4zonAqVNbnxTBF76wxqPe5XZpoxz0pGJtA==}
+  /webext-store-incompat-fixer/0.1.42:
+    resolution: {integrity: sha512-YCC9xOP5dgCnlJxG4SE7opeNZsk/7aZHLSwuM9r4WY0IJ8ii4fSc+6f9OuD7rp+PLpOgCOtHJ/9JizS+2n0kAw==}
     engines: {node: '>=8.0.0'}
     hasBin: true
     dependencies:
