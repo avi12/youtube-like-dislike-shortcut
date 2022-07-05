@@ -37,7 +37,6 @@ body:
       - Opera
       - Vivaldi
       - Brave
-      - Safari
     validations:
       required: true
   - type: dropdown
