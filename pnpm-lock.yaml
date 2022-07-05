@@ -30,7 +30,7 @@ specifiers:
   svelte-preprocess: ^4.10.7
   typescript: ^4.7.4
   web-ext: ^7.1.0
-  webext-store-incompat-fixer: ^0.1.42
+  webext-store-incompat-fixer: 0.3.1
   zip-self: ^0.5.2
 
 devDependencies:
@@ -43,7 +43,7 @@ devDependencies:
   '@types/chrome': 0.0.191
   '@typescript-eslint/eslint-plugin': 5.30.4_aye54oa67ofzrialru76zxwshi
   '@typescript-eslint/parser': 5.30.4_4x5o4skxv6sl53vpwefgt23khm
-  build-for-browser: github.com/avi12/build-for-browser/b0995379a340fff16c8f609257ad067f9681e0ca
+  build-for-browser: github.com/avi12/build-for-browser/6288ad2e805e91c2dc701f43d4fb14c20a8e52e1
   eslint: 8.19.0
   eslint-config-prettier: 8.5.0_eslint@8.19.0
   eslint-plugin-import: 2.26.0_eewxtjj33uq4o73zpcjsegq3l4
@@ -63,7 +63,7 @@ devDependencies:
   svelte-preprocess: 4.10.7_jfsn2ouic3rv74qrghhpkjlaui
   typescript: 4.7.4
   web-ext: 7.1.0
-  webext-store-incompat-fixer: 0.1.42
+  webext-store-incompat-fixer: 0.3.1
   zip-self: 0.5.2
 
 packages:
@@ -5070,9 +5070,9 @@ packages:
       - utf-8-validate
     dev: true
 
-  /webext-store-incompat-fixer/0.1.42:
-    resolution: {integrity: sha512-YCC9xOP5dgCnlJxG4SE7opeNZsk/7aZHLSwuM9r4WY0IJ8ii4fSc+6f9OuD7rp+PLpOgCOtHJ/9JizS+2n0kAw==}
-    engines: {node: '>=8.0.0'}
+  /webext-store-incompat-fixer/0.3.1:
+    resolution: {integrity: sha512-qHNSzNresu3n2AWne2yivFfIlBAOzLcrSnooN239igSpfSLrF4NK4vWGmq7/zjVRFpuO7bR7PcuS08Cz+Y0ohQ==}
+    engines: {node: '>=12.20.0'}
     hasBin: true
     dependencies:
       jszip: 3.10.0
@@ -5247,8 +5247,8 @@ packages:
       readable-stream: 3.6.0
     dev: true
 
-  github.com/avi12/build-for-browser/b0995379a340fff16c8f609257ad067f9681e0ca:
-    resolution: {tarball: https://codeload.github.com/avi12/build-for-browser/tar.gz/b0995379a340fff16c8f609257ad067f9681e0ca}
+  github.com/avi12/build-for-browser/6288ad2e805e91c2dc701f43d4fb14c20a8e52e1:
+    resolution: {tarball: https://codeload.github.com/avi12/build-for-browser/tar.gz/6288ad2e805e91c2dc701f43d4fb14c20a8e52e1}
     name: build-for-browser
     version: 0.0.1
     hasBin: true
