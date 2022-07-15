@@ -1,7 +1,7 @@
 "use strict";
 
 import { svgs } from "./icons";
-import { Selectors } from "../utils-initials";
+import { getVisibleElement, Selectors } from "../utils-initials";
 
 let gLastRating: "like" | "dislike";
 
@@ -69,7 +69,7 @@ function clearAnimationOnEnd(): void {
 }
 
 export function getActiveButton(): HTMLButtonElement {
-  return document.querySelector(Selectors.activeButton);
+  return getVisibleElement(Selectors.activeButton);
 }
 
 /**

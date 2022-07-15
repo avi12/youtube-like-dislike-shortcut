@@ -17,11 +17,14 @@ let gUrlLast = location.href;
 
 const gPlayerObserver = new MutationObserver((_, observer) => {
   const elVideo = getVisibleElement<HTMLVideoElement>(Selectors.video);
+  if (!elVideo) {
+    return;
+  }
   stopTracking(elVideo);
 
   const elLiveBadge = document.querySelector<HTMLDivElement>(Selectors.live);
   const [, elDislike] = getRateButtons();
-  if (!elVideo || !elDislike || !elLiveBadge) {
+  if (!elDislike || !elLiveBadge) {
     return;
   }
 
@@ -147,10 +150,10 @@ function addTemporaryBodyListener(): void {
 
 async function addGlobalEventListener(): Promise<void> {
   // Fires when navigating to another page
-  const elTItle =
+  const elTitle =
     document.documentElement.querySelector(Selectors.title) ||
     (await getElementByMutationObserver(Selectors.title));
-  new MutationObserver(addTemporaryBodyListener).observe(elTItle, observerOptions);
+  new MutationObserver(addTemporaryBodyListener).observe(elTitle, observerOptions);
 }
 
 export function prepareToAutoLike(): void {
