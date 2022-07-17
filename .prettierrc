@@ -3,7 +3,7 @@
   "trailingComma": "none",
   "singleQuote": false,
   "semi": true,
-  "svelteSortOrder": "scripts-markup-styles",
+  "svelteSortOrder": "scripts-markup-options-styles",
   "plugins": ["prettier-plugin-svelte"],
   "printWidth": 110
 }
