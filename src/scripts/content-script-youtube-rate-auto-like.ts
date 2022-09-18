@@ -2,6 +2,7 @@ import {
   getActiveButton,
   getIsShorts,
   getRateButtons,
+  getVisualRateButtons,
   rateVideo
 } from "./content-script-youtube-rate-buttons";
 import {
@@ -107,7 +108,7 @@ export function setPercentageWatched({
   percentage: number;
   isVisible: boolean;
 }): void {
-  const [{ parentElement: elContainer } = { parentElement: null }] = getRateButtons();
+  const [{ parentElement: elContainer } = { parentElement: null }] = getVisualRateButtons();
   if (!elContainer) {
     return;
   }
