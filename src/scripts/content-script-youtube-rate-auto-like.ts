@@ -69,12 +69,15 @@ function autoLikeWhenNeeded(e: Event): void {
     return;
   }
 
-  const tempDelta = Math.abs(elVideo.currentTime - gTimeCurrentLast);
+  const tempDelta = elVideo.currentTime - gTimeCurrentLast;
   // Only record normal playing to correctly assess the X% threshold
-  if (tempDelta > 0 && tempDelta < 1) {
+  if ((tempDelta > 0 && tempDelta < 1) || tempDelta < 0) {
     gTimeDelta = tempDelta;
   }
   gTimeCounter += gTimeDelta || 0;
+  if (gTimeCounter < 0) {
+    gTimeCounter = 0;
+  }
   gTimeCurrentLast = elVideo.currentTime;
 
   // Counting the watch time regardless if the user has enabled the option or not,
@@ -104,7 +107,7 @@ export function setPercentageWatched({
   percentage: number;
   isVisible: boolean;
 }): void {
-  const [{ parentElement: elContainer }] = getRateButtons();
+  const [{ parentElement: elContainer } = { parentElement: null }] = getRateButtons();
   if (!elContainer) {
     return;
   }
