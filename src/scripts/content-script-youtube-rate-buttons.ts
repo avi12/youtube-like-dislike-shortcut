@@ -95,7 +95,10 @@ export function rateVideo(isLike: boolean | null): void {
       elLike.click();
       elLike.blur();
     }
-  } else if (isLike === false) {
+    return;
+  }
+
+  if (isLike === false) {
     gLastRating = "dislike";
     showIndicator(true);
 
@@ -103,19 +106,20 @@ export function rateVideo(isLike: boolean | null): void {
       elDislike.click();
       elDislike.blur();
     }
-  } else {
-    // isLike === null
-    // Un-rate a video
-    const elBtnActive = getActiveButton();
+    return;
+  }
 
-    if (!gLastRating) {
-      gLastRating = elBtnActive === elDislike ? "dislike" : "like";
-    }
-    showIndicator(false);
+  // isLike === null
+  // Un-rate a video
+  const elBtnActive = getActiveButton();
 
-    if (elBtnActive) {
-      elBtnActive.click();
-      elBtnActive.blur();
-    }
+  if (!gLastRating) {
+    gLastRating = elBtnActive === elDislike ? "dislike" : "like";
+  }
+  showIndicator(false);
+
+  if (elBtnActive) {
+    elBtnActive.click();
+    elBtnActive.blur();
   }
 }
