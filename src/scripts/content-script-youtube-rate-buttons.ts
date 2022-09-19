@@ -24,10 +24,11 @@ function getIsVisible(element: HTMLElement): boolean {
 }
 
 export function getRateButtons(): HTMLButtonElement[] {
-  return getVisualRateButtons().map(el => el.querySelector("button"));
+  const elButtonsRate = getVisualRateButtons();
+  return getIsShorts() ? elButtonsRate : elButtonsRate.map(el => el.querySelector("button"));
 }
 
-export function getVisualRateButtons(): HTMLButtonElement[] {
+function getVisualRateButtons(): HTMLButtonElement[] {
   const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = Selectors;
   const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
   return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
