@@ -107,7 +107,8 @@ export function setPercentageWatched({
   percentage: number;
   isVisible: boolean;
 }): void {
-  const [{ parentElement: elContainer } = { parentElement: null }] = getRateButtons();
+  const [elLike] = getRateButtons();
+  const { parentElement: elContainer = null } = elLike.closest(Selectors.toggleButtonsNormalVideo);
   if (!elContainer) {
     return;
   }
