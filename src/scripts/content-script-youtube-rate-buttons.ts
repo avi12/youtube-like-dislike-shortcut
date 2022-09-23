@@ -73,10 +73,8 @@ function clearAnimationOnEnd(): void {
   );
 }
 
-export function getActiveButton(elDislike?: HTMLButtonElement): HTMLButtonElement {
-  return !elDislike
-    ? getVisibleElement(Selectors.activeButton)
-    : elDislike.parentElement.querySelector(Selectors.activeButton);
+export function getActiveButton(): HTMLButtonElement {
+  return getVisibleElement(Selectors.activeButton);
 }
 
 /**
