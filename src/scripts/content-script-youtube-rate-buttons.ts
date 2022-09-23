@@ -5,8 +5,8 @@ import { getVisibleElement, Selectors } from "../utils-initials";
 
 let gLastRating: "like" | "dislike";
 
-export function getIsActive(elButton: HTMLElement): boolean {
-  return elButton.classList.contains(Selectors.activeButton.substring(1));
+function getIsActive(elButton: HTMLElement): boolean {
+  return elButton.ariaPressed === "true";
 }
 
 function getIsInViewport(element: HTMLElement): boolean {
