@@ -5,8 +5,8 @@ import { getVisibleElement, Selectors } from "../utils-initials";
 
 let gLastRating: "like" | "dislike";
 
-export function getIsActive(elButton: HTMLElement): boolean {
-  return elButton.classList.contains(Selectors.activeButton.substring(1));
+function getIsActive(elButton: HTMLElement): boolean {
+  return elButton.ariaPressed === "true";
 }
 
 function getIsInViewport(element: HTMLElement): boolean {
@@ -73,10 +73,8 @@ function clearAnimationOnEnd(): void {
   );
 }
 
-export function getActiveButton(elDislike?: HTMLButtonElement): HTMLButtonElement {
-  return !elDislike
-    ? getVisibleElement(Selectors.activeButton)
-    : elDislike.parentElement.querySelector(Selectors.activeButton);
+export function getActiveButton(): HTMLButtonElement {
+  return getVisibleElement(Selectors.activeButton);
 }
 
 /**

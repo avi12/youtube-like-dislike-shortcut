@@ -30,7 +30,7 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
 
   observer.disconnect();
 
-  const isRated = getActiveButton(elDislike);
+  const isRated = Boolean(getActiveButton());
   const isLiveOrPremiere = getIsElementVisible(elLiveBadge);
   if (isRated || isLiveOrPremiere) {
     return;
