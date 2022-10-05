@@ -24,7 +24,7 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
 
   const elLiveBadge = document.querySelector<HTMLDivElement>(Selectors.live);
   const [, elDislike] = getRateButtons();
-  if (!elDislike || !elLiveBadge) {
+  if (!elDislike) {
     return;
   }
 
@@ -108,7 +108,9 @@ export function setPercentageWatched({
   isVisible: boolean;
 }): void {
   const [elLike] = getRateButtons();
-  const { parentElement: elContainer = null } = elLike.closest(Selectors.toggleButtonsNormalVideo);
+  const { parentElement: elContainer = null } =
+    elLike.closest(Selectors.toggleButtonsNormalVideoMD) ||
+    elLike.closest(Selectors.toggleButtonsNormalVideo);
   if (!elContainer) {
     return;
   }
