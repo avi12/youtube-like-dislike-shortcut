@@ -10,10 +10,10 @@ export enum Selectors {
   adSkipNow = ".ytp-ad-skip-button-text",
   live = ".ytp-live-badge",
   percentageWatched = ".ytr-percentage",
-  toggleButtonsNormalVideoMD = "ytd-segmented-like-dislike-button-renderer", // A/B tested Material Design
-  toggleButtonsNormalVideo = "#top-level-buttons-computed ytd-toggle-button-renderer",
+  toggleButtonsNormalVideoMY = "ytd-segmented-like-dislike-button-renderer", // A/B tested Material You
+  toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
   toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer",
-  activeButton = ".style-default-active",
+  toggleButton = "ytd-toggle-button-renderer",
   // Bezel classes
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",

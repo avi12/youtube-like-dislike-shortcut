@@ -24,13 +24,18 @@ function getIsVisible(element: HTMLElement): boolean {
 }
 
 export function getRateButtons(): HTMLButtonElement[] {
-  const elButtonsRate = getVisualRateButtons();
-  return getIsShorts() ? elButtonsRate : elButtonsRate.map(el => el.querySelector("button"));
+  const elButtonsRate = getContainerRateButtons();
+  if (elButtonsRate[0].matches(Selectors.toggleButtonsNormalVideoMY)) {
+    return [...elButtonsRate[0].querySelectorAll("button")];
+  }
+  return elButtonsRate.map(el => el.querySelector("button"));
 }
 
-function getVisualRateButtons(): HTMLButtonElement[] {
-  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = Selectors;
-  const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
+function getContainerRateButtons(): HTMLButtonElement[] {
+  const { toggleButtonsNormalVideoMY, toggleButtonsNormalVideo, toggleButtonsShortsVideo } = Selectors;
+  const elButtons = document.querySelectorAll(
+    `${toggleButtonsNormalVideoMY}, ${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`
+  );
   return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
 }
 
@@ -73,8 +78,11 @@ function clearAnimationOnEnd(): void {
   );
 }
 
-export function getActiveButton(): HTMLButtonElement {
-  return getVisibleElement(Selectors.activeButton);
+export function getRatedButton(): HTMLButtonElement {
+  const { toggleButtonsShortsVideo, toggleButtonsNormalVideo, toggleButtonsNormalVideoMY } = Selectors;
+  return getVisibleElement(
+    `${toggleButtonsNormalVideo}, ${toggleButtonsNormalVideoMY}, ${toggleButtonsShortsVideo}`
+  ).querySelector("button[aria-pressed=true]");
 }
 
 /**
@@ -109,7 +117,7 @@ export function rateVideo(isLike: boolean | null): void {
 
   // isLike === null
   // Un-rate a video
-  const elBtnActive = getActiveButton();
+  const elBtnActive = getRatedButton();
 
   if (!gLastRating) {
     gLastRating = elBtnActive === elDislike ? "dislike" : "like";

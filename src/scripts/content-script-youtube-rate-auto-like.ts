@@ -1,12 +1,11 @@
 import {
-  getActiveButton,
+  getRatedButton,
   getIsShorts,
   getRateButtons,
   rateVideo
 } from "./content-script-youtube-rate-buttons";
 import {
   getElementByMutationObserver,
-  getIsElementVisible,
   getVisibleElement,
   observerOptions,
   Selectors
@@ -22,22 +21,32 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
   }
   stopTracking(elVideo);
 
-  const elLiveBadge = document.querySelector<HTMLDivElement>(Selectors.live);
+  // Start the time counting only when the rating buttons loaded
   const [, elDislike] = getRateButtons();
   if (!elDislike) {
     return;
   }
 
-  observer.disconnect();
-
-  const isRated = Boolean(getActiveButton());
-  const isLiveOrPremiere = getIsElementVisible(elLiveBadge);
-  if (isRated || isLiveOrPremiere) {
+  const isRated = Boolean(getRatedButton());
+  if (isRated) {
     return;
   }
 
-  gTimeCurrentLast = elVideo.currentTime;
-  startTracking(elVideo);
+  observer.disconnect();
+
+  elVideo.addEventListener(
+    "canplay",
+    () => {
+      const isLiveOrPremiere = Boolean(getVisibleElement(Selectors.live));
+      if (isLiveOrPremiere) {
+        return;
+      }
+
+      gTimeCurrentLast = elVideo.currentTime;
+      startTracking(elVideo);
+    },
+    { once: true }
+  );
 });
 
 let gTimeCounter = 0;
@@ -108,9 +117,9 @@ export function setPercentageWatched({
   isVisible: boolean;
 }): void {
   const [elLike] = getRateButtons();
-  const { parentElement: elContainer = null } =
-    elLike.closest(Selectors.toggleButtonsNormalVideoMD) ||
-    elLike.closest(Selectors.toggleButtonsNormalVideo);
+  const elContainer =
+    elLike.closest(Selectors.toggleButtonsNormalVideoMY) ||
+    elLike.closest(Selectors.toggleButtonsNormalVideo)?.parentElement;
   if (!elContainer) {
     return;
   }
@@ -170,3 +179,17 @@ export function prepareToAutoLike(): void {
     gPlayerObserver.observe(document, observerOptions);
   }
 }
+
+// Don't auto-like if rated by clicking
+document.addEventListener("click", e => {
+  if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
+    return;
+  }
+
+  const elRatePressed = (<HTMLElement>e.target)
+    .closest(Selectors.toggleButton)
+    ?.querySelector("button[aria-pressed=true]");
+  if (elRatePressed) {
+    window.ytrUserInteracted = true;
+  }
+});
