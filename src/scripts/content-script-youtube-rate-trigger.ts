@@ -26,7 +26,10 @@ async function init(): Promise<void> {
       initial.buttonTriggers) as ButtonTriggers;
 
     const { isAutoLike = initial.isAutoLike, autoLikeThreshold = initial.autoLikeThreshold } =
-      await new Promise(resolve => chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve));
+      await new Promise<{
+        isAutoLike: boolean;
+        autoLikeThreshold: number;
+      }>(resolve => chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve));
     window.ytrAutoLikeEnabled = isAutoLike;
     window.ytrAutoLikeThreshold = autoLikeThreshold;
   } catch {

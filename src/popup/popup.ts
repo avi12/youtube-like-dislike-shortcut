@@ -18,9 +18,10 @@ async function init(): Promise<void> {
   const buttonTriggersStorage = (await getStorage("local", "buttonTriggers")) ?? initial.buttonTriggers;
   buttonTriggers.set(buttonTriggersStorage as ButtonTriggers);
 
-  const { isAutoLike, autoLikeThreshold } = await new Promise(resolve =>
-    chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve)
-  );
+  const { isAutoLike, autoLikeThreshold } = await new Promise<{
+    isAutoLike: boolean;
+    autoLikeThreshold: number;
+  }>(resolve => chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve));
 
   new Popup({
     target: document.body,
