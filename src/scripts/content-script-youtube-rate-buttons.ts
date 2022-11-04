@@ -25,7 +25,7 @@ function getIsVisible(element: HTMLElement): boolean {
 
 export function getRateButtons(): HTMLButtonElement[] {
   const elButtonsRate = getContainerRateButtons();
-  if (elButtonsRate[0].matches(Selectors.toggleButtonsNormalVideoMY)) {
+  if (elButtonsRate[0]?.matches(Selectors.toggleButtonsNormalVideoMY)) {
     return [...elButtonsRate[0].querySelectorAll("button")];
   }
   return elButtonsRate.map(el => el.querySelector("button"));
