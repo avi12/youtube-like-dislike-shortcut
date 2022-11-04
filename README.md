@@ -34,11 +34,20 @@ Made by [avi12](https://avi12.com).
 
 Install [Node.js](https://nodejs.org) and [PNPM](https://pnpm.js.org/en/installation).
 
+
 ## Install dependencies
 
 ```shell script
 pnpm i
 ```
+
+<details>
+<summary>If installing dependencies is throwing an error on Windows</summary>
+Install C++ build tools<br>  
+The easiest way is by installing <a href="https://visualstudio.microsoft.com/downloads">Visual Studio</a> and through the installer, selecting
+
+![Desktop development with C++ under Workloads tab](https://user-images.githubusercontent.com/6422804/199964961-529c11cd-2891-4ca2-bd89-bb848fac8d58.png)
+</details>
 
 ## Start Rollup for development
 
@@ -60,12 +69,11 @@ pnpm run-chromium
 pnpm run-edge-windows
 ```
 
-### Browsers that don't support Manifest v3
+### Firefox
 
-1. Build the extension for Firefox/Opera (see below).
-2. Open the extensions page in that browser.
-3. Enable the developer mode (top-right corner usually).
-4. Either drag-drop the browser-compatible ZIP onto the browser or click "Load unpacked extension" and choose it.
+1. Build the extension for Firefox (see below)
+2. Open `about:debugging#/runtime/this-firefox`
+3. "Load Temporary Add-on" → select `dist/manifest.json`
 
 ## Build & pack
 
