@@ -8,7 +8,7 @@ export enum Selectors {
   video = "video",
   adSkipIn = ".ytp-ad-preview-text",
   adSkipNow = ".ytp-ad-skip-button-text",
-  live = ".ytp-live-badge",
+  liveBadge = ".ytp-live-badge",
   percentageWatched = ".ytr-percentage",
   toggleButtonsNormalVideoMY = "ytd-segmented-like-dislike-button-renderer", // A/B tested Material You
   toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
