@@ -28,22 +28,29 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
   }
 
   const isRated = Boolean(getRatedButton());
-  if (isRated) {
+  const getIsLiveOrPremiere = (): boolean => Boolean(getVisibleElement(Selectors.liveBadge));
+  if (isRated || getIsLiveOrPremiere()) {
     return;
   }
 
   observer.disconnect();
 
+  gTimeCurrentLast = elVideo.currentTime;
+  startTracking(elVideo);
+
   elVideo.addEventListener(
     "canplay",
     () => {
-      const isLiveOrPremiere = Boolean(getVisibleElement(Selectors.live));
-      if (isLiveOrPremiere) {
+      if (!getIsLiveOrPremiere()) {
         return;
       }
 
-      gTimeCurrentLast = elVideo.currentTime;
-      startTracking(elVideo);
+      window.ytrPercentageWatched = 0;
+      setPercentageWatched({
+        percentage: window.ytrPercentageWatched,
+        isVisible: false
+      });
+      stopTracking(elVideo);
     },
     { once: true }
   );
