@@ -1,7 +1,7 @@
 import {
-  getRatedButton,
   getIsShorts,
   getRateButtons,
+  getRatedButton,
   rateVideo
 } from "./content-script-youtube-rate-buttons";
 import {
@@ -124,21 +124,22 @@ export function setPercentageWatched({
   isVisible: boolean;
 }): void {
   const [elLike] = getRateButtons();
+  const { percentageWatched, toggleButtonsNormalVideo, toggleButtonsNormalVideoMY } = Selectors;
+
   const elContainer =
-    elLike.closest(Selectors.toggleButtonsNormalVideoMY) ||
-    elLike.closest(Selectors.toggleButtonsNormalVideo)?.parentElement;
+    elLike.closest(toggleButtonsNormalVideoMY) || elLike.closest(toggleButtonsNormalVideo)?.parentElement;
   if (!elContainer) {
     return;
   }
 
   const createPercentageWatchedIndicator = (): HTMLElement => {
     const elPercentageWatched = document.createElement("div");
-    elPercentageWatched.className = Selectors.percentageWatched.substring(1);
+    elPercentageWatched.className = percentageWatched.substring(1);
     elPercentageWatched.textContent = "0%";
     return elPercentageWatched;
   };
 
-  const elIndicatorFound = elContainer.querySelector(Selectors.percentageWatched);
+  const elIndicatorFound = elContainer.querySelector(percentageWatched);
   const elIndicator = elIndicatorFound || createPercentageWatchedIndicator();
   if (!isVisible) {
     elIndicator.classList.add("hidden");
@@ -194,7 +195,7 @@ document.addEventListener("click", e => {
   }
 
   const elRatePressed = (<HTMLElement>e.target)
-    .closest(Selectors.toggleButton)
+    .closest(`${Selectors.toggleButtonsContainer}, ${Selectors.toggleButtonsShortsVideo}`)
     ?.querySelector("button[aria-pressed=true]");
   if (elRatePressed) {
     window.ytrUserInteracted = true;
