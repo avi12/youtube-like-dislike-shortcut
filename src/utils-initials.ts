@@ -13,7 +13,7 @@ export enum Selectors {
   toggleButtonsNormalVideoMY = "ytd-segmented-like-dislike-button-renderer", // A/B tested Material You
   toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
   toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer",
-  toggleButton = "ytd-toggle-button-renderer",
+  toggleButtonsContainer = "#segmented-like-buttons",
   // Bezel classes
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",
