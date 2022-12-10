@@ -64,7 +64,7 @@ function showIndicator(isRated: boolean): void {
 }
 
 function getBezelContainer(): HTMLDivElement {
-  return document.querySelector<HTMLDivElement>(Selectors.bezelTextHide);
+  return document.querySelector(Selectors.bezelTextWrapper).parentElement as HTMLDivElement;
 }
 
 function clearAnimationOnEnd(): void {
