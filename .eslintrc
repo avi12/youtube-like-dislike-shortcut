@@ -1,32 +1,12 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2021,
-    "sourceType": "module"
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "lib": ["dom", "esnext"]
   },
   "rules": {
-    "arrow-parens": ["warn", "as-needed"],
-    "prefer-const": "warn",
-    "no-async-promise-executor": "off",
-    "semi": "warn",
-    "quotes": [
-      "warn",
-      "double",
-      {
-        "allowTemplateLiterals": true
-      }
-    ],
-    "indent": [
-      "warn",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["warn"],
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "quote-props": ["warn", "as-needed"]
+    "@typescript-eslint/no-var-requires": "off"
   },
   "overrides": [
     {
@@ -35,13 +15,13 @@
     }
   ],
   "env": {
-    "es6": true,
     "browser": true,
+    "es6": true,
     "node": true,
     "webextensions": true
   },
   "plugins": ["svelte3", "@typescript-eslint"],
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "avi12"],
   "settings": {
     "svelte3/typescript": true
   }

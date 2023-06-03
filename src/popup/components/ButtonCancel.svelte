@@ -1,6 +1,6 @@
 <script>
-  import { Button, Icon } from "svelte-materialify";
   import { mdiClose } from "@mdi/js";
+  import { Button, Icon } from "svelte-materialify";
   import { recordingAction } from "../stores";
 </script>
 

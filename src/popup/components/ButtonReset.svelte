@@ -1,10 +1,10 @@
-<script type="ts">
-  import { Button, Icon } from "svelte-materialify";
-  import { getJoinedModifiers } from "../utils";
-  import { buttonTriggers } from "../stores";
-  import type { RecordingType } from "../../types";
-  import { initial } from "../../utils-initials";
+<script lang="ts">
   import { mdiRestart } from "@mdi/js";
+  import { Button, Icon } from "svelte-materialify";
+  import { buttonTriggers } from "../stores";
+  import { getJoinedModifiers } from "../utils";
+  import type { RecordingType } from "~types";
+  import { initial } from "~utils-initials";
 
   export let type: RecordingType;
 

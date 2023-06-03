@@ -1,9 +1,9 @@
-<script type="ts">
+<script lang="ts">
   import { Checkbox } from "svelte-materialify";
-  import { buttonTriggers, recordingAction } from "../stores";
-  import type { ButtonTrigger, SupportedActions } from "../../types";
   import { numpadAliases } from "../mappers";
+  import { buttonTriggers, recordingAction } from "../stores";
   import { getJoinedModifiers } from "../utils";
+  import type { ButtonTrigger, SupportedActions } from "~types";
 
   export let type: SupportedActions;
 
@@ -20,10 +20,9 @@
 </script>
 
 <Checkbox
-  disabled={$recordingAction !== null && $recordingAction !== type}
   checked={$buttonTriggers[type].secondary}
-  on:change={setAlias}
->
+  disabled={$recordingAction !== null && $recordingAction !== type}
+  on:change={setAlias}>
   Also use
   {numpadAliases[getJoinedModifiers($buttonTriggers[type])]}
 </Checkbox>

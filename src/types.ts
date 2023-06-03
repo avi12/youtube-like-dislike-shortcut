@@ -14,3 +14,8 @@ export interface ButtonTriggers {
 
 export type SupportedActions = "like" | "dislike" | "unrate";
 export type RecordingType = SupportedActions | null;
+declare global {
+  interface Window {
+    ytrUserInteracted: boolean;
+  }
+}

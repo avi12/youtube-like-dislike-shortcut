@@ -1,25 +1,18 @@
-import type { ButtonTriggers } from "./types";
+import type { ButtonTriggers } from "~types";
 
-export async function getStorage(storageArea: "local" | "sync", key: string): Promise<unknown> {
-  return new Promise(resolve => chrome.storage[storageArea].get(key, result => resolve(result[key])));
-}
-
-export enum Selectors {
+export enum SELECTORS {
   video = "video",
   adSkipIn = ".ytp-ad-preview-text",
   adSkipNow = ".ytp-ad-skip-button-text",
   liveBadge = ".ytp-live-badge",
-  percentageWatched = ".ytr-percentage",
-  toggleButtonsNormalVideoMY = "ytd-segmented-like-dislike-button-renderer", // A/B tested Material You
-  toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
-  toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer",
-  toggleButtonsContainer = "#segmented-like-buttons",
+  toggleButtonsNormalVideo = "ytd-segmented-like-dislike-button-renderer yt-smartimation",
+  toggleButtonsShortsVideo = "ytd-like-button-renderer",
+  title = "title",
   // Bezel classes
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",
   bezelTextWrapper = ".ytp-bezel-text-wrapper",
-  bezelTextHide = ".ytp-bezel-text-hide",
-  title = "title"
+  bezelTextHide = ".ytp-bezel-text-hide"
 }
 
 export const initial = {
@@ -44,18 +37,18 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
-export const observerOptions: MutationObserverInit = { childList: true, subtree: true };
+export const OBSERVER_OPTIONS: MutationObserverInit = { childList: true, subtree: true };
+export const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts)/;
 
-export function getIsElementVisible(element: HTMLElement): boolean {
-  return element?.offsetWidth > 0 && element?.offsetHeight > 0;
+export function getIsShorts(): boolean {
+  return location.pathname.startsWith("/shorts/");
 }
 
 export function getVisibleElement<T extends HTMLElement>(selector: string): T {
   const elements = [...document.querySelectorAll(selector)] as T[];
-  return [...elements].find(getIsElementVisible);
+  return [...elements].find(getIsShorts() ? getIsInViewport : getIsPhisicallyOnViewport);
 }
-
-export async function getElementByMutationObserver(selector: Selectors): Promise<HTMLElement> {
+export async function getElementByMutationObserver(selector: SELECTORS): Promise<HTMLElement> {
   return new Promise(resolve => {
     new MutationObserver((_, observer) => {
       const element = document.documentElement.querySelector<HTMLElement>(selector);
@@ -63,6 +56,44 @@ export async function getElementByMutationObserver(selector: Selectors): Promise
         observer.disconnect();
         resolve(element);
       }
-    }).observe(document, observerOptions);
+    }).observe(document, OBSERVER_OPTIONS);
   });
+}
+
+function getIsInViewport(element: HTMLElement): boolean {
+  const rect = element.getBoundingClientRect();
+  const isVisibleInViewport =
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= document.documentElement.clientHeight &&
+    rect.right <= document.documentElement.clientWidth;
+  return getIsPhisicallyOnViewport(element) && isVisibleInViewport;
+}
+
+function getIsPhisicallyOnViewport(element: HTMLElement): boolean {
+  return element.offsetWidth > 0 && element.offsetHeight > 0;
+}
+
+export function getContainerRateButtons(): HTMLDivElement {
+  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = SELECTORS;
+  const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
+  const [elContainer] = [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsPhisicallyOnViewport);
+  return elContainer as HTMLDivElement;
+}
+
+export function getRateButtons(): HTMLButtonElement[] {
+  const elContainerButtonsRate = getContainerRateButtons();
+  if (!elContainerButtonsRate) {
+    return [];
+  }
+  return [...elContainerButtonsRate.querySelectorAll("button")];
+}
+
+export function getRatedButton(): HTMLButtonElement {
+  const [elLike] = getRateButtons();
+  if (!elLike) {
+    return null;
+  }
+  const elContainer = elLike.parentElement;
+  return elContainer.querySelector("button[aria-pressed=true]");
 }

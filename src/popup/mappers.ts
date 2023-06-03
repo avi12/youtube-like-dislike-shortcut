@@ -1,5 +1,3 @@
-"use strict";
-
 const isMac = navigator.platform.includes("Mac");
 
 export const modifierToKeyDisplay = {

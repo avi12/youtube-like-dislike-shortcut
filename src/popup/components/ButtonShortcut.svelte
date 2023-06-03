@@ -1,8 +1,8 @@
-<script type="ts">
+<script lang="ts">
   import { Button } from "svelte-materialify";
   import { buttonTriggers, recordingAction, theme } from "../stores";
-  import type { RecordingType } from "../../types";
   import { getJoinedModifiers } from "../utils";
+  import type { RecordingType } from "~types";
 
   function toggleRecording(): void {
     // Scenarios:
@@ -45,13 +45,11 @@
   {/if}
 </Button>
 
-<style>
-  /*noinspection CssUnusedSymbol*/
+<style lang="scss" global>
   :global(.text-none.text-none .s-btn__content) {
     text-transform: none;
   }
 
-  /*noinspection CssUnusedSymbol*/
   :global(.s-btn.text-none) {
     white-space: normal;
     display: block;

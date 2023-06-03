@@ -1,6 +1,10 @@
-<script type="ts">
-  import { initial } from "../../utils-initials";
+<script lang="ts">
+  import { Storage } from "@plasmohq/storage";
   import { DataTableCell, DataTableRow } from "svelte-materialify/dist";
+  import Alias from "../components/Alias.svelte";
+  import ButtonCancel from "../components/ButtonCancel.svelte";
+  import ButtonReset from "../components/ButtonReset.svelte";
+  import ButtonShortcut from "../components/ButtonShortcut.svelte";
   import {
     actionNameToDisplay,
     buttonTriggersYouTube,
@@ -9,12 +13,9 @@
     numpadAliases
   } from "../mappers";
   import { buttonTriggers, recordingAction } from "../stores";
-  import type { ButtonTrigger, Modifier } from "../../types";
-  import ButtonShortcut from "./ButtonShortcut.svelte";
   import { getJoinedModifiers } from "../utils";
-  import Alias from "./Alias.svelte";
-  import ButtonCancel from "./ButtonCancel.svelte";
-  import ButtonReset from "./ButtonReset.svelte";
+  import type { ButtonTrigger, Modifier } from "~types";
+  import { initial } from "~utils-initials";
 
   const errorMessage = {
     youtube: "Cannot assign. Used by YouTube",
@@ -27,6 +28,7 @@
   let recordingKeys = "";
   let isErrorRecording = false;
   let isAlreadyInUse = false;
+  const storageLocal = new Storage({ area: "local" });
 
   function onKeyDown(e: KeyboardEvent): void {
     keysSet.add(e.code);
@@ -83,9 +85,8 @@
     };
   }
 
-  buttonTriggers.subscribe(buttonTriggers => {
-    // noinspection TypeScriptUnresolvedFunction
-    chrome.storage.local.set({ buttonTriggers });
+  buttonTriggers.subscribe(async buttonTriggers => {
+    await storageLocal.set("buttonTriggers", buttonTriggers);
   });
 
   function getIsAlreadyInUse(): boolean {
@@ -99,36 +100,35 @@
 </script>
 
 {#each Object.keys(initial.buttonTriggers) as type}
-  <DataTableRow>
-    <DataTableCell class="pt-4 pb-4 label">{actionNameToDisplay[type]}</DataTableCell>
-    <DataTableCell class="pt-4 pb-4">
-      <div class="mb-2">
-        <ButtonShortcut {recordingKeys} {isErrorRecording} {record} {stopRecording} {type} />
-      </div>
-      {#if isErrorRecording && $recordingAction === type}
-        <div class="error-text">
-          {isAlreadyInUse ? errorMessage.alreadyInUse : errorMessage.youtube}
-        </div>
-      {/if}
-      {#if $recordingAction === type}
-        <div class="mt-3">
-          <ButtonCancel />
-        </div>
-      {:else if numpadAliases[getJoinedModifiers($buttonTriggers[type])]}
-        <div class="mt-3">
-          <Alias {type} />
-        </div>
-      {/if}
-      {#if $recordingAction !== type}
-        <ButtonReset {type} />
-      {/if}
-    </DataTableCell>
-  </DataTableRow>
+    <DataTableRow>
+        <DataTableCell class="pt-4 pb-4 label">{actionNameToDisplay[type]}</DataTableCell>
+        <DataTableCell class="pt-4 pb-4">
+            <div class="mb-2">
+                <ButtonShortcut {recordingKeys} {isErrorRecording} {record} {stopRecording} {type}/>
+            </div>
+            {#if isErrorRecording && $recordingAction === type}
+                <div class="error-text">
+                    {isAlreadyInUse ? errorMessage.alreadyInUse : errorMessage.youtube}
+                </div>
+            {/if}
+            {#if $recordingAction === type}
+                <div class="mt-3">
+                    <ButtonCancel/>
+                </div>
+            {:else if numpadAliases[getJoinedModifiers($buttonTriggers[type])]}
+                <div class="mt-3">
+                    <Alias {type}/>
+                </div>
+            {/if}
+            {#if $recordingAction !== type}
+                <ButtonReset {type}/>
+            {/if}
+        </DataTableCell>
+    </DataTableRow>
 {/each}
 
-<style>
-    /*noinspection CssUnusedSymbol*/
-  :global(.s-tbl-cell.label) {
+<style global lang="scss">
+  .s-tbl-cell.label {
     vertical-align: top;
   }
 </style>
