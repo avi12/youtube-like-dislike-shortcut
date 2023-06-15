@@ -20,7 +20,7 @@
 </script>
 
 <section class="pl-3 pr-5" class:is-auto-like={isAutoLike}>
-  <Switch class="pt-5 mb-6" on:change={e => (isAutoLike = e.target.checked)} checked={isAutoLike}>
+  <Switch class="pt-5 mb-6" on:change={e => (isAutoLike = e.currentTarget.checked)} checked={isAutoLike}>
     Auto-like videos
   </Switch>
   {#if isAutoLike}
@@ -34,7 +34,7 @@
       <span slot="prepend-outer">
         <TextField
           bind:value={autoLikeThreshold}
-          on:input={debounce(e => chrome.storage.sync.set({ autoLikeThreshold: Number(e.target.value) }))}
+          on:input={debounce(e => chrome.storage.sync.set({ autoLikeThreshold: Number(e.currentTarget.value) }))}
           min={1}
           max={99}
           type="number"

@@ -7,28 +7,28 @@ import {
 import {
   getElementByMutationObserver,
   getVisibleElement,
-  observerOptions,
-  Selectors
+  OBSERVER_OPTIONS,
+  SELECTORS
 } from "../utils-initials";
 
 let gTitleLast = document.title;
 let gUrlLast = location.href;
 
 const gPlayerObserver = new MutationObserver((_, observer) => {
-  const elVideo = getVisibleElement<HTMLVideoElement>(Selectors.video);
+  const elVideo = getVisibleElement<HTMLVideoElement>(SELECTORS.video);
   if (!elVideo) {
     return;
   }
   stopTracking(elVideo);
 
   // Start the time counting only when the rating buttons loaded
-  const [, elDislike] = getRateButtons();
-  if (!elDislike) {
+  const [elLike] = getRateButtons();
+  if (!elLike) {
     return;
   }
 
   const isRated = Boolean(getRatedButton());
-  const getIsLiveOrPremiere = (): boolean => Boolean(getVisibleElement(Selectors.liveBadge));
+  const getIsLiveOrPremiere = (): boolean => Boolean(getVisibleElement(SELECTORS.liveBadge));
   if (isRated || getIsLiveOrPremiere()) {
     return;
   }
@@ -74,13 +74,13 @@ export function getIsPassedThreshold(): boolean {
 }
 
 function autoLikeWhenNeeded(e: Event): void {
-  const elVideo = <HTMLVideoElement>e.target;
+  const elVideo = e.target as HTMLVideoElement;
   if (window.ytrUserInteracted) {
     stopTracking(elVideo);
     return;
   }
 
-  const isAdPlaying = document.querySelector(`${Selectors.adSkipIn}, ${Selectors.adSkipNow}`);
+  const isAdPlaying = document.querySelector(`${SELECTORS.adSkipIn}, ${SELECTORS.adSkipNow}`);
   if (isAdPlaying) {
     return;
   }
@@ -124,10 +124,9 @@ export function setPercentageWatched({
   isVisible: boolean;
 }): void {
   const [elLike] = getRateButtons();
-  const { percentageWatched, toggleButtonsNormalVideo, toggleButtonsNormalVideoMY } = Selectors;
+  const { percentageWatched, toggleButtonsNormalVideo } = SELECTORS;
 
-  const elContainer =
-    elLike.closest(toggleButtonsNormalVideoMY) || elLike.closest(toggleButtonsNormalVideo)?.parentElement;
+  const elContainer = elLike.closest(toggleButtonsNormalVideo);
   if (!elContainer) {
     return;
   }
@@ -168,15 +167,15 @@ function addTemporaryBodyListener(): void {
   window.ytrUserInteracted = false;
   gTimeCounter = 0;
 
-  gPlayerObserver.observe(document, observerOptions);
+  gPlayerObserver.observe(document, OBSERVER_OPTIONS);
 }
 
 async function addGlobalEventListener(): Promise<void> {
   // Fires when navigating to another page
   const elTitle =
-    document.documentElement.querySelector(Selectors.title) ||
-    (await getElementByMutationObserver(Selectors.title));
-  new MutationObserver(addTemporaryBodyListener).observe(elTitle, observerOptions);
+    document.documentElement.querySelector(SELECTORS.title) ||
+    (await getElementByMutationObserver(SELECTORS.title));
+  new MutationObserver(addTemporaryBodyListener).observe(elTitle, OBSERVER_OPTIONS);
 }
 
 export function prepareToAutoLike(): void {
@@ -184,7 +183,7 @@ export function prepareToAutoLike(): void {
 
   // Runs only on /watch & /shorts pages
   if (location.pathname.match(REGEX_SUPPORTED_PAGES)) {
-    gPlayerObserver.observe(document, observerOptions);
+    gPlayerObserver.observe(document, OBSERVER_OPTIONS);
   }
 }
 
@@ -194,8 +193,8 @@ document.addEventListener("click", e => {
     return;
   }
 
-  const elRatePressed = (<HTMLElement>e.target)
-    .closest(`${Selectors.toggleButtonsContainer}, ${Selectors.toggleButtonsShortsVideo}`)
+  const elRatePressed = (e.target as HTMLElement)
+    .closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
     ?.querySelector("button[aria-pressed=true]");
   if (elRatePressed) {
     window.ytrUserInteracted = true;

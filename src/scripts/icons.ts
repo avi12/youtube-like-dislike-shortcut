@@ -53,4 +53,4 @@ export const svgs = {
     ></path>
 </svg>
 `
-};
+} as const;

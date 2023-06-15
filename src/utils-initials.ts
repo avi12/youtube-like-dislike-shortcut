@@ -4,16 +4,14 @@ export async function getStorage(storageArea: "local" | "sync", key: string): Pr
   return new Promise(resolve => chrome.storage[storageArea].get(key, result => resolve(result[key])));
 }
 
-export enum Selectors {
+export enum SELECTORS {
   video = "video",
   adSkipIn = ".ytp-ad-preview-text",
   adSkipNow = ".ytp-ad-skip-button-text",
-  liveBadge = ".ytp-live-badge",
+  liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
   percentageWatched = ".ytr-percentage",
-  toggleButtonsNormalVideoMY = "ytd-segmented-like-dislike-button-renderer", // A/B tested Material You
-  toggleButtonsNormalVideo = "#top-level-buttons-computed > ytd-toggle-button-renderer",
-  toggleButtonsShortsVideo = "ytd-like-button-renderer > ytd-toggle-button-renderer",
-  toggleButtonsContainer = "#segmented-like-buttons",
+  toggleButtonsNormalVideo = "ytd-segmented-like-dislike-button-renderer yt-smartimation",
+  toggleButtonsShortsVideo = "ytd-like-button-renderer",
   // Bezel classes
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",
@@ -44,7 +42,7 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
-export const observerOptions: MutationObserverInit = { childList: true, subtree: true };
+export const OBSERVER_OPTIONS: MutationObserverInit = { childList: true, subtree: true };
 
 export function getIsElementVisible(element: HTMLElement): boolean {
   return element?.offsetWidth > 0 && element?.offsetHeight > 0;
@@ -55,7 +53,7 @@ export function getVisibleElement<T extends HTMLElement>(selector: string): T {
   return [...elements].find(getIsElementVisible);
 }
 
-export async function getElementByMutationObserver(selector: Selectors): Promise<HTMLElement> {
+export async function getElementByMutationObserver(selector: SELECTORS): Promise<HTMLElement> {
   return new Promise(resolve => {
     new MutationObserver((_, observer) => {
       const element = document.documentElement.querySelector<HTMLElement>(selector);
@@ -63,6 +61,6 @@ export async function getElementByMutationObserver(selector: Selectors): Promise
         observer.disconnect();
         resolve(element);
       }
-    }).observe(document, observerOptions);
+    }).observe(document, OBSERVER_OPTIONS);
   });
 }

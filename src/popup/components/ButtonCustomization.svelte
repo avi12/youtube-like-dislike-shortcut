@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import { initial } from "../../utils-initials";
   import { DataTableCell, DataTableRow } from "svelte-materialify/dist";
   import {

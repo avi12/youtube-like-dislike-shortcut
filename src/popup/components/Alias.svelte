@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import { Checkbox } from "svelte-materialify";
   import { buttonTriggers, recordingAction } from "../stores";
   import type { ButtonTrigger, SupportedActions } from "../../types";
@@ -8,7 +8,7 @@
   export let type: SupportedActions;
 
   function setAlias(e: KeyboardEvent): void {
-    const { checked } = <HTMLInputElement>e.target;
+    const { checked } = e.target as HTMLInputElement;
     buttonTriggers.update(buttons => ({
       ...buttons,
       [type]: {

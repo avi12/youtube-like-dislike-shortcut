@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import { Button, Icon } from "svelte-materialify";
   import { getJoinedModifiers } from "../utils";
   import { buttonTriggers } from "../stores";

@@ -1,10 +1,9 @@
 {
   "name": "youtube-like-dislike-shortcut",
-  "version": "1.5.7",
+  "version": "1.6.0",
   "description": "Like videos with Shift+Plus or Numpad Plus, dislike with Shift+Minus or Numpad Minus.",
   "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
   "license": "GPL-3.0-or-later",
-  "type": "module",
   "author": "avi12 <avi6106@gmail.com>",
   "homepage": "https://avi12.com/youtube-like-dislike-shortcut",
   "bugs": {
@@ -13,16 +12,15 @@
   "scripts": {
     "dev": "rollup -c -w",
     "build": "rollup -c",
-    "pack": "web-ext build --overwrite-dest --artifacts-dir dist_packed --source-dir dist --filename youtube-like-dislike-shortcut-{version}.zip",
-    "pack-self": "zip-self -o dist_packed/youtube-like-dislike-shortcut-{version}-source.zip",
-    "build-pack": "pnpm run build && pnpm run pack && pnpm run webext-incompat-fix && pnpm run pack-self",
-    "build-for-firefox": "build-for-browser --i dist_packed/youtube-like-dislike-shortcut-{version}.zip --browser=firefox --source",
-    "webext-incompat-fix": "webext-store-incompat-fixer -i dist_packed/youtube-like-dislike-shortcut-{version}.zip -s chrome,edge,firefox,opera",
+    "package": "web-ext build --filename youtube-like-dislike-shortcut-{version}.zip --source-dir dist",
+    "package:self": "zip-self -o web-ext-artifacts/youtube-like-dislike-shortcut-{version}-source.zip",
+    "build-pack": "pnpm build && pnpm package && pnpm webext-incompat-fix && pnpm package:self",
+    "build-for-firefox": "build-for-browser --i web-ext-artifacts/youtube-like-dislike-shortcut-{version}.zip --browser=firefox --source",
+    "webext-incompat-fix": "webext-store-incompat-fixer -i web-ext-artifacts/youtube-like-dislike-shortcut-{version}.zip -s chrome,edge,firefox,opera",
     "set-version": "set-json-version -f package.json dist/manifest.json -v",
-    "run-browser": "web-ext run --no-config-discovery --start-url https://www.youtube.com/watch?v=dQw4w9WgXcQ --source-dir dist --verbose --target",
+    "run-browser": "web-ext run --start-url https://www.youtube.com/watch?v=aiSla-5xq3w --source-dir dist --verbose --target",
     "run-firefox": "pnpm run-browser firefox-desktop",
-    "run-chromium": "pnpm run-browser chromium",
-    "run-edge-windows": "\"\"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"\" https://www.youtube.com/watch?v=dQw4w9WgXcQ --load-extension=%cd%\\dist"
+    "run-chromium": "pnpm run-browser chromium"
   },
   "devDependencies": {
     "@mdi/js": "^7.0.96",
@@ -40,7 +38,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-svelte3": "^4.0.0",
-    "node-sass": "^7.0.3",
+    "node-sass": "^9.0.0",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.8.0",
     "rollup": "^3.2.5",

@@ -1,7 +1,7 @@
 "use strict";
 
 import { svgs } from "./icons";
-import { getVisibleElement, Selectors } from "../utils-initials";
+import { getVisibleElement, SELECTORS } from "../utils-initials";
 
 let gLastRating: "like" | "dislike";
 
@@ -25,18 +25,16 @@ function getIsVisible(element: HTMLElement): boolean {
 
 export function getRateButtons(): HTMLButtonElement[] {
   const elButtonsRate = getContainerRateButtons();
-  if (elButtonsRate[0]?.matches(Selectors.toggleButtonsNormalVideoMY)) {
-    return [...elButtonsRate[0].querySelectorAll("button")];
+  if (!elButtonsRate) {
+    return [];
   }
-  return elButtonsRate.map(el => el.querySelector("button"));
+  return [...elButtonsRate.querySelectorAll("button")] as HTMLButtonElement[];
 }
 
-function getContainerRateButtons(): HTMLButtonElement[] {
-  const { toggleButtonsNormalVideoMY, toggleButtonsNormalVideo, toggleButtonsShortsVideo } = Selectors;
-  const elButtons = document.querySelectorAll(
-    `${toggleButtonsNormalVideoMY}, ${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`
-  );
-  return [...elButtons].filter(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement[];
+function getContainerRateButtons(): HTMLButtonElement {
+  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = SELECTORS;
+  const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
+  return [...elButtons].find(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement;
 }
 
 export function getIsShorts(): boolean {
@@ -49,22 +47,22 @@ function showIndicator(isRated: boolean): void {
   }
 
   const elBezelContainer = getBezelContainer();
-  const elBezel = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezel);
-  const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(Selectors.bezelIcon);
+  const elBezel = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezel);
+  const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezelIcon);
   const { parentElement: elBezelTextWrapperContainer } = elBezelContainer.querySelector<HTMLDivElement>(
-    Selectors.bezelTextWrapper
+    SELECTORS.bezelTextWrapper
   );
   const iconName = isRated ? gLastRating : `un${gLastRating}`;
   elBezelIcon.innerHTML = svgs[iconName];
 
-  elBezelTextWrapperContainer.className = Selectors.bezelTextHide.substring(1);
+  elBezelTextWrapperContainer.className = SELECTORS.bezelTextHide.substring(1);
 
   elBezelContainer.style.display = "";
   elBezel.ariaLabel = "";
 }
 
 function getBezelContainer(): HTMLDivElement {
-  return document.querySelector(Selectors.bezelTextWrapper).parentElement as HTMLDivElement;
+  return document.querySelector(SELECTORS.bezelTextWrapper).parentElement as HTMLDivElement;
 }
 
 function clearAnimationOnEnd(): void {
@@ -79,10 +77,10 @@ function clearAnimationOnEnd(): void {
 }
 
 export function getRatedButton(): HTMLButtonElement {
-  const { toggleButtonsShortsVideo, toggleButtonsNormalVideo, toggleButtonsNormalVideoMY } = Selectors;
-  return getVisibleElement(
-    `${toggleButtonsNormalVideo}, ${toggleButtonsNormalVideoMY}, ${toggleButtonsShortsVideo}`
-  ).querySelector("button[aria-pressed=true]");
+  const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
+  return getVisibleElement(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`).querySelector(
+    "button[aria-pressed=true]"
+  );
 }
 
 /**

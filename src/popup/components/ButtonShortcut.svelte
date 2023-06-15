@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import { Button } from "svelte-materialify";
   import { buttonTriggers, recordingAction, theme } from "../stores";
   import type { RecordingType } from "../../types";

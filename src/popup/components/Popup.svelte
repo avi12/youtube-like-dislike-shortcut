@@ -19,65 +19,56 @@
   <AutoLike {isAutoLike} {autoLikeThreshold} />
 </MaterialApp>
 
-<style>
-  /* Chromium browsers */
-  :global(::-webkit-scrollbar) {
+<style global lang="scss">
+  // Chromium browsers
+  ::-webkit-scrollbar {
     width: 0;
   }
 
-  /* Firefox */
-  :global(html, body) {
-    /*noinspection CssUnknownProperty*/
+  // Firefox
+  html,
+  body {
     scrollbar-width: none;
 
-    /* Necessary to not keep any whitespace in the bottom part of the popup */
+    // Necessary to not keep any whitespace in the bottom part of the popup
     height: unset !important;
   }
 
-  :global(body) {
+  body {
     overflow: hidden;
     box-sizing: border-box;
     margin: auto;
     width: 400px;
     font-family: Roboto, Arial, sans-serif;
     font-size: 1rem;
-  }
-
-  /* Correcting the line height */
-
-  :global(body) {
+    // Correcting the line height
     line-height: 1.2 !important;
   }
 
-  /* Other styling */
+  // Other styling
 
-  /*noinspection CssUnusedSymbol*/
-  :global(.s-app) {
+  .s-app {
     text-align: center;
-    padding: 16px;
+    padding: 4px 16px 16px;
   }
 
-  /*noinspection CssUnusedSymbol*/
-  :global(.s-app .is-auto-like) {
+  .s-app .is-auto-like {
     padding-bottom: 0;
   }
 
-  /*noinspection CssUnusedSymbol*/
-  :global(.s-tbl) {
+  .s-tbl {
     text-align: left;
     display: flex !important;
     border: none !important;
   }
 
-  /*noinspection CssUnusedSymbol*/
-  :global(.s-tbl-row:last-child) {
-    /*noinspection CssUnresolvedCustomProperty*/
+  .s-tbl-row:last-child {
     border-bottom: 1px solid var(--theme-dividers);
   }
 
-  /* Making sure the table spans the whole width */
+  // Making sure the table spans the whole width
 
-  :global(table) {
+  table {
     flex: 1;
   }
 </style>

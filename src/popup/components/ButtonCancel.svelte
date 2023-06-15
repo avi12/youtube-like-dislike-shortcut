@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Button, Icon } from "svelte-materialify";
   import { mdiClose } from "@mdi/js";
   import { recordingAction } from "../stores";
