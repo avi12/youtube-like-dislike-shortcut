@@ -1,11 +1,13 @@
-# Yarn and npm
+# Yarn, npm and pnpm
 yarn-error.log
 npm-debug.log
+.pnpm-debug.log*
 node_modules
 *.env
 
 # WebStorm files
 .idea
+.vscode
 
 # Vim swap files
 *.swp
@@ -19,6 +21,12 @@ node_modules
 .DS_Store
 .tmp
 
+# local env files
+chrome.env
+firefox.env
+edge.env
+opera.env
+
 # Distribution
-/dist_packed
-/dist/build
+web-ext-artifacts
+dist/build
