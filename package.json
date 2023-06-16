@@ -21,7 +21,8 @@
     "run-browser": "web-ext run --start-url https://www.youtube.com/watch?v=aiSla-5xq3w --source-dir dist --verbose --target",
     "run-firefox": "pnpm run-browser firefox-desktop",
     "run-chromium": "pnpm run-browser chromium",
-    "run-edge-windows": "pnpm run-chromium --chromium-binary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\""
+    "run-edge-windows": "pnpm run-chromium --chromium-binary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
+    "run-opera-windows": "pnpm run-chromium --chromium-binary \"%LocalAppDAta%\\Programs\\Opera\\opera.exe\""
   },
   "devDependencies": {
     "@mdi/js": "^7.0.96",
