@@ -34,7 +34,6 @@ Made by [avi12](https://avi12.com).
 
 Install [Node.js](https://nodejs.org) and [PNPM](https://pnpm.js.org/en/installation).
 
-
 ## Install dependencies
 
 ```shell script
@@ -47,6 +46,7 @@ Install C++ build tools<br>
 The easiest way is by installing <a href="https://visualstudio.microsoft.com/downloads">Visual Studio</a> and through the installer, selecting
 
 ![Desktop development with C++ under Workloads tab](https://user-images.githubusercontent.com/6422804/199964961-529c11cd-2891-4ca2-bd89-bb848fac8d58.png)
+
 </details>
 
 ## Start Rollup for development
@@ -69,6 +69,12 @@ pnpm run-chromium
 pnpm run-edge-windows
 ```
 
+### Opera on Windows 10/11
+
+```shell
+pnpm run-opera-windows
+```
+
 ### Firefox
 
 1. Build the extension for Firefox (see below)
@@ -84,9 +90,10 @@ pnpm build-pack
 ### Build for Firefox (first run `pnpm build-pack`)
 
 ```shell
-pnpm build-for-firefox
+pnpm build:firefox
 ```
 
-## Do you want to contribute?
+## Contribution
 
-Feel free to! Make sure to comply with the license, [GPL v3](https://github.com/avi12/skillshare-player-control/blob/main/LICENSE).
+Feel free to contribute! Keep in mind that the license I chose is [GPL v3](https://github.com/avi12/youtube-like-dislike-shortcut/blob/main/LICENSE).  
+If you want to fork, make sure to credit [avi12](https://avi12.com) and link to this repository.
