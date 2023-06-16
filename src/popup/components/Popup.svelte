@@ -41,6 +41,7 @@
     width: 400px;
     font-family: Roboto, Arial, sans-serif;
     font-size: 1rem;
+    user-select: none;
     // Correcting the line height
     line-height: 1.2 !important;
   }
