@@ -34,7 +34,7 @@ devDependencies:
     version: 5.42.0(eslint@8.26.0)(typescript@4.8.4)
   build-for-browser:
     specifier: github:avi12/build-for-browser
-    version: github.com/avi12/build-for-browser/d719d7b7fbbf16593f38e3f18362b9f29c76f2c5
+    version: github.com/avi12/build-for-browser/538b30d4e35e54d16cf7378b5db76289f076100d
   eslint:
     specifier: ^8.26.0
     version: 8.26.0
@@ -2029,7 +2029,7 @@ packages:
       regexp-tree: 0.1.27
       regjsparser: 0.10.0
       safe-regex: 2.1.1
-      semver: 7.5.1
+      semver: 7.5.2
       strip-indent: 3.0.0
     dev: true
 
@@ -4891,6 +4891,14 @@ packages:
       lru-cache: 6.0.0
     dev: true
 
+  /semver@7.5.2:
+    resolution: {integrity: sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dependencies:
+      lru-cache: 6.0.0
+    dev: true
+
   /serialize-javascript@4.0.0:
     resolution: {integrity: sha512-GaNA54380uFefWghODBWEGisLZFj00nS5ACs6yHa9nLqlLpVLO8ChDGeKRjZnV4Nh4n0Qi7nhYZD/9fCPzEqkw==}
     dependencies:
@@ -5963,8 +5971,8 @@ packages:
       readable-stream: 3.6.2
     dev: true
 
-  github.com/avi12/build-for-browser/d719d7b7fbbf16593f38e3f18362b9f29c76f2c5:
-    resolution: {tarball: https://codeload.github.com/avi12/build-for-browser/tar.gz/d719d7b7fbbf16593f38e3f18362b9f29c76f2c5}
+  github.com/avi12/build-for-browser/538b30d4e35e54d16cf7378b5db76289f076100d:
+    resolution: {tarball: https://codeload.github.com/avi12/build-for-browser/tar.gz/538b30d4e35e54d16cf7378b5db76289f076100d}
     name: build-for-browser
     version: 0.0.1
     hasBin: true
