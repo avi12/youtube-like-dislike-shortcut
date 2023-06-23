@@ -14,7 +14,7 @@
     "build": "rollup -c",
     "package": "web-ext build --filename youtube-like-dislike-shortcut-{version}.zip --source-dir dist",
     "package:self": "zip-self -o web-ext-artifacts/youtube-like-dislike-shortcut-{version}-source.zip",
-    "build:firefox": "build-for-browser --i web-ext-artifacts/youtube-like-dislike-shortcut-{version}.zip --o web-ext-artifacts --source && pnpm package:self",
+    "build:firefox": "pnpm package:self && build-for-browser --i web-ext-artifacts/youtube-like-dislike-shortcut-{version}.zip --o web-ext-artifacts --source",
     "build-pack": "pnpm build && pnpm package && pnpm webext-incompat-fix",
     "build-pack:all": "pnpm build-pack && pnpm build:firefox",
     "webext-incompat-fix": "webext-store-incompat-fixer -i web-ext-artifacts/youtube-like-dislike-shortcut-{version}.zip -s chrome,edge,firefox,opera",
