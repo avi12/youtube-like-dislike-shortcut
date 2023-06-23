@@ -39,7 +39,7 @@
           max={99}
           type="number"
         >
-          Threshold
+          Like after watched
           <span slot="append">%</span>
         </TextField>
       </span>
