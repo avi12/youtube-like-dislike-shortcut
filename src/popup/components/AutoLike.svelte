@@ -50,7 +50,7 @@
 <style>
   /*noinspection CssUnusedSymbol*/
   :global(.s-text-field__input) {
-    width: 35px;
+    width: 80px;
   }
 
   /*noinspection CssUnusedSymbol*/
