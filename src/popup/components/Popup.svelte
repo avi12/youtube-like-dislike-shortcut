@@ -6,17 +6,17 @@
   import { initial } from "../../utils-initials";
 
   export let isAutoLike = initial.isAutoLike;
+  export let isAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels;
   export let autoLikeThreshold = initial.autoLikeThreshold;
 </script>
 
 <MaterialApp theme={$theme}>
-  <h1 class="text-h6 text-center">Shortcut Settings</h1>
   <DataTable class="align-start mt-4">
     <DataTableBody>
       <ButtonCustomization />
     </DataTableBody>
   </DataTable>
-  <AutoLike {isAutoLike} {autoLikeThreshold} />
+  <AutoLike {isAutoLike} {isAutoLikeSubscribedChannels} {autoLikeThreshold} />
 </MaterialApp>
 
 <style global lang="scss">

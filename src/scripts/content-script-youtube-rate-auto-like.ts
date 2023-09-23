@@ -14,7 +14,11 @@ import {
 let gTitleLast = document.title;
 let gUrlLast = location.href;
 
-const gPlayerObserver = new MutationObserver((_, observer) => {
+async function getIsAutoLikeDueToSubscribing(): Promise<boolean> {
+  return window.ytrAutoLikeSubscribedChannels && (await getIsSubscribed());
+}
+
+const OBSERVER_PLAYER = new MutationObserver(async (_, observer) => {
   const elVideo = getVisibleElement<HTMLVideoElement>(SELECTORS.video);
   if (!elVideo) {
     return;
@@ -23,11 +27,18 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
 
   // Start the time counting only when the rating buttons loaded
   const [elLike] = getRateButtons();
-  if (!elLike) {
+  const elSubscribe = getVisibleElement(SELECTORS.buttonSubscribe);
+  if (!elLike || !elSubscribe) {
     return;
   }
 
   const isRated = Boolean(getRatedButton());
+  if (await getIsAutoLikeDueToSubscribing()) {
+    rateVideo(true);
+    observer.disconnect();
+    return;
+  }
+
   const getIsLiveOrPremiere = (): boolean => Boolean(getVisibleElement(SELECTORS.liveBadge));
   if (isRated || getIsLiveOrPremiere()) {
     return;
@@ -56,6 +67,14 @@ const gPlayerObserver = new MutationObserver((_, observer) => {
   );
 });
 
+async function likeIfSubscribed(): Promise<void> {
+  if (await getIsAutoLikeDueToSubscribing()) {
+    rateVideo(true);
+  }
+}
+
+const OBSERVER_SUBSCRIPTION = new MutationObserver(likeIfSubscribed);
+
 let gTimeCounter = 0;
 let gTimeDelta: number;
 let gTimeCurrentLast: number;
@@ -71,6 +90,21 @@ function stopTracking(elVideo: HTMLVideoElement): void {
 
 export function getIsPassedThreshold(): boolean {
   return window.ytrPercentageWatched >= window.ytrAutoLikeThreshold;
+}
+
+export async function getIsSubscribed(): Promise<boolean> {
+  const elSubscribe =
+    getVisibleElement(SELECTORS.buttonSubscribe) ||
+    (await getElementByMutationObserver(SELECTORS.buttonSubscribe));
+  return elSubscribe.getAttribute("subscribed") !== null;
+}
+
+async function addSubscribeListener(): Promise<void> {
+  const elSubscribe = await getElementByMutationObserver(SELECTORS.buttonSubscribe);
+  OBSERVER_SUBSCRIPTION.observe(elSubscribe, {
+    attributes: true,
+    attributeFilter: ["subscribed"]
+  });
 }
 
 function autoLikeWhenNeeded(e: Event): void {
@@ -167,10 +201,11 @@ function addTemporaryBodyListener(): void {
   window.ytrUserInteracted = false;
   gTimeCounter = 0;
 
-  gPlayerObserver.observe(document, OBSERVER_OPTIONS);
+  OBSERVER_PLAYER.observe(document, OBSERVER_OPTIONS);
+  addSubscribeListener();
 }
 
-async function addGlobalEventListener(): Promise<void> {
+async function addNavigationListener(): Promise<void> {
   // Fires when navigating to another page
   const elTitle =
     document.documentElement.querySelector(SELECTORS.title) ||
@@ -179,11 +214,12 @@ async function addGlobalEventListener(): Promise<void> {
 }
 
 export function prepareToAutoLike(): void {
-  addGlobalEventListener();
+  addNavigationListener();
 
   // Runs only on /watch & /shorts pages
   if (location.pathname.match(REGEX_SUPPORTED_PAGES)) {
-    gPlayerObserver.observe(document, OBSERVER_OPTIONS);
+    OBSERVER_PLAYER.observe(document, OBSERVER_OPTIONS);
+    addSubscribeListener();
   }
 }
 

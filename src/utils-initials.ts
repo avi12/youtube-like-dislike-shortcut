@@ -12,6 +12,7 @@ export enum SELECTORS {
   percentageWatched = ".ytr-percentage",
   toggleButtonsNormalVideo = "ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "ytd-like-button-renderer",
+  buttonSubscribe = "ytd-subscribe-button-renderer",
   // Bezel classes
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",
@@ -39,6 +40,7 @@ export const initial = {
     }
   } as ButtonTriggers,
   isAutoLike: false,
+  isAutoLikeSubscribedChannels: false,
   autoLikeThreshold: 70
 };
 

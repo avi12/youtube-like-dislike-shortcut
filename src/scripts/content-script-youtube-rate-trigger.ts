@@ -5,6 +5,7 @@ import type { ButtonTrigger, ButtonTriggers, SupportedActions } from "../types";
 import { getStorage, initial } from "../utils-initials";
 import {
   getIsPassedThreshold,
+  getIsSubscribed,
   prepareToAutoLike,
   setPercentageWatched
 } from "./content-script-youtube-rate-auto-like";
@@ -15,6 +16,7 @@ declare global {
     ytrAutoLikeEnabled: boolean;
     ytrAutoLikeThreshold: number;
     ytrPercentageWatched: number;
+    ytrAutoLikeSubscribedChannels: boolean;
   }
 }
 
@@ -25,17 +27,25 @@ async function init(): Promise<void> {
     gLastTriggers = ((await getStorage("local", "buttonTriggers")) ??
       initial.buttonTriggers) as ButtonTriggers;
 
-    const { isAutoLike = initial.isAutoLike, autoLikeThreshold = initial.autoLikeThreshold } =
-      await new Promise<{
-        isAutoLike: boolean;
-        autoLikeThreshold: number;
-      }>(resolve => chrome.storage.sync.get(["isAutoLike", "autoLikeThreshold"], resolve));
+    const {
+      isAutoLike = initial.isAutoLike,
+      isAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels,
+      autoLikeThreshold = initial.autoLikeThreshold
+    } = await new Promise<{
+      isAutoLike: boolean;
+      autoLikeThreshold: number;
+      isAutoLikeSubscribedChannels: boolean;
+    }>(resolve =>
+      chrome.storage.sync.get(["isAutoLike", "isAutoLikeSubscribedChannels", "autoLikeThreshold"], resolve)
+    );
     window.ytrAutoLikeEnabled = isAutoLike;
     window.ytrAutoLikeThreshold = autoLikeThreshold;
+    window.ytrAutoLikeSubscribedChannels = isAutoLikeSubscribedChannels;
   } catch {
     gLastTriggers = initial.buttonTriggers;
     window.ytrAutoLikeEnabled = initial.isAutoLike;
     window.ytrAutoLikeThreshold = initial.autoLikeThreshold;
+    window.ytrAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels;
   }
 
   prepareToAutoLike();
@@ -64,6 +74,14 @@ chrome.storage.onChanged.addListener(async changes => {
   if ("autoLikeThreshold" in changes) {
     window.ytrAutoLikeThreshold = changes.autoLikeThreshold.newValue;
     if (getIsPassedThreshold()) {
+      rateVideo(true);
+    }
+    return;
+  }
+
+  if ("isAutoLikeSubscribedChannels" in changes) {
+    window.ytrAutoLikeSubscribedChannels = changes.isAutoLikeSubscribedChannels.newValue;
+    if (window.ytrAutoLikeSubscribedChannels && (await getIsSubscribed())) {
       rateVideo(true);
     }
     return;
