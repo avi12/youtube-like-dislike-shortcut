@@ -9,12 +9,12 @@ Basically copies the like/dislike shortcut from YouTube Music, which means:
 
 Additionally:
 
-- Auto-like videos based on a watch time threshold you set
+- Auto-like videos based on a watch time threshold that you set OR based on whether you're subscribed to the channel
 - Shift+0 (on the number row) to remove your like/dislike
 - Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 - <details>
     <summary>Pop-up page with options</summary>
-    <img src="https://user-images.githubusercontent.com/6422804/174785249-fd92ca55-11bc-4043-bdac-58837609a63d.png" alt="Screenshot">
+    <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/31f486bd-2273-4448-9b7b-5378cf220b48" alt="Screenshot">
   </details>
 
 **This extension does not reveal the videos' dislike counters.**
@@ -77,9 +77,8 @@ pnpm run-opera-windows
 
 ### Firefox
 
-1. Build the extension for Firefox (see below)
-2. Open `about:debugging#/runtime/this-firefox`
-3. "Load Temporary Add-on" → select `dist/manifest.json`
+1. Open `about:debugging#/runtime/this-firefox`
+2. "Load Temporary Add-on" → select `dist/manifest.json`
 
 ## Build & pack
 
@@ -87,13 +86,8 @@ pnpm run-opera-windows
 pnpm build-pack
 ```
 
-### Build for Firefox (first run `pnpm build-pack`)
-
-```shell
-pnpm build:firefox
-```
-
 ## Contribution
 
-Feel free to contribute! Keep in mind that the license I chose is [GPL v3](https://github.com/avi12/youtube-like-dislike-shortcut/blob/main/LICENSE).  
+Feel free to contribute! Keep in mind that the license I chose
+is [GPL v3](https://github.com/avi12/youtube-like-dislike-shortcut/blob/main/LICENSE).  
 If you want to fork, make sure to credit [avi12](https://avi12.com) and link to this repository.
