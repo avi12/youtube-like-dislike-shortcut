@@ -3,11 +3,17 @@
   import { Slider, Switch, TextField } from "svelte-materialify";
 
   export let isAutoLike = initial.isAutoLike;
+  export let isAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels;
   export let autoLikeThreshold = initial.autoLikeThreshold;
 
   $: {
     // noinspection TypeScriptUnresolvedFunction
     chrome.storage.sync.set({ isAutoLike });
+  }
+
+  $: {
+    // noinspection TypeScriptUnresolvedFunction
+    chrome.storage.sync.set({ isAutoLikeSubscribedChannels });
   }
 
   function debounce(func, timeout = 300): (...args) => void {
@@ -44,6 +50,15 @@
         </TextField>
       </span>
     </Slider>
+
+    <!-- Add a switch "Auto-like subscribed channels" -->
+    <Switch
+      class="pt-5"
+      on:change={e => (isAutoLikeSubscribedChannels = e.currentTarget.checked)}
+      checked={isAutoLikeSubscribedChannels}
+    >
+      Auto-like in subscribed channels
+    </Switch>
   {/if}
 </section>
 
