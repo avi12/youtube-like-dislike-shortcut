@@ -1,11 +1,11 @@
 {
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist/*"],
+  "extends": "plasmo/templates/tsconfig.base",
+  "exclude": ["node_modules"],
+  "include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.svelte"],
   "compilerOptions": {
-    "target": "ES2021",
-    "sourceMap": false,
-    "types": ["svelte", "chrome"],
-    "moduleResolution": "Node"
-  },
-  "extends": "@tsconfig/svelte/tsconfig.json"
+    "paths": {
+      "~*": ["./src/*"]
+    },
+    "baseUrl": "."
+  }
 }

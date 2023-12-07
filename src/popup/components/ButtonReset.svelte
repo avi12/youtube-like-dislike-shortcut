@@ -1,24 +1,33 @@
 <script lang="ts">
-  import { Button, Icon } from "svelte-materialify";
-  import { getJoinedModifiers } from "../utils";
-  import { buttonTriggers } from "../stores";
-  import type { RecordingType } from "../../types";
-  import { initial } from "../../utils-initials";
-  import { mdiRestart } from "@mdi/js";
+  import { createEventDispatcher } from "svelte";
+  import IconReset from "~popup/components/icons/IconReset.svelte";
 
-  export let type: RecordingType;
+  const dispatch = createEventDispatcher();
 
-  function reset(): void {
-    buttonTriggers.update(buttons => ({ ...buttons, [type]: initial.buttonTriggers[type] }));
-  }
+  export let disabled: boolean;
 </script>
 
-<Button
-  outlined
-  disabled={getJoinedModifiers($buttonTriggers[type]) === getJoinedModifiers(initial.buttonTriggers[type])}
-  on:click={reset}
-  class="mt-3"
->
-  <Icon class="mr-2" path={mdiRestart} />
+<button class="button-reset quick-transition" {disabled} on:click={() => dispatch("click")}>
+  <IconReset {disabled} />
   Reset
-</Button>
+</button>
+
+<style lang="scss">
+  .button-reset {
+    color: var(--button-reset-color);
+    background-color: var(--button-reset-bg);
+    border: var(--button-reset-border);
+    padding: 10.5px 16px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &:disabled {
+      color: var(--button-disabled-color);
+      background-color: var(--button-disabled-bg);
+      border: var(--button-disabled-border);
+      cursor: not-allowed;
+    }
+  }
+</style>

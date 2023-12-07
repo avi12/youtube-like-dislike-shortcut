@@ -1,61 +1,61 @@
 <script lang="ts">
-  import { Button } from "svelte-materialify";
-  import { buttonTriggers, recordingAction, theme } from "../stores";
-  import type { RecordingType } from "../../types";
-  import { getJoinedModifiers } from "../utils";
+  import { createEventDispatcher } from "svelte";
 
-  function toggleRecording(): void {
-    // Scenarios:
-    // - first time user clicks to record a keystroke
-    if (!$recordingAction) {
-      record();
-      $recordingAction = type;
-      return;
-    }
+  const dispatch = createEventDispatcher();
 
-    // - user clicks to stop recording the same type
-    if ($recordingAction === type) {
-      if (!isErrorRecording) {
-        stopRecording();
-      }
-      $recordingAction = null;
-      return;
-    }
-  }
-
-  export let isErrorRecording = false;
-  export let recordingKeys = "";
-  export let record;
-  export let stopRecording;
-  export let type: RecordingType;
-
-  $: colorActiveButton = isErrorRecording ? "error-color" : "secondary-color";
+  export let active = false;
+  export let error = false;
+  export let disabled = false;
 </script>
 
-<Button
-  outlined={$theme === "dark"}
-  class={"text-none " + ($recordingAction === type ? colorActiveButton : "")}
-  disabled={$recordingAction !== null && $recordingAction !== type}
-  on:click={toggleRecording}
->
-  {#if $recordingAction === type}
-    {recordingKeys || getJoinedModifiers($buttonTriggers[type])}
-  {:else}
-    {getJoinedModifiers($buttonTriggers[type])}
-  {/if}
-</Button>
+<button
+  class="button-shortcut quick-transition"
+  class:button-shortcut--active={active}
+  class:button-shortcut--error={error}
+  {disabled}
+  on:click={() => dispatch("click")}>
+  <slot />
+</button>
 
-<style>
-  /*noinspection CssUnusedSymbol*/
-  :global(.text-none.text-none .s-btn__content) {
-    text-transform: none;
+<style lang="scss">
+  .button-shortcut {
+    color: var(--button-shortcut-color);
+    background-color: var(--button-shortcut-bg);
+    border: var(--button-shortcut-border);
+    box-shadow: var(--button-shortcut-shadow);
+    padding: 14.5px 16px;
+    border-radius: 12px;
+
+    &--active {
+      color: var(--button-shortcut-active-color);
+      background-color: var(--button-shortcut-active-bg);
+      border: var(--button-shortcut-active-border);
+    }
+
+    &:disabled {
+      color: var(--button-disabled-color);
+      background-color: var(--button-disabled-bg);
+      border: var(--button-disabled-border);
+      cursor: not-allowed;
+    }
+
+    &--error {
+      color: var(--button-shortcut-error-color);
+      background-color: var(--button-shortcut-error-bg);
+      border: var(--button-shortcut-error-border);
+
+      &:disabled {
+        color: var(--button-shortcut-error-color);
+        background-color: var(--button-shortcut-error-bg);
+      }
+    }
   }
 
-  /*noinspection CssUnusedSymbol*/
-  :global(.s-btn.text-none) {
-    white-space: normal;
-    display: block;
-    height: unset !important;
-    padding: 10px !important;
+  :global([data-theme="dark"]) {
+    .button-shortcut {
+      &--error:disabled {
+        filter: brightness(0.8);
+      }
+    }
   }
 </style>
