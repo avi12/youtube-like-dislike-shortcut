@@ -9,12 +9,12 @@ Basically copies the like/dislike shortcut from YouTube Music, which means:
 
 Additionally:
 
-- Auto-like videos based on a watch time threshold that you set OR based on whether you're subscribed to the channel
+- Auto-like videos based on a watch time threshold that you set
 - Shift+0 (on the number row) to remove your like/dislike
 - Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 - <details>
     <summary>Pop-up page with options</summary>
-    <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/31f486bd-2273-4448-9b7b-5378cf220b48" alt="Screenshot">
+    <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/961a7890-752d-49a1-99f3-e68bbaec18aa" alt="Screenshot">
   </details>
 
 **This extension does not reveal the videos' dislike counters.**
@@ -40,16 +40,7 @@ Install [Node.js](https://nodejs.org) and [PNPM](https://pnpm.js.org/en/installa
 pnpm i
 ```
 
-<details>
-<summary>If installing dependencies is throwing an error on Windows</summary>
-Install C++ build tools<br>  
-The easiest way is by installing <a href="https://visualstudio.microsoft.com/downloads">Visual Studio</a> and through the installer, selecting
-
-![Desktop development with C++ under Workloads tab](https://user-images.githubusercontent.com/6422804/199964961-529c11cd-2891-4ca2-bd89-bb848fac8d58.png)
-
-</details>
-
-## Start Rollup for development
+## Start dev server
 
 ```shell script
 pnpm dev
@@ -77,9 +68,9 @@ pnpm run-opera-windows
 
 ### Firefox
 
-1. Open `about:debugging#/runtime/this-firefox`
-2. "Load Temporary Add-on" → select `dist/manifest.json`
-
+```shell
+pnpm run-firefox
+```
 ## Build & pack
 
 ```shell
