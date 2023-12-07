@@ -1,9 +1,9 @@
 export type Modifier = "shiftKey" | "ctrlKey" | "altKey" | "metaKey";
 
 export interface ButtonTrigger {
-  primary: string;
+  primary: string[];
   modifiers: Modifier[];
-  secondary: string;
+  secondary: boolean;
 }
 
 export interface ButtonTriggers {
@@ -13,4 +13,12 @@ export interface ButtonTriggers {
 }
 
 export type SupportedActions = "like" | "dislike" | "unrate";
-export type RecordingType = SupportedActions | null;
+
+declare global {
+  interface Window {
+    ytrUserInteracted: boolean;
+    ytrAutoLikeEnabled: boolean;
+    ytrAutoLikeThreshold: number;
+    ytrAutoLikeSubscribedChannels: boolean;
+  }
+}

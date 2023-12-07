@@ -1,9 +1,0 @@
-{
-  "arrowParens": "avoid",
-  "trailingComma": "none",
-  "singleQuote": false,
-  "semi": true,
-  "svelteSortOrder": "scripts-markup-options-styles",
-  "plugins": ["prettier-plugin-svelte"],
-  "printWidth": 110
-}

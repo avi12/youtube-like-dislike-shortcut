@@ -3,7 +3,6 @@ yarn-error.log
 npm-debug.log
 .pnpm-debug.log*
 node_modules
-*.env
 
 # WebStorm files
 .idea
@@ -30,3 +29,7 @@ opera.env
 # Distribution
 web-ext-artifacts
 dist/build
+
+# Plasmo
+build
+.plasmo

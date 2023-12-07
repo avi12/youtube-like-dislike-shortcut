@@ -15,7 +15,7 @@ body:
     id: reproduction
     attributes:
       label: How to reproduce
-      placeholder: E.g. go to a /watch page and then click on another video. Then, pressing "+" will not Like the video.
+      placeholder: Include a screen recording, if possible
     validations:
       required: true
   - type: textarea
@@ -52,10 +52,17 @@ body:
   - type: input
     id: version
     attributes:
-      label: What's the version you're running?
+      label: What's the extension version you're running?
       description: Go to the extensions page and copy the version number
     validations:
       required: true
+  - type: checkboxes
+    id: reported
+    attributes:
+      label: Make sure the bug wasn't reported before
+      options:
+        - label: I'm the first one to [report](https://github.com/avi12/youtube-auto-hd/issues?q=is%3Aissue) it
+          required: true
   - type: textarea
     id: additional-context
     attributes:

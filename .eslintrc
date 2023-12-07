@@ -1,14 +1,53 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2021,
-    "sourceType": "module"
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "lib": ["dom", "esnext"]
   },
+  "overrides": [
+    {
+      "files": ["*.svelte"],
+      "parser": "svelte-eslint-parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser"
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "webextensions": true
+  },
+  "globals": {
+    "chrome": true
+  },
+  "plugins": ["svelte", "@typescript-eslint", "import"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:svelte/recommended"],
   "rules": {
-    "arrow-parens": ["warn", "as-needed"],
-    "prefer-const": "warn",
-    "no-async-promise-executor": "off",
-    "semi": "warn",
+    "indent": ["warn", 2, { "SwitchCase": 1 }],
+    "semi": ["warn", "always"],
+    "quote-props": ["warn", "as-needed"],
+    "comma-spacing": [
+      "warn",
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    "key-spacing": [
+      "warn",
+      {
+        "beforeColon": false,
+        "afterColon": true
+      }
+    ],
+    "@typescript-eslint/type-annotation-spacing": "warn",
+    "space-infix-ops": "warn",
+    "space-in-parens": ["warn", "never"],
+    "array-bracket-spacing": ["warn", "never"],
+    "object-curly-spacing": ["warn", "always"],
     "quotes": [
       "warn",
       "double",
@@ -16,33 +55,22 @@
         "allowTemplateLiterals": true
       }
     ],
-    "indent": [
+    "no-trailing-spaces": [
       "warn",
-      2,
       {
-        "SwitchCase": 1
+        "skipBlankLines": true
       }
     ],
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["warn"],
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "quote-props": ["warn", "as-needed"]
-  },
-  "overrides": [
-    {
-      "files": ["*.svelte"],
-      "processor": "svelte3/svelte3"
-    }
-  ],
-  "env": {
-    "es6": true,
-    "browser": true,
-    "node": true,
-    "webextensions": true
-  },
-  "plugins": ["svelte3", "@typescript-eslint"],
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-  "settings": {
-    "svelte3/typescript": true
+    "eol-last": ["warn", "always"],
+    "no-multiple-empty-lines": [
+      "warn",
+      {
+        "max": 2
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": "warn",
+    "comma-dangle": ["warn", "never"],
+    "import/order": ["warn", { "groups": ["external", "internal"], "alphabetize": { "order": "asc" } }],
+    "prefer-const": "warn"
   }
 }

@@ -1,10 +1,24 @@
 <script lang="ts">
-  import { Button, Icon } from "svelte-materialify";
-  import { mdiClose } from "@mdi/js";
-  import { recordingAction } from "../stores";
+  import { createEventDispatcher } from "svelte";
+  import IconCancel from "~popup/components/icons/IconCancel.svelte";
+
+  const dispatch = createEventDispatcher();
 </script>
 
-<Button outlined on:click={() => ($recordingAction = null)}>
-  <Icon class="mr-2" path={mdiClose} />
+<button class="button-cancel quick-transition" on:click={() => dispatch("click")}>
+  <IconCancel />
   Cancel
-</Button>
+</button>
+
+<style lang="scss">
+  .button-cancel {
+    color: var(--button-cancel-color);
+    background-color: var(--button-cancel-bg);
+    border: var(--button-cancel-border);
+    padding: 10.5px 16px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+</style>
