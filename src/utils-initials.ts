@@ -33,7 +33,7 @@ export enum SELECTORS {
   adSkipNow = ".ytp-ad-skip-button-text",
   liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
   percentageWatched = ".ytr-percentage",
-  toggleButtonsNormalVideo = "[class*=YtSegmentedLikeDislikeButton] yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
+  toggleButtonsNormalVideo = "#top-level-buttons-computed yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "ytd-like-button-renderer",
   buttonSubscribe = "ytd-subscribe-button-renderer",
   // Bezel classes
@@ -67,6 +67,7 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
+export const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts)/;
 export const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"];
 
@@ -81,13 +82,13 @@ export function getVisibleElement<T extends HTMLElement>(selector: string): T {
   return [...elements].find(getIsElementVisible);
 }
 
-export async function getElementByMutationObserver(selector: SELECTORS): Promise<HTMLElement> {
+export async function getElementByMutationObserver<T extends HTMLElement>(selector: SELECTORS): Promise<T> {
   return new Promise(resolve => {
     new MutationObserver((_, observer) => {
       const element = document.documentElement.querySelector<HTMLElement>(selector);
       if (element) {
         observer.disconnect();
-        resolve(element);
+        resolve(element as T);
       }
     }).observe(document, OBSERVER_OPTIONS);
   });

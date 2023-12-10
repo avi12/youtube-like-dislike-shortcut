@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import ButtonCancel from "~popup/components/ButtonCancel.svelte";
   import ButtonReset from "~popup/components/ButtonReset.svelte";
   import ButtonShortcut from "~popup/components/ButtonShortcut.svelte";
@@ -130,7 +131,7 @@
       {displayedKeyComboList.join(" + ")}
     </ButtonShortcut>
     {#if error}
-      <div class="error">{error}</div>
+      <div class="error" transition:fade>{error}</div>
     {:else if isHasAnotherShortcut && (!$isRecording || $currentlyRecording !== type)}
       <Checkbox bind:checked={$keyCombosSecondary[type]} disabled={$isRecording && $currentlyRecording !== type}>
         Also use {defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]}

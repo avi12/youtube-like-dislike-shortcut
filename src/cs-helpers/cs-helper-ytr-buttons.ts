@@ -1,8 +1,5 @@
-import { Storage } from "@plasmohq/storage";
 import { svgs } from "~cs-helpers/icons";
-import { getElementByMutationObserver, getVisibleElement, SELECTORS } from "~utils-initials";
-
-const storageLocal = new Storage({ area: "local" });
+import { getVisibleElement, SELECTORS } from "~utils-initials";
 
 let gLastRating: "like" | "dislike";
 
@@ -33,8 +30,7 @@ export function getRateButtons(): HTMLButtonElement[] {
 }
 
 function getContainerRateButtons(): HTMLButtonElement {
-  const { toggleButtonsNormalVideo, toggleButtonsShortsVideo } = SELECTORS;
-  const elButtons = document.querySelectorAll(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`);
+  const elButtons = document.querySelectorAll(`${(SELECTORS.toggleButtonsNormalVideo)}, ${(SELECTORS.toggleButtonsShortsVideo)}`);
   return [...elButtons].find(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement;
 }
 
@@ -79,21 +75,20 @@ function clearAnimationOnEnd(): void {
 
 export function getRatedButton(): HTMLButtonElement {
   const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
-  return getVisibleElement(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`).querySelector(
+  return getVisibleElement(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`)?.querySelector(
     "button[aria-pressed=true]"
   );
 }
 
-export async function getIsSubscribed(): Promise<boolean> {
-  const elSubscribe =
-    getVisibleElement(SELECTORS.buttonSubscribe) || (await getElementByMutationObserver(SELECTORS.buttonSubscribe));
-  return elSubscribe.getAttribute("subscribed") !== null;
+export function getIsSubscribed(): boolean {
+  const elSubscribe = getVisibleElement(SELECTORS.buttonSubscribe);
+  return elSubscribe?.getAttribute("subscribed") !== null;
 }
 
 /**
  * Rates/un-rates a video on YouTube.com
  */
-export async function rateVideo(isLike: boolean | null): Promise<void> {
+export function rateVideo(isLike: boolean | null): Promise<void> {
   const [elLike, elDislike] = getRateButtons();
   clearAnimationOnEnd();
 
@@ -123,7 +118,6 @@ export async function rateVideo(isLike: boolean | null): Promise<void> {
   // isLike === null
   // Un-rate a video
   const elBtnActive = getRatedButton();
-
   if (!gLastRating) {
     gLastRating = elBtnActive === elDislike ? "dislike" : "like";
   }

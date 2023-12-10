@@ -44,7 +44,7 @@
 
   input[type="number"] {
     border-radius: 12px;
-    border: var(--textbox-border);
+    border: 1.5px solid var(--textbox-border);
     color: var(--textbox-color);
     background-color: var(--textbox-bg);
     font-size: 0.875rem;

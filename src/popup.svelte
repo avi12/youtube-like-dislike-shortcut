@@ -15,7 +15,7 @@
     --action-bg-color: #7061ed;
 
     --card-bg: #ffffff;
-    --card-border: 1px solid rgba(188, 192, 200, 0.5);
+    --card-border: rgba(188, 192, 200, 0.5);
 
     --theme-switcher-bg: #f5f6fc;
     --theme-switcher-button-bg: var(--action-bg-color);
@@ -24,29 +24,29 @@
 
     --button-shortcut-color: #1b1b1b;
     --button-shortcut-bg: #ffffff;
-    --button-shortcut-border: 1.5px solid rgba(188, 192, 200, 0.5);
+    --button-shortcut-border: rgba(188, 192, 200, 0.5);
     --button-shortcut-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.09);
 
     --button-shortcut-active-color: #ffffff;
     --button-shortcut-active-bg: var(--action-bg-color);
-    --button-shortcut-active-border: 1.5px solid var(--button-shortcut-active-bg);
+    --button-shortcut-active-border-color: var(--button-shortcut-active-bg);
 
     --button-shortcut-error-color: #ffffff;
     --button-shortcut-error-bg: #ff4d4f;
-    --button-shortcut-error-border: 1.5px solid var(---button-shortcut-error-bg);
+    --button-shortcut-error-border-color: var(---button-shortcut-error-bg);
 
     --button-reset-color: #1b1b1b;
     --button-reset-bg: #ffffff;
-    --button-reset-border: 1.5px solid rgba(188, 192, 200, 0.5);
+    --button-reset-border-color: rgba(188, 192, 200, 0.5);
 
     --button-cancel-color: #ffffff;
     --button-cancel-bg: #1b1b1b;
-    --button-cancel-border: 1.5px solid var(--button-cancel-bg);
+    --button-cancel-border-color: var(--button-cancel-bg);
 
     --button-disabled-color: #bcc0c8;
     --button-disabled-icon-color: #BCC0C8;
     --button-disabled-bg: #f5f6fc;
-    --button-disabled-border: 1.5px solid rgba(188, 192, 200, 0.5);
+    --button-disabled-border-color: rgba(188, 192, 200, 0.5);
 
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: 0px 4px 4px 0px rgba(112, 97, 237, 0.25);
@@ -60,7 +60,7 @@
 
     --textbox-color: #1b1b1b;
     --textbox-bg: #ffffff;
-    --textbox-border: 1.5px solid rgba(188, 192, 200, 0.5);
+    --textbox-border: rgba(188, 192, 200, 0.5);
     --textbox-suffix-color: var(--action-bg-color);
 
     --textbox-color-disabled: var(--button-disabled-color);
@@ -77,7 +77,7 @@
     --action-bg-color: #7061ed;
 
     --card-bg: #242424;
-    --card-border: 1px solid #242424;
+    --card-border: #242424;
 
     --theme-switcher-bg: var(--card-bg);
     --theme-switcher-button-bg: var(--action-bg-color);
@@ -86,29 +86,29 @@
 
     --button-shortcut-color: #ffffff;
     --button-shortcut-bg: #1b1b1b;
-    --button-shortcut-border: 1.5px solid #35373A;
+    --button-shortcut-border: #35373A;
     --button-shortcut-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.09);
 
     --button-shortcut-active-color: #ffffff;
     --button-shortcut-active-bg: var(--action-bg-color);
-    --button-shortcut-active-border: 1.5px solid var(--button-shortcut-active-bg);
+    --button-shortcut-active-border-color: var(--button-shortcut-active-bg);
 
     --button-shortcut-error-color: #ffffff;
     --button-shortcut-error-bg: #ff4d4f;
-    --button-shortcut-error-border: 1.5x solid currentColor;
+    --button-shortcut-error-border-color: currentColor;
 
     --button-reset-color: #ffffff;
     --button-reset-bg: #1b1b1b;
-    --button-reset-border: 1.5px solid #35373A;
+    --button-reset-border-color: #35373A;
 
     --button-cancel-color: var(--button-reset-color);
     --button-cancel-bg: var(--button-reset-bg);
-    --button-cancel-border: var(--button-reset-border);
+    --button-cancel-border-color: var(--button-reset-border-color);
 
     --button-disabled-color: rgba(188, 192, 200, 0.5);
     --button-disabled-icon-color: rgba(255, 255, 255, 0.5);
     --button-disabled-bg: rgba(27, 27, 27, 0.5);
-    --button-disabled-border: 1.5px solid rgba(188, 192, 200, 0.5);
+    --button-disabled-border-color: rgba(188, 192, 200, 0.5);
 
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: #7061ed;
@@ -122,7 +122,7 @@
 
     --textbox-color: #ffffff;
     --textbox-bg: #1b1b1b;
-    --textbox-border: 1.5px solid #35373A;
+    --textbox-border: #35373A;
     --textbox-suffix-color: var(--action-bg-color);
 
     --textbox-color-disabled: var(--button-disabled-color);

@@ -1,13 +1,13 @@
 import { Storage } from "@plasmohq/storage";
 import type { PlasmoCSConfig } from "plasmo";
-import { rateVideo } from "~cs-helpers/content-script-youtube-rate-buttons";
+import { rateVideo } from "~cs-helpers/cs-helper-ytr-buttons";
 import { defaultAdditionalShortcuts } from "~popup/popup/sections/store-keyboard";
-import type { ButtonTrigger, ButtonTriggers, SupportedActions } from "~types";
+import type { ButtonTriggers, SupportedActions } from "~types";
 import { getStorage, initial, keyToModifier, MODIFIER_KEYS } from "~utils-initials";
 
 let gLastTriggers: ButtonTriggers;
 const storageLocal = new Storage({ area: "local" });
-type Modifier = typeof MODIFIER_KEYS[number];
+type Modifier = (typeof MODIFIER_KEYS)[number];
 
 document.addEventListener(
   "keydown",
@@ -25,13 +25,27 @@ document.addEventListener(
   { capture: true }
 );
 
-function getSecondaryKeyFromPrimary({ modifiers, primary }: { modifiers: Modifier[], primary: string[] }): string | null {
+function getSecondaryKeyFromPrimary({
+  modifiers,
+  primary
+}: {
+  modifiers: Modifier[];
+  primary: string[];
+}): string | null {
   const formattedModifiers = modifiers.map(keyToModifier).join(" + ");
   const formattedPrimary = formattedModifiers + " + " + primary.join(" + ");
   return defaultAdditionalShortcuts[formattedPrimary];
 }
 
-function isComboPressed({ modifiers, primary, event }: { modifiers: Modifier[], primary: string[], event: KeyboardEvent }): boolean {
+function isComboPressed({
+  modifiers,
+  primary,
+  event
+}: {
+  modifiers: Modifier[];
+  primary: string[];
+  event: KeyboardEvent;
+}): boolean {
   if (!primary.includes(event.code)) {
     return false;
   }

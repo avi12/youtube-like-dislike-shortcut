@@ -32,10 +32,15 @@
 
 <script lang="ts">
   import { Storage } from "@plasmohq/storage";
-  import { getRatedButton, rateVideo } from "~cs-helpers/content-script-youtube-rate-buttons";
-  import { addNavigationListener, getStorage, getVisibleElement, initial, OBSERVER_OPTIONS } from "~utils-initials";
-
-  const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts)/;
+  import { getRatedButton, rateVideo } from "~cs-helpers/cs-helper-ytr-buttons";
+  import {
+    addNavigationListener,
+    getStorage,
+    getVisibleElement,
+    initial,
+    OBSERVER_OPTIONS,
+    REGEX_SUPPORTED_PAGES
+  } from "~utils-initials";
 
   let percentageWatched = 0;
 

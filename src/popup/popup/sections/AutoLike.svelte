@@ -2,7 +2,7 @@
   import { Storage } from "@plasmohq/storage";
   import Textbox from "~popup/components/Textbox.svelte";
   import ToggleSwitch from "~popup/components/ToggleSwitch.svelte";
-  import { autoLikeThreshold, isAutoLike } from "~popup/popup/sections/store-autolike";
+  import { autoLikeThreshold, isAutoLike, isAutoLikeSubscribedChannels } from "~popup/popup/sections/store-autolike";
   import { isRecording } from "~popup/popup/sections/store-keyboard";
   import { initial } from "~utils-initials";
 
@@ -10,14 +10,17 @@
 
   Promise.all([
     storageSync.get<typeof initial.isAutoLike>("isAutoLike"),
-    storageSync.get<typeof initial.autoLikeThreshold>("autoLikeThreshold")
+    storageSync.get<typeof initial.autoLikeThreshold>("autoLikeThreshold"),
+    storageSync.get<typeof initial.isAutoLikeSubscribedChannels>("isAutoLikeSubscribedChannels")
   ]).then(
     ([
       pIsAutoLike = initial.isAutoLike,
-      pAutoLikeThreshold = initial.autoLikeThreshold
+      pAutoLikeThreshold = initial.autoLikeThreshold,
+      pIsAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels
     ]) => {
       $isAutoLike = pIsAutoLike;
       $autoLikeThreshold = pAutoLikeThreshold;
+      $isAutoLikeSubscribedChannels = pIsAutoLikeSubscribedChannels;
     }
   );
 
@@ -27,6 +30,10 @@
 
   $: {
     storageSync.set("autoLikeThreshold", $autoLikeThreshold);
+  }
+
+  $: {
+    storageSync.set("isAutoLikeSubscribedChannels", $isAutoLikeSubscribedChannels);
   }
 </script>
 
@@ -41,6 +48,9 @@
         <Textbox disabled={$isRecording} bind:value={$autoLikeThreshold} />
       {/if}
     </div>
+    {#if $isAutoLikeSubscribedChannels !== undefined}
+      <ToggleSwitch disabled={$isRecording} bind:checked={$isAutoLikeSubscribedChannels}>Auto-like in subscribed channels</ToggleSwitch>
+    {/if}
   </div>
 </section>
 
