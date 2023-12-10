@@ -51,7 +51,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-svelte": "^2.35.1",
     "postcss": "^8.4.32",
-    "prettier": "^3.1.0",
+    "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.1.2",
     "typescript": "^5.3.3",
     "web-ext": "^7.9.0",
