@@ -19,7 +19,7 @@
   };
 
   export const getInlineAnchor: PlasmoGetInlineAnchor = () =>
-    document.querySelector("#top-level-buttons-computed");
+    document.querySelector(SELECTORS.percentageContainer);
 
   function addStyles() {
     const elStyle = document.createElement("style");
