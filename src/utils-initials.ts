@@ -67,6 +67,7 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
+export const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts)/;
 export const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"];
 
