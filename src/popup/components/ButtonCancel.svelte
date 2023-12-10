@@ -15,7 +15,7 @@
   .button-cancel {
     color: var(--button-cancel-color);
     background-color: var(--button-cancel-bg);
-    border: 1.5px solid var(--button-cancel-border);
+    border: 1.5px solid var(--button-cancel-border-color);
     padding: 0.65625rem 1rem;
     border-radius: 32px;
     display: flex;

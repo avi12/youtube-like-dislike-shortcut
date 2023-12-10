@@ -29,20 +29,20 @@
     &--active {
       color: var(--button-shortcut-active-color);
       background-color: var(--button-shortcut-active-bg);
-      border: 1.5px solid var(--button-shortcut-active-border);
+      border: 1.5px solid var(--button-shortcut-active-border-color);
     }
 
     &:disabled {
       color: var(--button-disabled-color);
       background-color: var(--button-disabled-bg);
-      border: 1.5px solid var(--button-disabled-border);
+      border: 1.5px solid var(--button-disabled-border-color);
       cursor: not-allowed;
     }
 
     &--error {
       color: var(--button-shortcut-error-color);
       background-color: var(--button-shortcut-error-bg);
-      border: 1.5px solid var(--button-shortcut-error-border);
+      border: 1.5px solid var(--button-shortcut-error-border-color);
 
       &:disabled {
         color: var(--button-shortcut-error-color);

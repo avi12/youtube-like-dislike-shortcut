@@ -16,7 +16,7 @@
   .button-reset {
     color: var(--button-reset-color);
     background-color: var(--button-reset-bg);
-    border: 1.5px solid var(--button-reset-border);
+    border: 1.5px solid var(--button-reset-border-color);
     padding: 0.65625rem 1rem;
     border-radius: 32px;
     display: flex;
@@ -27,7 +27,7 @@
     &:disabled {
       color: var(--button-disabled-color);
       background-color: var(--button-disabled-bg);
-      border: 1.5px solid var(--button-disabled-border);
+      border: 1.5px solid var(--button-disabled-border-color);
       cursor: not-allowed;
     }
   }

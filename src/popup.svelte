@@ -29,24 +29,24 @@
 
     --button-shortcut-active-color: #ffffff;
     --button-shortcut-active-bg: var(--action-bg-color);
-    --button-shortcut-active-border: var(--button-shortcut-active-bg);
+    --button-shortcut-active-border-color: var(--button-shortcut-active-bg);
 
     --button-shortcut-error-color: #ffffff;
     --button-shortcut-error-bg: #ff4d4f;
-    --button-shortcut-error-border: var(---button-shortcut-error-bg);
+    --button-shortcut-error-border-color: var(---button-shortcut-error-bg);
 
     --button-reset-color: #1b1b1b;
     --button-reset-bg: #ffffff;
-    --button-reset-border: rgba(188, 192, 200, 0.5);
+    --button-reset-border-color: rgba(188, 192, 200, 0.5);
 
     --button-cancel-color: #ffffff;
     --button-cancel-bg: #1b1b1b;
-    --button-cancel-border: var(--button-cancel-bg);
+    --button-cancel-border-color: var(--button-cancel-bg);
 
     --button-disabled-color: #bcc0c8;
     --button-disabled-icon-color: #BCC0C8;
     --button-disabled-bg: #f5f6fc;
-    --button-disabled-border: rgba(188, 192, 200, 0.5);
+    --button-disabled-border-color: rgba(188, 192, 200, 0.5);
 
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: 0px 4px 4px 0px rgba(112, 97, 237, 0.25);
@@ -91,24 +91,24 @@
 
     --button-shortcut-active-color: #ffffff;
     --button-shortcut-active-bg: var(--action-bg-color);
-    --button-shortcut-active-border: var(--button-shortcut-active-bg);
+    --button-shortcut-active-border-color: var(--button-shortcut-active-bg);
 
     --button-shortcut-error-color: #ffffff;
     --button-shortcut-error-bg: #ff4d4f;
-    --button-shortcut-error-border: currentColor;
+    --button-shortcut-error-border-color: currentColor;
 
     --button-reset-color: #ffffff;
     --button-reset-bg: #1b1b1b;
-    --button-reset-border: #35373A;
+    --button-reset-border-color: #35373A;
 
     --button-cancel-color: var(--button-reset-color);
     --button-cancel-bg: var(--button-reset-bg);
-    --button-cancel-border: var(--button-reset-border);
+    --button-cancel-border-color: var(--button-reset-border-color);
 
     --button-disabled-color: rgba(188, 192, 200, 0.5);
     --button-disabled-icon-color: rgba(255, 255, 255, 0.5);
     --button-disabled-bg: rgba(27, 27, 27, 0.5);
-    --button-disabled-border: rgba(188, 192, 200, 0.5);
+    --button-disabled-border-color: rgba(188, 192, 200, 0.5);
 
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: #7061ed;
