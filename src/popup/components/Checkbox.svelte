@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
+
   export let checked: boolean;
   export let disabled: boolean;
   const id = Math.random().toString(36).substring(7);
 </script>
 
-<div class="checkbox-container">
+<div class="checkbox-container" transition:fade={{ duration: 200 }}>
   <input
     bind:checked
     {disabled}
@@ -29,7 +31,6 @@
           border-radius: 2px;
           content: "";
           position: absolute;
-          display: block;
           top: 50%;
           left: 50%;
           translate: -50% -50%;
@@ -64,13 +65,13 @@
         width: 16px;
         height: 16px;
         border: 1px solid var(--checkbox-bg);
-        display: inline-block;
         position: relative;
         border-radius: 2px;
-        transition: border 0.02s ease-in-out;
+        $transition-time: 0.2s;
+        transition: border $transition-time ease-in-out;
 
         &::before {
-          transition: background-color 0.02s ease-in-out;
+          transition: background-color $transition-time ease-in-out;
         }
       }
     }

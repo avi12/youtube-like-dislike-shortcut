@@ -83,7 +83,7 @@
 <style lang="scss">
   main {
     background-color: var(--card-bg);
-    border: var(--card-border);
+    border: 1px solid var(--card-border);
     margin-top: 16px;
     padding: 24px;
     border-radius: 24px;
