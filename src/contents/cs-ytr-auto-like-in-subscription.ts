@@ -5,7 +5,7 @@ import {
   getRateButtons,
   getRatedButton,
   rateVideo
-} from "~cs-helpers/content-script-youtube-rate-buttons";
+} from "~cs-helpers/cs-helper-ytr-buttons";
 import {
   addNavigationListener,
   getElementByMutationObserver,

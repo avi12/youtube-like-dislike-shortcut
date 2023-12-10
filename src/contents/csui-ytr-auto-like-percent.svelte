@@ -32,7 +32,7 @@
 
 <script lang="ts">
   import { Storage } from "@plasmohq/storage";
-  import { getRatedButton, rateVideo } from "~cs-helpers/content-script-youtube-rate-buttons";
+  import { getRatedButton, rateVideo } from "~cs-helpers/cs-helper-ytr-buttons";
   import {
     addNavigationListener,
     getStorage,
