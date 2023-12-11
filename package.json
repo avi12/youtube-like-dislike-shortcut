@@ -24,12 +24,13 @@
     "run-browser": "web-ext run --start-url https://www.youtube.com/watch?v=aiSla-5xq3w --target",
     "run-firefox": "pnpm run-browser firefox-desktop --source-dir build/firefox-mv3-dev",
     "run-chromium": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev",
-    "run-edge:windows": "pnpm run-browser chromium --source-dir build/edge-mv3-dev --chromium-bonary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
-    "run-opera:windows": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev --chromium-bonary \"%LocalAppData%\\Opera\\opera.exe\"",
+    "run-edge:windows": "pnpm run-browser chromium --source-dir build/edge-mv3-dev --chromium-binary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
+    "run-opera:windows": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev --chromium-binary \"%LocalAppData%\\Opera\\opera.exe\"",
     "run-browser:screenshot": "web-ext run --start-url about:blank --target",
     "run-firefox:screenshot": "pnpm run-browser:screenshot firefox-desktop --source-dir build/firefox-mv3-prod",
     "run-chromium:screenshot": "pnpm run-browser:screenshot chromium --args=\"--lang=en\" --source-dir build/chrome-mv3-prod",
-    "run-opera:screenshot": "pnpm run-browser:screenshot chromium --source-dir build/chrome-mv3-prod --chromium-bonary \"%LocalAppData%\\Opera\\opera.exe\""
+    "run-edge:screenshot": "pnpm run-browser:screenshot chromium --args=\"--lang=en\" --source-dir build/chrome-mv3-prod --chromium-binary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
+    "run-opera:screenshot": "pnpm run-browser:screenshot chromium --source-dir build/chrome-mv3-prod --chromium-binary \"%LocalAppData%\\Opera\\opera.exe\""
   },
   "dependencies": {
     "@plasmohq/storage": "^1.9.0",
