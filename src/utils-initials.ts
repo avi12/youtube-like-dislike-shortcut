@@ -37,12 +37,12 @@ export enum SELECTORS {
   toggleButtonsNormalVideo = "#top-level-buttons-computed yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "ytd-like-button-renderer",
   buttonSubscribe = "ytd-subscribe-button-renderer",
+  title = "title",
   // Bezel classes
   bezel = ".ytp-bezel",
   bezelIcon = ".ytp-bezel-icon",
   bezelTextWrapper = ".ytp-bezel-text-wrapper",
-  bezelTextHide = ".ytp-bezel-text-hide",
-  title = "title"
+  bezelTextHide = ".ytp-bezel-text-hide"
 }
 
 export const initial = {
@@ -70,7 +70,7 @@ export const initial = {
 
 export const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts)/;
 export const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
-export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"];
+export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
 export const OBSERVER_OPTIONS: MutationObserverInit = { childList: true, subtree: true };
 
