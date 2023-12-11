@@ -12,7 +12,7 @@
     keyCombos,
     keyCombosSecondary,
     type ShortcutType
-  } from "~popup/popup/sections/store-keyboard";
+  } from "~popup/sections/store-keyboard";
   import { keyToModifier, MODIFIER_KEYCODES, MODIFIER_KEYS, modifierToKey } from "~utils-initials";
 
   export let type: ShortcutType;

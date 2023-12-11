@@ -2,10 +2,10 @@
   import { Storage } from "@plasmohq/storage";
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
-  import AutoLike from "~popup/popup/sections/AutoLike.svelte";
-  import KeyboardShortcut from "~popup/popup/sections/KeyboardShortcut.svelte";
-  import { autoLikeThreshold, isAutoLike } from "~popup/popup/sections/store-autolike";
-  import { defaultShortcuts, keyCombos, keyCombosSecondary } from "~popup/popup/sections/store-keyboard";
+  import AutoLike from "~popup/sections/AutoLike.svelte";
+  import KeyboardShortcut from "~popup/sections/KeyboardShortcut.svelte";
+  import { autoLikeThreshold, isAutoLike } from "~popup/sections/store-autolike";
+  import { defaultShortcuts, keyCombos, keyCombosSecondary } from "~popup/sections/store-keyboard";
   import type { ButtonTriggers } from "~types";
   import { initial, MODIFIER_KEYS } from "~utils-initials";
 

@@ -1,7 +1,7 @@
 import { Storage } from "@plasmohq/storage";
 import type { PlasmoCSConfig } from "plasmo";
 import { rateVideo } from "~cs-helpers/cs-helper-ytr-buttons";
-import { defaultAdditionalShortcuts } from "~popup/popup/sections/store-keyboard";
+import { defaultAdditionalShortcuts } from "~popup/sections/store-keyboard";
 import type { ButtonTriggers, SupportedActions } from "~types";
 import { getStorage, initial, keyToModifier, MODIFIER_KEYS } from "~utils-initials";
 

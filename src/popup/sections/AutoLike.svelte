@@ -2,8 +2,8 @@
   import { Storage } from "@plasmohq/storage";
   import Textbox from "~popup/components/Textbox.svelte";
   import ToggleSwitch from "~popup/components/ToggleSwitch.svelte";
-  import { autoLikeThreshold, isAutoLike, isAutoLikeSubscribedChannels } from "~popup/popup/sections/store-autolike";
-  import { isRecording } from "~popup/popup/sections/store-keyboard";
+  import { autoLikeThreshold, isAutoLike, isAutoLikeSubscribedChannels } from "~popup/sections/store-autolike";
+  import { isRecording } from "~popup/sections/store-keyboard";
   import { initial } from "~utils-initials";
 
   const storageSync = new Storage({ area: "sync" });

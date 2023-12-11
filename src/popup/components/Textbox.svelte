@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isAutoLike } from "~popup/popup/sections/store-autolike";
+  import { isAutoLike } from "~popup/sections/store-autolike";
 
   export let value = 60;
   export let disabled: boolean;
