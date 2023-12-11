@@ -9,12 +9,12 @@ Basically copies the like/dislike shortcut from YouTube Music, which means:
 
 Additionally:
 
-- Auto-like videos based on a watch time threshold that you set
+- Auto-like videos based on a watch time threshold that you set OR based on whether you're subscribed to the channel
 - Shift+0 (on the number row) to remove your like/dislike
 - Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 - <details>
     <summary>Pop-up page with options</summary>
-    <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/961a7890-752d-49a1-99f3-e68bbaec18aa" alt="Screenshot">
+    <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/4fd19d7c-cf26-433d-b34d-2104dabb881b" alt="Screenshot">
   </details>
 
 **This extension does not reveal the videos' dislike counters.**
