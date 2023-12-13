@@ -1,6 +1,6 @@
 {
   "name": "youtube-like-dislike-shortcut",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Like videos with Shift+Plus or Numpad Plus, dislike with Shift+Minus or Numpad Minus.",
   "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
   "license": "GPL-3.0-or-later",
@@ -38,15 +38,15 @@
     "plasmo": "^0.84.0",
     "sass": "^1.69.5",
     "svelte": "^4.2.8",
-    "svelte-preprocess": "^5.1.1"
+    "svelte-preprocess": "^5.1.2"
   },
   "devDependencies": {
     "@plasmohq/prettier-plugin-sort-imports": "^4.0.1",
     "@sveltejs/eslint-config": "^6.0.4",
     "@types/chrome": "^0.0.254",
     "@types/node": "^20.10.4",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.55.0",
     "eslint-plugin-import": "^2.29.0",
@@ -56,7 +56,7 @@
     "prettier-plugin-svelte": "^3.1.2",
     "typescript": "^5.3.3",
     "web-ext": "^7.9.0",
-    "zip-self": "^0.5.10"
+    "zip-self": "^0.6.0"
   },
   "manifest": {
     "name": "$PLASMO_PUBLIC_EXT_NAME",
