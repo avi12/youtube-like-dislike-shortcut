@@ -82,16 +82,16 @@
 
   function autoLikeWhenNeeded(e: Event) {
     const elVideo = e.target as HTMLVideoElement;
-    if (window.ytrUserInteracted) {
+
+    const isRated = Boolean(getRatedButton());
+    const isLiveOrPremiere = Boolean(getVisibleElement(SELECTORS.liveBadge));
+    if (window.ytrUserInteracted || isRated || isLiveOrPremiere) {
       stopTracking(elVideo);
       return;
     }
 
-    const isRated = Boolean(getRatedButton());
-    const isLiveOrPremiere = Boolean(getVisibleElement(SELECTORS.liveBadge));
     const isAdPlaying = Boolean(document.querySelector(`${SELECTORS.adSkipIn}, ${SELECTORS.adSkipNow}`));
-    if (isRated || isLiveOrPremiere || isAdPlaying) {
-      stopTracking(elVideo);
+    if (isAdPlaying) {
       return;
     }
 
