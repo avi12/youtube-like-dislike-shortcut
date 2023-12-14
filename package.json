@@ -20,7 +20,7 @@
     "build:pack": "pnpm build && pnpm package",
     "build-pack:edge": "pnpm build:edge && pnpm package:edge",
     "build-pack:firefox": "pnpm build:firefox && pnpm package:firefox && pnpm package:self",
-    "build:pack:all": "pnpm build:pack && pnpm build-pack:edge && pnpm build-pack:firefox",
+    "build-pack:all": "pnpm build:pack && pnpm build-pack:edge && pnpm build-pack:firefox",
     "run-browser": "web-ext run --start-url https://www.youtube.com/watch?v=aiSla-5xq3w --target",
     "run-firefox": "pnpm run-browser firefox-desktop --source-dir build/firefox-mv3-dev",
     "run-chromium": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev",
