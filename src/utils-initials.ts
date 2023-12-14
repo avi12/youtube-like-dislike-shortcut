@@ -33,7 +33,7 @@ export enum SELECTORS {
   adSkipNow = ".ytp-ad-skip-button-text",
   liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
   percentageWatched = ".ytr-percentage",
-  percentageContainer = "#top-level-buttons-computed",
+  percentageContainer = "#menu ytd-menu-renderer",
   toggleButtonsNormalVideo = "#top-level-buttons-computed yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "ytd-like-button-renderer",
   buttonSubscribe = "ytd-subscribe-button-renderer",
