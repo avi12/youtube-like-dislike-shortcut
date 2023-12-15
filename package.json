@@ -67,10 +67,6 @@
         "strict_min_version": "90.0"
       }
     },
-    "options_ui": {
-      "browser_style": true,
-      "open_in_tab": false
-    },
     "web_accessible_resources": [
       {
         "resources": [
