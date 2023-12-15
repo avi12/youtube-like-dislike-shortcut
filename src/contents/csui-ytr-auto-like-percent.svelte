@@ -80,12 +80,13 @@
     rateVideo(true);
   }
 
+  const getIsLiveOrPremiere = () => Boolean(getVisibleElement(SELECTORS.liveBadge));
+
   function autoLikeWhenNeeded(e: Event) {
     const elVideo = e.target as HTMLVideoElement;
 
     const isRated = Boolean(getRatedButton());
-    const isLiveOrPremiere = Boolean(getVisibleElement(SELECTORS.liveBadge));
-    if (window.ytrUserInteracted || isRated || isLiveOrPremiere) {
+    if (window.ytrUserInteracted || isRated || getIsLiveOrPremiere()) {
       stopTracking(elVideo);
       return;
     }
@@ -151,6 +152,13 @@
     window.ytrUserInteracted = false;
     timeCounter = 0;
     isVideoRatedInitially = Boolean(getRatedButton());
+
+    const isRenewTracking = !isVideoRatedInitially && !getIsLiveOrPremiere();
+    if (isRenewTracking) {
+      const elVideo = getVisibleElement<HTMLVideoElement>(SELECTORS.video);
+      stopTracking(elVideo);
+      startTracking(elVideo);
+    }
   }
 
   function addStorageListener() {
