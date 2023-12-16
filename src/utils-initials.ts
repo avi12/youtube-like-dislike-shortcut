@@ -29,8 +29,7 @@ export async function getStorage<T>({
 
 export enum SELECTORS {
   video = "video",
-  adSkipIn = ".ytp-ad-preview-text",
-  adSkipNow = ".ytp-ad-skip-button-text",
+  adOverlay = ".ytp-ad-player-overlay",
   liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
   percentageWatched = ".ytr-percentage",
   percentageContainer = "#menu ytd-menu-renderer",

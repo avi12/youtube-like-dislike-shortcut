@@ -91,7 +91,7 @@
       return;
     }
 
-    const isAdPlaying = Boolean(document.querySelector(`${SELECTORS.adSkipIn}, ${SELECTORS.adSkipNow}`));
+    const isAdPlaying = Boolean(document.querySelector(SELECTORS.adOverlay));
     if (isAdPlaying) {
       return;
     }
