@@ -19,7 +19,7 @@
   };
 
   export const getInlineAnchor: PlasmoGetInlineAnchor = () =>
-    document.querySelector(SELECTORS.percentageContainer);
+    getVisibleElement(SELECTORS.percentageContainer);
 
   function addStyles() {
     const elStyle = document.createElement("style");
