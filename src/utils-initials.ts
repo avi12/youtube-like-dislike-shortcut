@@ -32,7 +32,7 @@ export enum SELECTORS {
   adOverlay = ".ytp-ad-player-overlay",
   liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
   percentageWatched = ".ytr-percentage",
-  percentageContainer = "#menu ytd-menu-renderer",
+  percentageContainer = "#actions ytd-menu-renderer, #actions #like-button",
   toggleButtonsNormalVideo = "#top-level-buttons-computed yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "ytd-like-button-renderer",
   buttonSubscribe = "ytd-subscribe-button-renderer",
@@ -73,13 +73,19 @@ export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
 export const OBSERVER_OPTIONS: MutationObserverInit = { childList: true, subtree: true };
 
-export function getIsElementVisible(element: HTMLElement): boolean {
+function getIsElementVisible(element: HTMLElement): boolean {
   return element?.offsetWidth > 0 && element?.offsetHeight > 0;
+}
+
+function getIsElementInViewport(element: HTMLElement): boolean {
+  const { bottom, left, right, top } = element.getBoundingClientRect();
+  return top > 0 && left > 0 && bottom < innerHeight && right < innerWidth;
 }
 
 export function getVisibleElement<T extends HTMLElement>(selector: string): T {
   const elements = [...document.querySelectorAll(selector)] as T[];
-  return [...elements].find(getIsElementVisible);
+  const isNormalVideo = location.pathname.startsWith("/watch");
+  return [...elements].find(isNormalVideo ? getIsElementVisible : getIsElementInViewport);
 }
 
 export async function getElementByMutationObserver<T extends HTMLElement>(selector: SELECTORS): Promise<T> {

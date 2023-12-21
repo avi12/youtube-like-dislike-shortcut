@@ -8,18 +8,12 @@
   };
 
   export const mountShadowHost: PlasmoMountShadowHost = async ({ shadowHost, anchor, mountState }) => {
-    const isShorts = location.pathname.startsWith("/shorts/");
-    if (isShorts) {
-      return;
-    }
-
     shadowHost.className = SELECTORS.percentageWatched.substring(1);
     anchor.element.prepend(shadowHost);
     mountState.observer.disconnect();
   };
 
-  export const getInlineAnchor: PlasmoGetInlineAnchor = () =>
-    getVisibleElement(SELECTORS.percentageContainer);
+  export const getInlineAnchor: PlasmoGetInlineAnchor = () => getVisibleElement(SELECTORS.percentageContainer);
 
   function addStyles() {
     const elStyle = document.createElement("style");
@@ -213,6 +207,6 @@
     }
   }} />
 
-{#if isNormalVideo && isAutoLikeEnabled && !isVideoRatedInitially}
+{#if process.env.NODE_ENV === "development" || (isNormalVideo && isAutoLikeEnabled && !isVideoRatedInitially && !isLiveOrPremiere)}
   {percentageDisplay}
 {/if}
