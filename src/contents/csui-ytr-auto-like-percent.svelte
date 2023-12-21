@@ -52,6 +52,7 @@
   let isAutoLikeEnabled = initial.isAutoLike;
   let autoLikeThreshold = initial.autoLikeThreshold;
   let isVideoRatedInitially = Boolean(getRatedButton());
+  let isLiveOrPremiere = getIsLiveOrPremiere();
 
   function getIsNormalVideo() {
     return location.pathname === "/watch";
@@ -74,13 +75,16 @@
     rateVideo(true);
   }
 
-  const getIsLiveOrPremiere = () => Boolean(getVisibleElement(SELECTORS.liveBadge));
+  function getIsLiveOrPremiere() {
+    return Boolean(getVisibleElement(SELECTORS.liveBadge));
+  }
 
   function autoLikeWhenNeeded(e: Event) {
     const elVideo = e.target as HTMLVideoElement;
 
     const isRated = Boolean(getRatedButton());
-    if (window.ytrUserInteracted || isRated || getIsLiveOrPremiere()) {
+    isLiveOrPremiere = getIsLiveOrPremiere();
+    if (window.ytrUserInteracted || isRated || isLiveOrPremiere) {
       stopTracking(elVideo);
       return;
     }
