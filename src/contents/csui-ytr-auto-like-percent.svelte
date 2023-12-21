@@ -120,7 +120,7 @@
     elVideo.removeEventListener("timeupdate", autoLikeWhenNeeded);
   }
 
-  async function addVideoListener() {
+  function addVideoListener() {
     new MutationObserver((_, observer) => {
       const elVideo = getVisibleElement<HTMLVideoElement>(SELECTORS.video);
       if (!elVideo) {
