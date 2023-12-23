@@ -96,7 +96,7 @@
 
     const tempDelta = elVideo.currentTime - timeCurrentLast;
     // Only record normal playing to correctly assess the X% threshold
-    if ((tempDelta > 0 && tempDelta < 1) || tempDelta < 0) {
+    if (tempDelta > 0 && tempDelta < 1) {
       timeDelta = tempDelta;
     }
 
