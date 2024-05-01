@@ -51,12 +51,12 @@
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: 0px 4px 4px 0px rgba(112, 97, 237, 0.25);
     --switch-track-bg: #F5F6FC;
-    --switch-track-bg-chadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
+    --switch-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
     --switch-disabled-thumb-bg: #BCC0C8;
     --switch-disabled-thumb-shadow: 0px 4px 4px 0px rgba(188, 192, 200, 0.25);
     --switch-disabled-track-bg: #F5F6FC;
-    --switch-disabled-track-bg-chadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
+    --switch-disabled-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
     --textbox-color: #1b1b1b;
     --textbox-bg: #ffffff;
@@ -113,12 +113,12 @@
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: #7061ed;
     --switch-track-bg: #1b1b1b;
-    --switch-track-bg-chadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
+    --switch-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
     --switch-disabled-thumb-bg: #35373A;
     --switch-disabled-thumb-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
     --switch-disabled-track-bg: #1B1B1B;
-    --switch-disabled-track-bg-chadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
+    --switch-disabled-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
     --textbox-color: #ffffff;
     --textbox-bg: #1b1b1b;
