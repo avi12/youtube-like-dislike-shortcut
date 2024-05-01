@@ -20,5 +20,5 @@ html[dark="true"] .ytr-percentage {
 // Un-setting the min-width of the element next to the action buttons
 // so that the [ⵈ] button doesn't disappear when the percentage is injected
 #top-row #owner {
-  min-width: unset;
+  min-width: max-content;
 }
