@@ -6,6 +6,9 @@
     "paths": {
       "~*": ["./src/*"]
     },
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["svelte", "node", "chrome"],
+    "module": "ESNext",
+    "target": "ESNext"
   }
 }

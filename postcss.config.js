@@ -1,8 +1,10 @@
+import autoprefixer from "autoprefixer";
+
 /**
  * @type {import('postcss').ProcessOptions}
  */
-module.exports = {
+export default {
   plugins: [
-    require("autoprefixer")
+    autoprefixer
   ]
 };
