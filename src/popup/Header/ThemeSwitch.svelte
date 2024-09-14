@@ -3,23 +3,23 @@
   import ThemeAuto from "~popup/Header/themes/ThemeAuto.svelte";
   import ThemeDark from "~popup/Header/themes/ThemeDark.svelte";
   import ThemeLight from "~popup/Header/themes/ThemeLight.svelte";
-  import { themeCurrent, type ThemeMode, themeSelected } from "~popup/Header/themes/store-theme";
+  import { themeCurrent, ThemeMode, themeSelected } from "~popup/Header/themes/store-theme";
 
   const instanceDarkTheme = matchMedia("(prefers-color-scheme: dark)");
   const getIsDark = () => instanceDarkTheme.matches;
 
   const storageLocal = new Storage({ area: "local" });
 
-  function setTheme(theme: ThemeMode = "auto") {
+  function setTheme(theme = ThemeMode.auto) {
     if (theme === "auto") {
-      $themeCurrent = getIsDark() ? "dark" : "light";
+      $themeCurrent = getIsDark() ? ThemeMode.dark : ThemeMode.light;
       return;
     }
 
     $themeCurrent = theme;
   }
 
-  storageLocal.get<ThemeMode>("theme").then((theme = "auto") => {
+  storageLocal.get<ThemeMode>("theme").then((theme = ThemeMode.auto) => {
     $themeSelected = theme;
     setTheme(theme);
   });
@@ -29,7 +29,7 @@
     storageLocal.set("theme", $themeSelected);
     document.body.dataset.theme = $themeCurrent;
 
-    if ($themeSelected === "auto") {
+    if ($themeSelected === ThemeMode.auto) {
       instanceDarkTheme.addEventListener("change", () => {
         const elQuickTransitions = document.querySelectorAll(".quick-transition");
         for (const elQuickTransition of elQuickTransitions) {
@@ -47,14 +47,14 @@
 </script>
 
 <article class="themes">
-  <button class:selected={$themeSelected === "auto"} on:click={() => ($themeSelected = "auto")}>
-    <ThemeAuto checked={$themeSelected === "auto"} />
+  <button class:selected={$themeSelected === ThemeMode.auto} on:click={() => ($themeSelected = ThemeMode.auto)}>
+    <ThemeAuto checked={$themeSelected === ThemeMode.auto} />
   </button>
-  <button class:selected={$themeSelected === "light"} on:click={() => ($themeSelected = "light")}>
-    <ThemeLight checked={$themeSelected === "light"} />
+  <button class:selected={$themeSelected === ThemeMode.light} on:click={() => ($themeSelected = ThemeMode.light)}>
+    <ThemeLight checked={$themeSelected === ThemeMode.light} />
   </button>
-  <button class:selected={$themeSelected === "dark"} on:click={() => ($themeSelected = "dark")}>
-    <ThemeDark checked={$themeSelected === "dark"} />
+  <button class:selected={$themeSelected === ThemeMode.dark} on:click={() => ($themeSelected = ThemeMode.dark)}>
+    <ThemeDark checked={$themeSelected === ThemeMode.dark} />
   </button>
 </article>
 

@@ -12,12 +12,12 @@ export const defaultShortcuts = {
   dislike: ["shiftKey", "Minus"],
   unrate: ["shiftKey", "Digit0"]
 };
-export type ShortcutType = "like" | "dislike" | "unrate";
-export type ShortcutTypeSecondary = {
-  [key in ShortcutType]: boolean;
+export enum ShortcutType {
+  like = "like",
+  dislike = "dislike",
+  unrate = "unrate"
 }
-
 export const keyCombos = writable<typeof defaultShortcuts>();
-export const keyCombosSecondary = writable<ShortcutTypeSecondary>();
+export const keyCombosSecondary = writable<Record<ShortcutType, boolean>>();
 export const isRecording = writable<boolean>(false);
 export const currentlyRecording = writable<ShortcutType>(null);

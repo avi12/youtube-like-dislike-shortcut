@@ -1,5 +1,9 @@
 import { writable } from "svelte/store";
 
-export type ThemeMode = "auto" | "light" | "dark";
-export const themeSelected = writable<ThemeMode>("auto");
-export const themeCurrent = writable<Exclude<ThemeMode, "auto">>("light");
+export enum ThemeMode {
+  light = "light",
+  dark = "dark",
+  auto = "auto"
+}
+export const themeSelected = writable<ThemeMode>(ThemeMode.auto);
+export const themeCurrent = writable<Exclude<ThemeMode, ThemeMode.auto>>(ThemeMode.light);
