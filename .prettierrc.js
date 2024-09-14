@@ -14,5 +14,5 @@ export default {
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   arrowParens: "avoid",
-  svelteSortOrder: "scripts-markup-options-styles",
+  svelteSortOrder: "scripts-markup-options-styles"
 };
