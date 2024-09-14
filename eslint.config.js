@@ -7,6 +7,7 @@ import tsEslint from "typescript-eslint";
 
 export default [
   eslint.configs.recommended,
+  ...tsEslint.configs.recommended,
   ...svelteEslint.configs["flat/recommended"],
   ...avi12,
   {
@@ -24,7 +25,7 @@ export default [
     }
   },
   {
-    files: ["**/*.ts"],
+    files: ["**/*.{ts,js}"],
     languageOptions: {
       parser: tsEslint.parser,
       globals: {
