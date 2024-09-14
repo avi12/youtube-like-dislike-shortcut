@@ -1,5 +1,4 @@
 <script context="module" lang="ts">
-  import textStyle from "data-text:~cs-helpers/styles-youtube-rate.scss";
   import type { PlasmoCSConfig, PlasmoGetInlineAnchor, PlasmoMountShadowHost } from "plasmo";
   import { SELECTORS } from "~utils-initials";
 
@@ -14,14 +13,6 @@
   };
 
   export const getInlineAnchor: PlasmoGetInlineAnchor = () => getVisibleElement(SELECTORS.percentageContainer);
-
-  function addStyles() {
-    const elStyle = document.createElement("style");
-    elStyle.textContent = textStyle;
-    document.head.append(elStyle);
-  }
-
-  addStyles();
 </script>
 
 <script lang="ts">
@@ -214,3 +205,31 @@
 {#if process.env.NODE_ENV === "development" || (isNormalVideo && isAutoLikeEnabled && !isVideoRatedInitially && !isLiveOrPremiere)}
   {percentageDisplay}
 {/if}
+
+<style>
+    :global(.ytr-percentage) {
+        align-self: center;
+        padding-right: var(--yt-button-icon-padding, 8px);
+        position: relative;
+        bottom: 2px;
+        font-size: var(--ytd-tab-system-font-size);
+        font-weight: var(--ytd-tab-system-font-weight);
+        letter-spacing: var(--ytd-tab-system-letter-spacing);
+    }
+
+    /* noinspection CssInvalidHtmlTagReference */
+      :global([class*=YtSegmentedLikeDislikeButton] yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation) {
+          display: flex;
+      }
+
+    :global(html[dark="true"] .ytr-percentage) {
+        color: var(--yt-spec-text-primary, white);
+    }
+
+    /* Un-setting the min-width of the element next to the action buttons*/
+    /* so that the [ⵈ] button doesn't disappear when the percentage is injected*/
+    :global(#top-row #owner) {
+        min-width: max-content;
+    }
+
+</style>

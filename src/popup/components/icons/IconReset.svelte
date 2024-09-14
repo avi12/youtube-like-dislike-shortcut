@@ -11,13 +11,13 @@
     stroke-width="2" />
 </svg>
 
-<style lang="scss">
+<style>
   path {
     stroke: var(--button-reset-color);
   }
 
   .disabled {
-    path {
+    & path {
       stroke: var(--button-disabled-icon-color);
     }
   }

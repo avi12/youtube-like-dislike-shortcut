@@ -68,14 +68,14 @@
     stroke-width="1.46667" />
 </svg>
 
-<style lang="scss">
+<style>
   .theme-light {
-    path {
+    & path {
       stroke: var(--theme-switcher-button-color-inactive);
     }
 
     &.checked {
-      path {
+      & path {
         stroke: var(--theme-switcher-button-color-active);
 
         &.sun-fill {

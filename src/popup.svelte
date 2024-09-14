@@ -7,8 +7,8 @@
 
 <Card></Card>
 
-<style lang="scss">
-  @mixin light-theme {
+<style global>
+  body[data-theme="light"] {
     --color-text: #1b1b1b;
     --color-text-disabled: #bcc0c8;
     --color-bg: #ffffff;
@@ -44,18 +44,18 @@
     --button-cancel-border-color: var(--button-cancel-bg);
 
     --button-disabled-color: #bcc0c8;
-    --button-disabled-icon-color: #BCC0C8;
+    --button-disabled-icon-color: #bcc0c8;
     --button-disabled-bg: #f5f6fc;
     --button-disabled-border-color: rgba(188, 192, 200, 0.5);
 
     --switch-thumb-bg: var(--action-bg-color);
     --switch-thumb-shadow: 0px 4px 4px 0px rgba(112, 97, 237, 0.25);
-    --switch-track-bg: #F5F6FC;
+    --switch-track-bg: #f5f6fc;
     --switch-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
-    --switch-disabled-thumb-bg: #BCC0C8;
+    --switch-disabled-thumb-bg: #bcc0c8;
     --switch-disabled-thumb-shadow: 0px 4px 4px 0px rgba(188, 192, 200, 0.25);
-    --switch-disabled-track-bg: #F5F6FC;
+    --switch-disabled-track-bg: #f5f6fc;
     --switch-disabled-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
     --textbox-color: #1b1b1b;
@@ -70,7 +70,7 @@
     --checkbox-bg-disabled: #bcc0c8;
   }
 
-  @mixin dark-theme {
+  body[data-theme="dark"] {
     --color-text: #ffffff;
     --color-text-disabled: #bcc0c8;
     --color-bg: #1b1b1b;
@@ -86,7 +86,7 @@
 
     --button-shortcut-color: #ffffff;
     --button-shortcut-bg: #1b1b1b;
-    --button-shortcut-border: #35373A;
+    --button-shortcut-border: #35373a;
     --button-shortcut-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.09);
 
     --button-shortcut-active-color: #ffffff;
@@ -99,7 +99,7 @@
 
     --button-reset-color: #ffffff;
     --button-reset-bg: #1b1b1b;
-    --button-reset-border-color: #35373A;
+    --button-reset-border-color: #35373a;
 
     --button-cancel-color: var(--button-reset-color);
     --button-cancel-bg: var(--button-reset-bg);
@@ -115,14 +115,14 @@
     --switch-track-bg: #1b1b1b;
     --switch-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
-    --switch-disabled-thumb-bg: #35373A;
+    --switch-disabled-thumb-bg: #35373a;
     --switch-disabled-thumb-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
-    --switch-disabled-track-bg: #1B1B1B;
+    --switch-disabled-track-bg: #1b1b1b;
     --switch-disabled-track-bg-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.04) inset;
 
     --textbox-color: #ffffff;
     --textbox-bg: #1b1b1b;
-    --textbox-border: #35373A;
+    --textbox-border: #35373a;
     --textbox-suffix-color: var(--action-bg-color);
 
     --textbox-color-disabled: var(--button-disabled-color);
@@ -132,15 +132,7 @@
     --checkbox-bg-disabled: #707276;
   }
 
-  :global(body[data-theme="light"]) {
-    @include light-theme;
-  }
-
-  :global(body[data-theme="dark"]) {
-    @include dark-theme;
-  }
-
-  :global(body) {
+  body {
     color: var(--color-text);
     background-color: var(--color-bg);
     width: 752px;
@@ -154,40 +146,40 @@
       background-color 0.4s ease-in-out;
   }
 
-  :global(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
     display: none;
   }
 
-  :global(body *) {
+  body * {
     transition:
       color 0.02s ease-in-out,
       background-color 0.4s ease-in-out;
   }
 
-  :global(.quick-transition) {
+  .quick-transition {
     transition:
       color 0.2s ease-in-out,
       background-color 0.2s ease-in-out;
   }
 
-  :global(button), :global(.checkbox-custom) {
+  button, .checkbox-custom {
     cursor: pointer;
 
-    :global(&:focus-visible) {
+    &:focus-visible {
       outline: 1px solid var(--color-text);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(body),
-    :global(body *),
-    :global(.quick-transition) {
+    body,
+    body *,
+    .quick-transition {
       transition: none;
     }
   }
 
-  // Firefox
-  :global(html) {
+  /* Firefox */
+  html {
     scrollbar-width: none;
   }
 </style>

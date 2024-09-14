@@ -80,7 +80,7 @@
   <AutoLike />
 </main>
 
-<style lang="scss">
+<style>
   main {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);

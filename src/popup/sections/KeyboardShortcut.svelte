@@ -164,7 +164,7 @@
   </div>
 </section>
 
-<style lang="scss">
+<style>
   .shortcut-section {
     display: flex;
     flex-direction: column-reverse;

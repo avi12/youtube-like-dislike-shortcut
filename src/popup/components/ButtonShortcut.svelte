@@ -10,14 +10,14 @@
 
 <button
   class="button-shortcut quick-transition"
-  class:button-shortcut--active={active}
-  class:button-shortcut--error={error}
+  class:button-active={active}
+  class:button-error={error}
   {disabled}
   on:click={() => dispatch("click")}>
   <slot />
 </button>
 
-<style lang="scss">
+<style>
   .button-shortcut {
     color: var(--button-shortcut-color);
     background-color: var(--button-shortcut-bg);
@@ -26,7 +26,7 @@
     padding: 14.5px 16px;
     border-radius: 12px;
 
-    &--active {
+    &.active {
       color: var(--button-shortcut-active-color);
       background-color: var(--button-shortcut-active-bg);
       border: 1.5px solid var(--button-shortcut-active-border-color);
@@ -39,7 +39,7 @@
       cursor: not-allowed;
     }
 
-    &--error {
+    &.error {
       color: var(--button-shortcut-error-color);
       background-color: var(--button-shortcut-error-bg);
       border: 1.5px solid var(--button-shortcut-error-border-color);
@@ -52,8 +52,8 @@
   }
 
   :global([data-theme="dark"]) {
-    .button-shortcut {
-      &--error:disabled {
+    & .button-shortcut {
+      &.error:disabled {
         filter: brightness(0.8);
       }
     }

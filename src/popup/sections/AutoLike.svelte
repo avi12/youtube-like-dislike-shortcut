@@ -54,7 +54,7 @@
   </div>
 </section>
 
-<style lang="scss">
+<style>
   h2 {
     margin: 0 0 16px 0;
     font-weight: 600;

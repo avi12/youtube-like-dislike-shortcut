@@ -19,7 +19,7 @@
     $themeCurrent = theme;
   }
 
-  storageLocal.get("theme").then((theme: ThemeMode = "auto") => {
+  storageLocal.get<ThemeMode>("theme").then((theme = "auto") => {
     $themeSelected = theme;
     setTheme(theme);
   });
@@ -47,18 +47,18 @@
 </script>
 
 <article class="themes">
-  <button class:button--selected={$themeSelected === "auto"} on:click={() => ($themeSelected = "auto")}>
+  <button class:selected={$themeSelected === "auto"} on:click={() => ($themeSelected = "auto")}>
     <ThemeAuto checked={$themeSelected === "auto"} />
   </button>
-  <button class:button--selected={$themeSelected === "light"} on:click={() => ($themeSelected = "light")}>
+  <button class:selected={$themeSelected === "light"} on:click={() => ($themeSelected = "light")}>
     <ThemeLight checked={$themeSelected === "light"} />
   </button>
-  <button class:button--selected={$themeSelected === "dark"} on:click={() => ($themeSelected = "dark")}>
+  <button class:selected={$themeSelected === "dark"} on:click={() => ($themeSelected = "dark")}>
     <ThemeDark checked={$themeSelected === "dark"} />
   </button>
 </article>
 
-<style lang="scss">
+<style>
   .themes {
     display: flex;
     align-items: center;
@@ -67,7 +67,7 @@
     gap: 4px;
     padding: 8px;
 
-    button {
+    & button {
       border-radius: 50%;
       width: 30px;
       height: 30px;
@@ -76,27 +76,23 @@
       display: flex;
       align-items: center;
 
-      :global(path),
-      :global(circle) {
+      & :global(path),
+      & :global(circle) {
         transition:
           fill 0.4s ease-in-out,
           stroke 0.4s ease-in-out;
       }
 
-      &.button--selected {
+      &.selected {
         background-color: var(--theme-switcher-button-bg);
       }
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .themes {
-      button {
-        :global(path),
-        :global(circle) {
-          transition: none;
-        }
-      }
+    .themes button :global(path),
+    .themes button :global(circle) {
+      transition: none;
     }
   }
 </style>

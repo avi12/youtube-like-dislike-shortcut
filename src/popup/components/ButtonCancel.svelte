@@ -11,7 +11,7 @@
   Cancel
 </button>
 
-<style lang="scss">
+<style>
   .button-cancel {
     color: var(--button-cancel-color);
     background-color: var(--button-cancel-bg);

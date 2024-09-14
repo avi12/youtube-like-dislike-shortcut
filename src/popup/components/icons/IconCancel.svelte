@@ -7,13 +7,13 @@
   <path d="M4 4L12 12" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33333" />
 </svg>
 
-<style lang="scss">
+<style>
   path {
     fill: var(--button-cancel-color);
   }
 
   .disabled {
-    path {
+    & path {
       fill: var(--button-disabled-icon-color);
     }
   }

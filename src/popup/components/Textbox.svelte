@@ -13,7 +13,7 @@
     }
   }</script>
 
-<div class="textbox-wrapper" class:textbox-wrapper--disabled={!$isAutoLike}>
+<div class="textbox-wrapper" class:disabled={!$isAutoLike}>
   <section class="text-wrapper">
     <input
       type="number"
@@ -30,14 +30,14 @@
   </section>
 </div>
 
-<style lang="scss">
+<style>
   .textbox-wrapper {
     display: flex;
     align-items: center;
     color: var(--textbox-label-color);
     gap: 24px;
 
-    &--disabled {
+    &.disabled {
       color: var(--button-disabled-color);
     }
   }

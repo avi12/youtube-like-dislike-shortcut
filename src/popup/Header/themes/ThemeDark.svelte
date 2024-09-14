@@ -19,14 +19,14 @@
     stroke-width="1.5" />
 </svg>
 
-<style lang="scss">
+<style>
   .theme-dark {
-    path {
+    & path {
       stroke: var(--theme-switcher-button-color-inactive);
     }
 
     &.checked {
-      path {
+      & path {
         fill: var(--theme-switcher-button-color-active);
         stroke: var(--theme-switcher-button-color-active);
       }

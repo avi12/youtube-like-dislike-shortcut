@@ -12,7 +12,7 @@
   <IconReset {disabled} />Reset
 </button>
 
-<style lang="scss">
+<style>
   .button-reset {
     color: var(--button-reset-color);
     background-color: var(--button-reset-bg);

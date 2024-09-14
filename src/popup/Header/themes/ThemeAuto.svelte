@@ -17,19 +17,19 @@
     stroke-width="4"></path>
 </svg>
 
-<style lang="scss">
+<style>
   .theme-auto {
-    path {
+    & path {
       stroke: var(--theme-switcher-button-color-inactive);
     }
 
     &.checked {
-      path[mask] {
+      & path[mask] {
         stroke: var(--theme-switcher-button-color-active);
         fill: var(--theme-switcher-button-color-active);
       }
 
-      circle {
+      & circle {
         stroke: var(--theme-switcher-button-color-active);
       }
     }

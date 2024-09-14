@@ -7,7 +7,7 @@ import ThemeSwitch from "~popup/Header/ThemeSwitch.svelte";
   <ThemeSwitch></ThemeSwitch>
 </header>
 
-<style lang="scss">
+<style>
   header {
     display: flex;
     justify-content: space-between;

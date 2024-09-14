@@ -11,13 +11,13 @@
   </label>
 </div>
 
-<style lang="scss">
+<style>
   .toggle-switch {
     display: flex;
     align-items: center;
     position: relative;
 
-    label {
+    & label {
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -53,13 +53,8 @@
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      label:after {
-        transition: none;
-      }
-    }
 
-    input[type="checkbox"] {
+    & input[type="checkbox"] {
       &:checked + label {
         color: var(--color-text);
 
@@ -91,6 +86,11 @@
           cursor: not-allowed;
         }
       }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-auto label::after {
+      transition: none;
     }
   }
 </style>
