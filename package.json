@@ -7,6 +7,10 @@
   "license": "GPL-3.0-or-later",
   "author": "avi12 <avi6106@gmail.com>",
   "homepage": "https://avi12.com/youtube-like-dislike-shortcut",
+  "config": {
+    "pathEdgeWindows": "\"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
+    "pathOperaWindows": "\"%LocalAppData%\\Programs\\Opera\\opera.exe\""
+  },
   "scripts": {
     "dev": "plasmo dev --verbose",
     "dev:edge": "pnpm dev --target=edge-mv3",
@@ -20,18 +24,18 @@
     "package:self": "zip-self -o web-ext-artifacts/youtube-like-dislike-shortcut-{version}-source.zip",
     "build:pack": "pnpm build && pnpm package",
     "build-pack:edge": "pnpm build:edge && pnpm package:edge",
-    "build-pack:firefox": "pnpm build:firefox && pnpm package:firefox && pnpm package:self",
-    "build-pack:all": "pnpm build:pack && pnpm build-pack:edge && pnpm build-pack:firefox",
+    "build-pack:firefox": "concurrently \"pnpm build:firefox && pnpm package:firefox\" \"pnpm package:self\" --names \"Firefox build & pack,Firefox source pack\"",
+    "build-pack:all": "concurrently \"pnpm build-pack\" \"pnpm build-pack:edge\" \"pnpm build-pack:firefox\" --names Chromium,Edge,Firefox",
     "run-browser": "web-ext run --start-url https://www.youtube.com/watch?v=aiSla-5xq3w --target",
     "run-firefox": "pnpm run-browser firefox-desktop --source-dir build/firefox-mv3-dev",
     "run-chromium": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev",
-    "run-edge:windows": "pnpm run-browser chromium --source-dir build/edge-mv3-dev --chromium-binary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
-    "run-opera:windows": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev --chromium-binary \"%LocalAppData%\\Opera\\opera.exe\"",
+    "run-edge:windows": "pnpm run-browser chromium --source-dir build/edge-mv3-dev --chromium-binary %npm_package_config_pathEdgeWindows%",
+    "run-opera:windows": "pnpm run-browser chromium --source-dir build/chrome-mv3-dev --chromium-binary %npm_package_config_pathOperaWindows%",
     "run-browser:screenshot": "web-ext run --start-url about:blank --target",
     "run-firefox:screenshot": "pnpm run-browser:screenshot firefox-desktop --source-dir build/firefox-mv3-prod",
     "run-chromium:screenshot": "pnpm run-browser:screenshot chromium --args=\"--lang=en\" --source-dir build/chrome-mv3-prod",
-    "run-edge:screenshot": "pnpm run-browser:screenshot chromium --args=\"--lang=en\" --source-dir build/chrome-mv3-prod --chromium-binary \"%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe\"",
-    "run-opera:screenshot": "pnpm run-browser:screenshot chromium --source-dir build/chrome-mv3-prod --chromium-binary \"%LocalAppData%\\Opera\\opera.exe\""
+    "run-edge:screenshot": "pnpm run-browser:screenshot chromium --args=\"--lang=en\" --source-dir build/chrome-mv3-prod --chromium-binary %npm_package_config_pathEdgeWindows%",
+    "run-opera:screenshot": "pnpm run-browser:screenshot chromium --source-dir build/chrome-mv3-prod --chromium-binary %npm_package_config_pathOperaWindows%"
   },
   "dependencies": {
     "@plasmohq/storage": "^1.12.0",
@@ -80,9 +84,10 @@
           "assets/*"
         ],
         "matches": [
-          "<all_urls>"
+          "https://www.youtube.com/*"
         ]
       }
     ]
-  }
+  },
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }
