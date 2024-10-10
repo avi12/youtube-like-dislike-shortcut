@@ -1,24 +1,17 @@
-# Yarn, npm and pnpm
-yarn-error.log
-npm-debug.log
-.pnpm-debug.log*
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
 node_modules
-
-# WebStorm files
-.idea
-.vscode
-
-# Vim swap files
-*.swp
-*.swo
-
-# Sublime files
-*.sublime-workspace
-*.sublime-project
-
-# Mac and windows files
-.DS_Store
-.tmp
+build
+stats.html
+stats-*.json
+.wxt
 
 # local env files
 chrome.env
@@ -26,10 +19,13 @@ firefox.env
 edge.env
 opera.env
 
-# Distribution
-web-ext-artifacts
-dist/build
-
-# Plasmo
-build
-.plasmo
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
