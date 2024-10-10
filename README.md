@@ -2,15 +2,15 @@
 
 Basically copies the like/dislike shortcut from YouTube Music, which means:
 
-- Shift+Plus (on the number row) to like a video
-- Shift+Minus (on the number row) to dislike
-- Numpad Plus to like
-- Numpad Minus to dislike
+- <kbd>Shift</kbd>+<kbd>Plus</kbd> (on the number row) to like a video
+- <kbd>Shift</kbd>+<kbd>Minus</kbd> (on the number row) to dislike
+- <kbd>Numpad Plus</kbd> to like
+- <kbd>Numpad Minus</kbd> to dislike
 
 Additionally:
 
 - Auto-like videos based on a watch time threshold that you set OR based on whether you're subscribed to the channel
-- Shift+0 (on the number row) to remove your like/dislike
+- <kbd>Shift</kbd>+<kbd>0</kbd> (on the number row) to remove your like/dislike
 - Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
 - <details>
     <summary>Pop-up page with options</summary>
