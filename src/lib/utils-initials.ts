@@ -14,7 +14,7 @@ export async function getStorage<T>({
 }): Promise<T> {
   let value: T;
   try {
-    value = await storage.getItem<T>(`${area}:${key}`, { fallback });
+    value = getValue(await storage.getItem<T>(`${area}:${key}`, { fallback }));
   } catch {
     value = fallback;
   }
@@ -27,6 +27,14 @@ export async function getStorage<T>({
     window[updateWindowKey] = { ...fallback, ...value };
   }
   return value;
+}
+
+export function getValue(value: any) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
 }
 
 export enum SELECTORS {

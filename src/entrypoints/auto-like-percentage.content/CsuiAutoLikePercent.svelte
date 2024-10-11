@@ -2,7 +2,7 @@
   import { storage } from "wxt/storage";
   import {
     addNavigationListener,
-    getStorage,
+    getStorage, getValue,
     getVisibleElement,
     initial,
     OBSERVER_OPTIONS,
@@ -40,8 +40,8 @@
     storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
     storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold })
   ]).then(([isAutoLike, autoLikeThreshold]) => {
-    window.ytrAutoLikeEnabled = isAutoLike;
-    window.ytrAutoLikeThreshold = autoLikeThreshold;
+    window.ytrAutoLikeEnabled = getValue(isAutoLike);
+    window.ytrAutoLikeThreshold = getValue(autoLikeThreshold);
   });
 
   $: if (isAutoLikeEnabled && percentageWatched >= autoLikeThreshold) {

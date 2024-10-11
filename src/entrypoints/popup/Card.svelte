@@ -12,16 +12,16 @@
     ShortcutType
   } from "@/entrypoints/popup/sections/store-keyboard";
   import { type ButtonTriggers } from "@/lib/types";
-  import { initial, MODIFIER_KEYS } from "@/lib/utils-initials";
+  import { getValue, initial, MODIFIER_KEYS } from "@/lib/utils-initials";
 
   Promise.all([
     storage.getItem<typeof defaultShortcuts>("local:keyboardShortcuts", { fallback: defaultShortcuts }),
     storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
     storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold })
   ]).then(([pKeyboardShortcuts, pIsAutoLike, pAutoLikeThreshold]) => {
-    $keyCombos = pKeyboardShortcuts;
-    $isAutoLike = pIsAutoLike;
-    $autoLikeThreshold = pAutoLikeThreshold;
+    $keyCombos = (getValue(pKeyboardShortcuts));
+    $isAutoLike = (getValue(pIsAutoLike));
+    $autoLikeThreshold = (getValue(pAutoLikeThreshold));
   });
 
   function getShortcut(obj: typeof initial.buttonTriggers.like) {
