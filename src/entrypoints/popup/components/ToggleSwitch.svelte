@@ -96,7 +96,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .theme-auto label::after {
+    :global(.theme-auto) label::after {
       transition: none;
     }
   }
