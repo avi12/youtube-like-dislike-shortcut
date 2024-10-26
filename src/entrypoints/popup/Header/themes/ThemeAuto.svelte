@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let checked = false;
+  interface Props {
+    checked?: boolean;
+  }
+
+  const { checked = false }: Props = $props();
 </script>
 
 <svg class="theme-auto" class:checked height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">

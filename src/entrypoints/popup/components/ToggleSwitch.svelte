@@ -1,13 +1,20 @@
 <script lang="ts">
-  export let checked: boolean;
-  export let disabled: boolean;
+  import type { Snippet } from "svelte";
+
+  interface Props {
+    checked: boolean;
+    disabled: boolean;
+    children?: Snippet;
+  }
+
+  let { checked = $bindable(), disabled, children }: Props = $props();
   const id = Math.random().toString(36).substring(2);
 </script>
 
 <div class="toggle-switch">
   <input bind:checked {disabled} hidden id="switch-{id}" type="checkbox" />
   <label for="switch-{id}">
-    <slot />
+    {@render children?.()}
   </label>
 </div>
 
@@ -87,6 +94,7 @@
       }
     }
   }
+
   @media (prefers-reduced-motion: reduce) {
     .theme-auto label::after {
       transition: none;

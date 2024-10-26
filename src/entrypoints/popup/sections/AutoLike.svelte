@@ -24,17 +24,17 @@
     $isAutoLikeSubscribedChannels = pIsAutoLikeSubscribedChannels;
   });
 
-  $: {
+  $effect(() => {
     storage.setItem("sync:isAutoLike", $isAutoLike);
-  }
+  });
 
-  $: {
+  $effect(() => {
     storage.setItem("sync:autoLikeThreshold", $autoLikeThreshold);
-  }
+  });
 
-  $: {
+  $effect(() => {
     storage.setItem("sync:isAutoLikeSubscribedChannels", $isAutoLikeSubscribedChannels);
-  }
+  });
 </script>
 
 <section class="auto-like-section">
@@ -50,7 +50,8 @@
     </div>
     {#if $isAutoLikeSubscribedChannels !== undefined}
       <ToggleSwitch disabled={$isRecording} bind:checked={$isAutoLikeSubscribedChannels}
-        >Auto-like in subscribed channels</ToggleSwitch>
+        >Auto-like in subscribed channels
+      </ToggleSwitch>
     {/if}
   </div>
 </section>

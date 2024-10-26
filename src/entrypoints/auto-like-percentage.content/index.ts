@@ -1,3 +1,4 @@
+import { mount, unmount } from "svelte";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
 import { getElementByMutationObserver, SELECTORS } from "@/lib/utils-initials";
 
@@ -17,8 +18,8 @@ export default defineContentScript({
       position: "inline",
       append: "first",
       anchor: SELECTORS.percentageContainer,
-      onMount: container => new CsuiAutoLikePercent({ target: container }),
-      onRemove: container => container?.$destroy()
+      onMount: container => mount(CsuiAutoLikePercent, { target: container }),
+      onRemove: app => unmount(app!)
     });
 
     ui.mount();

@@ -22,7 +22,7 @@
     setTheme(theme);
   });
 
-  $: {
+  $effect(() => {
     setTheme($themeSelected);
     storage.setItem("local:theme", $themeSelected);
     document.body.dataset.theme = $themeCurrent;
@@ -41,17 +41,17 @@
         }
       });
     }
-  }
+  });
 </script>
 
 <article class="themes">
-  <button class:selected={$themeSelected === ThemeMode.auto} on:click={() => ($themeSelected = ThemeMode.auto)}>
+  <button class:selected={$themeSelected === ThemeMode.auto} onclick={() => ($themeSelected = ThemeMode.auto)}>
     <ThemeAuto checked={$themeSelected === ThemeMode.auto} />
   </button>
-  <button class:selected={$themeSelected === ThemeMode.light} on:click={() => ($themeSelected = ThemeMode.light)}>
+  <button class:selected={$themeSelected === ThemeMode.light} onclick={() => ($themeSelected = ThemeMode.light)}>
     <ThemeLight checked={$themeSelected === ThemeMode.light} />
   </button>
-  <button class:selected={$themeSelected === ThemeMode.dark} on:click={() => ($themeSelected = ThemeMode.dark)}>
+  <button class:selected={$themeSelected === ThemeMode.dark} onclick={() => ($themeSelected = ThemeMode.dark)}>
     <ThemeDark checked={$themeSelected === ThemeMode.dark} />
   </button>
 </article>

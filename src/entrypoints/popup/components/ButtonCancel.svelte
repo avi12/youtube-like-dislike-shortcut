@@ -1,12 +1,16 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import type { MouseEventHandler } from "svelte/elements";
   import { fade } from "svelte/transition";
   import IconCancel from "@/entrypoints/popup/components/icons/IconCancel.svelte";
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    onclick: MouseEventHandler<HTMLButtonElement>;
+  }
+
+  const { onclick }: Props = $props();
 </script>
 
-<button class="button-cancel quick-transition" in:fade={{ duration: 200 }} on:click={() => dispatch("click")}>
+<button class="button-cancel quick-transition" in:fade={{ duration: 200 }} {onclick}>
   <IconCancel />
   Cancel
 </button>

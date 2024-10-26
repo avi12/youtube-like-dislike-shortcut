@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { fade } from "svelte/transition";
   import ButtonCancel from "@/entrypoints/popup/components/ButtonCancel.svelte";
   import ButtonReset from "@/entrypoints/popup/components/ButtonReset.svelte";
@@ -15,29 +16,35 @@
   } from "@/entrypoints/popup/sections/store-keyboard";
   import { keyToModifier, MODIFIER_KEYCODES, MODIFIER_KEYS, modifierToKey } from "@/lib/utils-initials";
 
-  export let type: ShortcutType;
+  interface Props {
+    type: ShortcutType;
+    children?: Snippet;
+  }
 
-  let error = "";
+  const { type, children }: Props = $props();
+
+  let error = $state("");
   const pressedKeys = new Set<string>();
-  let lastShortcut = $keyCombos[type] || [];
-  let keyComboTemp = lastShortcut;
-  let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+  let lastShortcut = $state($keyCombos[type] || []);
+  let keyComboTemp = $state(lastShortcut);
+  let debounceTimeout = $state<ReturnType<typeof setTimeout>>();
   const DEBOUNCE_DELAY = 500;
   const isMac = navigator.platform.includes("Mac");
 
-  $: active = $isRecording && $currentlyRecording === type;
-  $: currentModifiers = $keyCombos[type].filter(key => MODIFIER_KEYS.includes(key));
-  $: currentNonModifiers = $keyCombos[type].filter(key => !MODIFIER_KEYS.includes(key));
-  $: displayedKeyComboList = (
-    $isRecording && $currentlyRecording === type
+  const active = $derived($isRecording && $currentlyRecording === type);
+  const currentModifiers = $derived($keyCombos[type].filter(key => MODIFIER_KEYS.includes(key)));
+  const currentNonModifiers = $derived($keyCombos[type].filter(key => !MODIFIER_KEYS.includes(key)));
+  const displayedKeyComboList = $derived(
+    ($isRecording && $currentlyRecording === type
       ? keyComboTemp
       : [
         ...currentModifiers.map(key => key.replace(isMac ? "Ctrl" : "Cmd", isMac ? "Cmd" : "Ctrl")),
         ...currentNonModifiers
       ]
-  ).map(keyToModifier);
-  // @ts-ignore
-  $: isHasAnotherShortcut = defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")];
+    ).map(keyToModifier)
+  );
+  // @ts-expect-error Incompatible types
+  const isHasAnotherShortcut = $derived(defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]);
 
   const REGEX_MODIFIERS = new RegExp(`(${MODIFIER_KEYCODES.join("|")})`, "g");
 
@@ -46,7 +53,7 @@
       return "ctrlKey";
     }
     const modifierCode = event.key.replace(REGEX_MODIFIERS, modifierToKey);
-    // @ts-ignore
+    // @ts-expect-error Incompatible types
     if (MODIFIER_KEYS.includes(modifierCode)) {
       return modifierCode;
     }
@@ -54,7 +61,9 @@
   }
 
   function getKeyCombo(): string[] {
+    // @ts-expect-error Incompatible types
     const modifiers = [...pressedKeys].filter(key => MODIFIER_KEYS.includes(key)).sort();
+    // @ts-expect-error Incompatible types
     const nonModifiers = [...pressedKeys].filter(key => !MODIFIER_KEYS.includes(key)).sort();
     return [...modifiers, ...nonModifiers];
   }
@@ -65,7 +74,7 @@
 
   function getHasConflicts(newKeyCombo: string[]) {
     for (const currentType in $keyCombos) {
-      // @ts-ignore
+      // @ts-expect-error Incompatible types
       if (currentType !== type && getIsKeyCombosTheSame($keyCombos[currentType], newKeyCombo)) {
         error = `Conflicts with ${currentType}'s shortcut`;
         return true;
@@ -77,7 +86,7 @@
 </script>
 
 <svelte:window
-  on:keydown={event => {
+  onkeydown={event => {
     if (!$isRecording || $currentlyRecording !== type) {
       return;
     }
@@ -87,7 +96,7 @@
     pressedKeys.add(key);
     keyComboTemp = getKeyCombo();
   }}
-  on:keyup={event => {
+  onkeyup={event => {
     if (!$isRecording || $currentlyRecording !== type) {
       return;
     }
@@ -122,7 +131,7 @@
       {active}
       disabled={Boolean(error) || ($isRecording && $currentlyRecording !== type)}
       error={Boolean(error) && $currentlyRecording === type}
-      on:click={() => {
+      onclick={() => {
         if (error) {
           return;
         }
@@ -146,11 +155,11 @@
   </div>
   <div class="head-wrapper">
     <h2>
-      <slot />
+      {@render children?.()}
     </h2>
     {#if $isRecording && $currentlyRecording === type}
       <ButtonCancel
-        on:click={() => {
+        onclick={() => {
           $isRecording = false;
           $currentlyRecording = null;
           keyComboTemp = lastShortcut;
@@ -160,7 +169,7 @@
     {:else}
       <ButtonReset
         disabled={getIsKeyCombosTheSame($keyCombos[type], defaultShortcuts[type]) || $isRecording}
-        on:click={() => {
+        onclick={() => {
           lastShortcut = defaultShortcuts[type];
           keyComboTemp = lastShortcut;
           $keyCombos = { ...$keyCombos, [type]: keyComboTemp };

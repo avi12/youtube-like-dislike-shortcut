@@ -1,8 +1,14 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { fade } from "svelte/transition";
 
-  export let checked: boolean;
-  export let disabled: boolean;
+  interface Props {
+    checked: boolean;
+    disabled: boolean;
+    children?: Snippet;
+  }
+
+  let { checked = $bindable(), disabled, children }: Props = $props();
   const id = Math.random().toString(36).substring(7);
 </script>
 
@@ -10,7 +16,7 @@
   <input bind:checked {disabled} hidden id="checkbox-{id}" type="checkbox" />
   <label for="checkbox-{id}">
     <span class="checkbox-custom"></span>
-    <slot />
+    {@render children?.()}
   </label>
 </div>
 

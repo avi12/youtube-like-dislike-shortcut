@@ -1,15 +1,20 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import type { Snippet } from "svelte";
+  import type { MouseEventHandler } from "svelte/elements";
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    active?: boolean;
+    error?: boolean;
+    disabled?: boolean;
+    children?: Snippet;
+    onclick: MouseEventHandler<HTMLButtonElement>;
+  }
 
-  export let active = false;
-  export let error = false;
-  export let disabled = false;
+  const { active = false, error = false, disabled = false, children, onclick }: Props = $props();
 </script>
 
-<button class="button-shortcut quick-transition" class:active class:error {disabled} on:click={() => dispatch("click")}>
-  <slot />
+<button class="button-shortcut quick-transition" class:active class:error {disabled} {onclick}>
+  {@render children?.()}
 </button>
 
 <style>

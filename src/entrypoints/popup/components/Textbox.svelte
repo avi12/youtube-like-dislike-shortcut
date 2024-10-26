@@ -1,33 +1,37 @@
 <script lang="ts">
   import { isAutoLike } from "@/entrypoints/popup/sections/store-autolike";
 
-  export let value = 60;
-  export let disabled: boolean;
+  interface Props {
+    value?: number;
+    disabled: boolean;
+  }
 
-  $: {
+  let { value = $bindable(60), disabled }: Props = $props();
+
+  $effect(() => {
     const num = value;
     if (num < 1) {
       value = 1;
     } else if (num > 99) {
       value = 99;
     }
-  }
+  });
 </script>
 
 <div class="textbox-wrapper" class:disabled={!$isAutoLike}>
   <section class="text-wrapper">
     <input
-      type="number"
       bind:value
       disabled={disabled || !$isAutoLike}
-      on:keydown={e => {
+      onkeydown={e => {
         const number = value;
         const isIncrement = e.key === "ArrowUp";
         const isDecrement = e.key === "ArrowDown";
         if ((isIncrement && number >= 99) || (isDecrement && number <= 1)) {
           e.preventDefault();
         }
-      }} />
+      }}
+      type="number" />
   </section>
 </div>
 

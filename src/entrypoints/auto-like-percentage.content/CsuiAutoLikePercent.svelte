@@ -2,7 +2,8 @@
   import { storage } from "wxt/storage";
   import {
     addNavigationListener,
-    getStorage, getValue,
+    getStorage,
+    getValue,
     getVisibleElement,
     initial,
     OBSERVER_OPTIONS,
@@ -11,23 +12,25 @@
   } from "@/lib/utils-initials";
   import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 
-  let percentageWatched = 0;
+  let percentageWatched = $state(0);
 
-  $: percentageDisplay = Intl.NumberFormat("en-US", {
-    style: "percent",
-    minimumFractionDigits: 2
-  }).format(percentageWatched / 100);
+  const percentageDisplay = $derived(
+    Intl.NumberFormat("en-US", {
+      style: "percent",
+      minimumFractionDigits: 2
+    }).format(percentageWatched / 100)
+  );
 
   let lastTitle = document.title;
   let lastUrl = location.href;
   let timeCounter = 0;
   let timeCurrentLast = 0;
   let timeDelta = 0;
-  let isNormalVideo = getIsNormalVideo();
-  let isAutoLikeEnabled = initial.isAutoLike;
-  let autoLikeThreshold = initial.autoLikeThreshold;
-  let isVideoRatedInitially = Boolean(getRatedButton());
-  let isLiveOrPremiere = getIsLiveOrPremiere();
+  let isNormalVideo = $state(getIsNormalVideo());
+  let isAutoLikeEnabled = $state(initial.isAutoLike);
+  let autoLikeThreshold = $state(initial.autoLikeThreshold);
+  let isVideoRatedInitially = $state(Boolean(getRatedButton()));
+  let isLiveOrPremiere = $state(getIsLiveOrPremiere());
 
   function getIsNormalVideo() {
     return location.pathname === "/watch";
@@ -44,9 +47,11 @@
     window.ytrAutoLikeThreshold = getValue(autoLikeThreshold);
   });
 
-  $: if (isAutoLikeEnabled && percentageWatched >= autoLikeThreshold) {
-    rateVideo(true);
-  }
+  $effect(() => {
+    if (isAutoLikeEnabled && percentageWatched >= autoLikeThreshold) {
+      rateVideo(true);
+    }
+  });
 
   function getIsLiveOrPremiere() {
     return Boolean(getVisibleElement(SELECTORS.liveBadge));
@@ -120,6 +125,7 @@
     lastTitle = document.title;
     lastUrl = location.href;
     isNormalVideo = getIsNormalVideo();
+    percentageWatched = 0;
     window.ytrUserInteracted = false;
     timeCounter = 0;
     isVideoRatedInitially = Boolean(getRatedButton());
@@ -133,11 +139,13 @@
   }
 
   function addStorageListener() {
-    storage.watch<typeof initial.isAutoLike>("sync:isAutoLike", isAutoLike => {
-      window.ytrAutoLikeEnabled = isAutoLike !== null ? isAutoLike : initial.isAutoLike;
+    storage.watch<typeof initial.isAutoLike>("sync:isAutoLike", pIsAutoLike => {
+      window.ytrAutoLikeEnabled = pIsAutoLike !== null ? pIsAutoLike : initial.isAutoLike;
+      isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
-    storage.watch<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", autoLikeThreshold => {
-      window.ytrAutoLikeThreshold = autoLikeThreshold || initial.autoLikeThreshold;
+    storage.watch<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", pAutoLikeThreshold => {
+      window.ytrAutoLikeThreshold = pAutoLikeThreshold || initial.autoLikeThreshold;
+      autoLikeThreshold = window.ytrAutoLikeThreshold;
     });
   }
 
@@ -168,13 +176,13 @@
 </script>
 
 <svelte:body
-  on:click={async e => {
+  onclick={async e => {
     if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
       return;
     }
 
     const elRatePressed = e.target
-      .closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
+      ?.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
       ?.querySelector("button[aria-pressed=true]");
     if (elRatePressed) {
       window.ytrUserInteracted = true;

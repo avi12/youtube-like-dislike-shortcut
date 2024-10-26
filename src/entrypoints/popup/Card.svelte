@@ -19,9 +19,9 @@
     storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
     storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold })
   ]).then(([pKeyboardShortcuts, pIsAutoLike, pAutoLikeThreshold]) => {
-    $keyCombos = (getValue(pKeyboardShortcuts));
-    $isAutoLike = (getValue(pIsAutoLike));
-    $autoLikeThreshold = (getValue(pAutoLikeThreshold));
+    $keyCombos = getValue(pKeyboardShortcuts);
+    $isAutoLike = getValue(pIsAutoLike);
+    $autoLikeThreshold = getValue(pAutoLikeThreshold);
   });
 
   function getShortcut(obj: typeof initial.buttonTriggers.like) {

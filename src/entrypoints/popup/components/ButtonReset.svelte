@@ -1,15 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import type { MouseEventHandler } from "svelte/elements";
   import { fade } from "svelte/transition";
   import IconReset from "@/entrypoints/popup/components/icons/IconReset.svelte";
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    disabled: boolean;
+    onclick: MouseEventHandler<HTMLButtonElement>;
+  }
 
-  export let disabled: boolean;
+  const { disabled, onclick }: Props = $props();
 </script>
 
-<button class="button-reset quick-transition" {disabled} in:fade={{ duration: 200 }} on:click={() => dispatch("click")}>
-  <IconReset {disabled} />Reset
+<button class="button-reset quick-transition" {disabled} in:fade={{ duration: 200 }} {onclick}>
+  <IconReset {disabled} />
+  Reset
 </button>
 
 <style>

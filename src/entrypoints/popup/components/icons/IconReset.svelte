@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let disabled = false;
+  interface Props {
+    disabled?: boolean;
+  }
+
+  const { disabled = false }: Props = $props();
 </script>
 
 <svg class:disabled fill="none" height="14" viewBox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg">
