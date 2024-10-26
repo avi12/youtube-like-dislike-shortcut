@@ -122,7 +122,7 @@ export function keyToModifier(key: string) {
     altKey: "Alt",
     metaKey: "Meta"
   };
-  // @ts-ignore
+  // @ts-expect-error Handled correctly
   return keyToModifierMap[key] || key;
 }
 
@@ -133,6 +133,6 @@ export function modifierToKey(modifier: string) {
     Ctrl: "ctrlKey",
     Alt: "altKey"
   };
-  // @ts-ignore
+  // @ts-expect-error Handled correctly
   return modifierToKeyMap[modifier] || modifier;
 }
