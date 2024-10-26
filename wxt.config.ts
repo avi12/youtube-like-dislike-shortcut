@@ -8,8 +8,7 @@ export default defineConfig({
   srcDir: "src",
   manifest({ browser, manifestVersion }) {
     const url = process.env.npm_package_repository;
-    // @ts-expect-error Handling the input correctly
-    const [, author, email] = process.env.npm_package_author!.match(/(.+) <(.+)>/);
+    const [, author, email] = process.env.npm_package_author!.match(/(.+) <(.+)>/)!;
     let manifest: UserManifest = {
       name: "YouTube Like-Dislike Shortcut",
       description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
