@@ -14,11 +14,7 @@ export default defineConfig({
       name: "YouTube Like-Dislike Shortcut",
       description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
       homepage_url: url,
-      permissions: ["storage"],
-      options_ui: {
-        page: "popup.html",
-        browser_style: true
-      }
+      permissions: ["storage"]
     };
     if (browser === "opera") {
       // @ts-expect-error https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/author
@@ -49,6 +45,7 @@ export default defineConfig({
     return manifest;
   },
   outDir: "build",
+  outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
     excludeSources: ["*.env", ".env*"],
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
@@ -58,12 +55,21 @@ export default defineConfig({
     vite: {
       preprocess: [
         vitePreprocess({
+          script: true,
           style: {
-            // @ts-expect-error Incompatible types
-            plugins: [autoprefixer, nesting()]
+            css: {
+              postcss: {
+                plugins: [autoprefixer, nesting()]
+              }
+            }
           }
         })
       ]
     }
-  }
+  },
+  vite: () => ({
+    build: {
+      sourcemap: "inline"
+    }
+  })
 });
