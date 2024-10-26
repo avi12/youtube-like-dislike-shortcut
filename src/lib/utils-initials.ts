@@ -18,20 +18,20 @@ export async function getStorage<T>({
   } catch {
     value = fallback;
   }
-  // @ts-ignore
+  // @ts-expect-error Incompatible types
   if (typeof window[updateWindowKey] !== "object") {
-    // @ts-ignore
+    // @ts-expect-error Incompatible types
     window[updateWindowKey] = value;
   } else {
-    // @ts-ignore
+    // @ts-expect-error Incompatible types
     window[updateWindowKey] = { ...fallback, ...value };
   }
   return value;
 }
 
-export function getValue(value: any) {
+export function getValue<T>(value: T): T {
   try {
-    return JSON.parse(value);
+    return JSON.parse(value as string);
   } catch {
     return value;
   }
@@ -39,7 +39,7 @@ export function getValue(value: any) {
 
 export enum SELECTORS {
   video = "video",
-  adOverlay = ".ytp-ad-player-overlay",
+  adOverlay = ".ytp-ad-player-overlay-layout",
   liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
   percentageContainer = "#actions ytd-menu-renderer, #actions #like-button",
   toggleButtonsNormalVideo = "#top-level-buttons-computed yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
