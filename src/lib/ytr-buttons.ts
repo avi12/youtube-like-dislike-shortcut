@@ -78,7 +78,8 @@ function clearAnimationOnEnd(): void {
 
 export function getRatedButton(): HTMLButtonElement {
   const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
-  return getVisibleElement(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`)!.querySelector(
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+  return getVisibleElement(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`)?.querySelector(
     "button[aria-pressed=true]"
   )!;
 }
