@@ -1,4 +1,4 @@
-import { storage, type StorageArea } from "wxt/storage";
+import { type StorageArea } from "#imports";
 import { type ButtonTriggers } from "@/lib/types";
 
 export async function getStorage<T>({
@@ -14,7 +14,7 @@ export async function getStorage<T>({
 }): Promise<T> {
   let value: T;
   try {
-    value = getValue(await storage.getItem<T>(`${area}:${key}`, { fallback }));
+    value = await storage.getItem<T>(`${area}:${key}`, { fallback });
   } catch {
     value = fallback;
   }
@@ -27,14 +27,6 @@ export async function getStorage<T>({
     window[updateWindowKey] = { ...fallback, ...value };
   }
   return value;
-}
-
-export function getValue<T>(value: T): T {
-  try {
-    return JSON.parse(value as string);
-  } catch {
-    return value;
-  }
 }
 
 export enum SELECTORS {

@@ -8,6 +8,7 @@
     children?: Snippet;
   }
 
+  // eslint-disable-next-line prefer-const
   let { checked = $bindable(), disabled, children }: Props = $props();
   const id = Math.random().toString(36).substring(7);
 </script>

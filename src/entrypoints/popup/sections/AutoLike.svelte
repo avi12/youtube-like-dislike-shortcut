@@ -1,13 +1,9 @@
 <script lang="ts">
-  import { storage } from "wxt/storage";
+  import { storage } from "#imports";
   import Textbox from "@/entrypoints/popup/components/Textbox.svelte";
   import ToggleSwitch from "@/entrypoints/popup/components/ToggleSwitch.svelte";
-  import {
-    autoLikeThreshold,
-    isAutoLike,
-    isAutoLikeSubscribedChannels
-  } from "@/entrypoints/popup/sections/store-autolike";
-  import { isRecording } from "@/entrypoints/popup/sections/store-keyboard";
+  import { autoLikeManager } from "@/entrypoints/popup/sections/autolike.svelte.js";
+  import { keys } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import { initial } from "@/lib/utils-initials";
 
   Promise.all([
@@ -19,21 +15,21 @@
       fallback: initial.isAutoLikeSubscribedChannels
     })
   ]).then(([pIsAutoLike, pAutoLikeThreshold, pIsAutoLikeSubscribedChannels]) => {
-    $isAutoLike = pIsAutoLike;
-    $autoLikeThreshold = pAutoLikeThreshold;
-    $isAutoLikeSubscribedChannels = pIsAutoLikeSubscribedChannels;
+    autoLikeManager.isAutoLike = pIsAutoLike;
+    autoLikeManager.autoLikeThreshold = pAutoLikeThreshold;
+    autoLikeManager.isAutoLikeSubscribedChannels = pIsAutoLikeSubscribedChannels;
   });
 
   $effect(() => {
-    storage.setItem("sync:isAutoLike", $isAutoLike);
+    storage.setItem("sync:isAutoLike", autoLikeManager.isAutoLike);
   });
 
   $effect(() => {
-    storage.setItem("sync:autoLikeThreshold", $autoLikeThreshold);
+    storage.setItem("sync:autoLikeThreshold", autoLikeManager.autoLikeThreshold);
   });
 
   $effect(() => {
-    storage.setItem("sync:isAutoLikeSubscribedChannels", $isAutoLikeSubscribedChannels);
+    storage.setItem("sync:isAutoLikeSubscribedChannels", autoLikeManager.isAutoLikeSubscribedChannels);
   });
 </script>
 
@@ -41,15 +37,15 @@
   <h2>Auto-like videos</h2>
   <div class="content">
     <div class="auto-like-container">
-      {#if $isAutoLike !== undefined}
-        <ToggleSwitch disabled={$isRecording} bind:checked={$isAutoLike}>After watched</ToggleSwitch>
+      {#if autoLikeManager.isAutoLike !== undefined}
+        <ToggleSwitch disabled={keys.isRecording} bind:checked={autoLikeManager.isAutoLike}>After watched</ToggleSwitch>
       {/if}
-      {#if $autoLikeThreshold !== undefined}
-        <Textbox disabled={$isRecording} bind:value={$autoLikeThreshold} />
+      {#if autoLikeManager.autoLikeThreshold !== undefined}
+        <Textbox disabled={keys.isRecording} bind:value={autoLikeManager.autoLikeThreshold} />
       {/if}
     </div>
-    {#if $isAutoLikeSubscribedChannels !== undefined}
-      <ToggleSwitch disabled={$isRecording} bind:checked={$isAutoLikeSubscribedChannels}
+    {#if autoLikeManager.isAutoLikeSubscribedChannels !== undefined}
+      <ToggleSwitch disabled={keys.isRecording} bind:checked={autoLikeManager.isAutoLikeSubscribedChannels}
         >Auto-like in subscribed channels
       </ToggleSwitch>
     {/if}

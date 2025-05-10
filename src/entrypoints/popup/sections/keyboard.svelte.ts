@@ -1,5 +1,3 @@
-import { writable } from "svelte/store";
-
 export const defaultAdditionalShortcuts = {
   "Shift + Equal": "NumpadAdd",
   "Shift + Minus": "NumpadSubtract",
@@ -17,7 +15,19 @@ export enum ShortcutType {
   dislike = "dislike",
   unrate = "unrate"
 }
-export const keyCombos = writable<typeof defaultShortcuts>();
-export const keyCombosSecondary = writable<Record<ShortcutType, boolean>>();
-export const isRecording = writable<boolean>(false);
-export const currentlyRecording = writable<ShortcutType | null>(null);
+
+export const keys = $state<{
+  combos: typeof defaultShortcuts;
+  combosSecondary: Record<ShortcutType, boolean>;
+  isRecording: boolean;
+  currentlyRecording: ShortcutType | null;
+}>({
+  combos: defaultShortcuts,
+  combosSecondary: {
+    [ShortcutType.like]: false,
+    [ShortcutType.dislike]: false,
+    [ShortcutType.unrate]: false
+  },
+  isRecording: false,
+  currentlyRecording: null
+});

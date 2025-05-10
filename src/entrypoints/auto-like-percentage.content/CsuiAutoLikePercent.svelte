@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { storage } from "wxt/storage";
+  import { storage } from "#imports";
   import {
     addNavigationListener,
     getStorage,
-    getValue,
     getVisibleElement,
     initial,
     OBSERVER_OPTIONS,
@@ -43,8 +42,8 @@
     storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
     storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold })
   ]).then(([isAutoLike, autoLikeThreshold]) => {
-    window.ytrAutoLikeEnabled = getValue(isAutoLike);
-    window.ytrAutoLikeThreshold = getValue(autoLikeThreshold);
+    window.ytrAutoLikeEnabled = isAutoLike;
+    window.ytrAutoLikeThreshold = autoLikeThreshold;
   });
 
   $effect(() => {

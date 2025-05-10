@@ -1,5 +1,5 @@
-import { storage } from "wxt/storage";
-import { defaultAdditionalShortcuts, ShortcutType } from "./popup/sections/store-keyboard";
+import { storage } from "#imports";
+import { defaultAdditionalShortcuts, ShortcutType } from "./popup/sections/keyboard.svelte.js";
 import { getStorage, initial, keyToModifier, MODIFIER_KEYS } from "@/lib/utils-initials";
 import { rateVideo } from "@/lib/ytr-buttons";
 
