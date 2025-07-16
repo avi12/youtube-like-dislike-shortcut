@@ -61,7 +61,7 @@ body:
     attributes:
       label: Make sure the bug wasn't reported before
       options:
-        - label: I'm the first one to [report](https://github.com/avi12/youtube-auto-hd/issues?q=is%3Aissue) it
+        - label: I'm the first one to [report](https://github.com/avi12/youtube-like-dislike-shortcut/issues?q=is%3Aissue) it
           required: true
   - type: textarea
     id: additional-context
