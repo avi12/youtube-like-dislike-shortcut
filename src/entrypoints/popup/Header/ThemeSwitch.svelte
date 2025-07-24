@@ -25,7 +25,7 @@
   $effect(() => {
     setTheme(theme.selected);
     storage.setItem("local:theme", theme.selected);
-    document.body.dataset.theme = theme.current;
+    document.documentElement.dataset.theme = theme.current;
 
     if (theme.selected === ThemeMode.auto) {
       instanceDarkTheme.addEventListener("change", () => {

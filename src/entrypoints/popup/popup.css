@@ -1,4 +1,4 @@
-body[data-theme="light"] {
+html[data-theme="light"] {
   --color-text: #1b1b1b;
   --color-text-disabled: #bcc0c8;
   --color-bg: #ffffff;
@@ -60,7 +60,7 @@ body[data-theme="light"] {
   --checkbox-bg-disabled: #bcc0c8;
 }
 
-body[data-theme="dark"] {
+html[data-theme="dark"] {
   --color-text: #ffffff;
   --color-text-disabled: #bcc0c8;
   --color-bg: #1b1b1b;
@@ -123,8 +123,6 @@ body[data-theme="dark"] {
 }
 
 body {
-  color: var(--color-text);
-  background-color: var(--color-bg);
   width: 752px;
   margin: 0;
   font-family: Inter, sans-serif;
@@ -136,11 +134,16 @@ body {
     background-color 0.4s ease-in-out;
 }
 
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
 
-body * {
+html * {
   transition:
     color 0.02s ease-in-out,
     background-color 0.4s ease-in-out;
@@ -162,8 +165,8 @@ button,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body,
-  body *,
+  html,
+  html *,
   .quick-transition {
     transition: none;
   }
