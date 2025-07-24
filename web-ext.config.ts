@@ -10,7 +10,7 @@ const path = (() => {
   return osMap[process.platform] || "";
 })();
 
-const env = dotenv.configDotenv({ path }).parsed as {
+const env = dotenv.configDotenv({ path, quiet: true }).parsed as {
   VITE_PATH_EDGE: string;
   VITE_PATH_OPERA: string;
 };
