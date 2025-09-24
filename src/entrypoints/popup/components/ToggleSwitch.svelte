@@ -9,7 +9,7 @@
 
   // eslint-disable-next-line prefer-const
   let { checked = $bindable(), disabled, children }: Props = $props();
-  const id = Math.random().toString(36).substring(2);
+  const id = $props.id();
 </script>
 
 <div class="toggle-switch">
@@ -33,7 +33,7 @@
       font-size: 0.875rem;
       color: var(--textbox-color-disabled);
 
-      &:before {
+      &::before {
         content: "";
         width: 50px;
         height: 28px;
@@ -44,7 +44,7 @@
         padding: 4px;
       }
 
-      &:after {
+      &::after {
         content: "";
         position: absolute;
         top: 50%;
@@ -65,12 +65,12 @@
       &:checked + label {
         color: var(--color-text);
 
-        &:before {
+        &::before {
           background-color: var(--switch-track-bg);
           box-shadow: var(--switch-track-bg-shadow);
         }
 
-        &:after {
+        &::after {
           translate: 26px -50%;
           background-color: var(--switch-thumb-bg);
           box-shadow: var(--switch-thumb-shadow);
@@ -81,13 +81,13 @@
         color: var(--textbox-color-disabled);
         cursor: not-allowed;
 
-        &:before {
+        &::before {
           background-color: var(--switch-disabled-track-bg);
           box-shadow: var(--switch-disabled-track-bg-shadow);
           cursor: not-allowed;
         }
 
-        &:after {
+        &::after {
           background-color: var(--switch-disabled-thumb-bg);
           box-shadow: var(--switch-disabled-thumb-shadow);
           cursor: not-allowed;
@@ -97,6 +97,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* noinspection CssUnusedSymbol */
     :global(.theme-auto) label::after {
       transition: none;
     }

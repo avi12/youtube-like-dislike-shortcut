@@ -22,7 +22,7 @@ export default defineWebExtConfig({
     edge: env.VITE_PATH_EDGE,
     opera: env.VITE_PATH_OPERA.replace("USERPROFILE", process.env.HOME!)
   },
-  disabled: false,
+  disabled: true,
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
   chromiumArgs: [`--lang=${VITE_LANG}`]
 });

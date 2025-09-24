@@ -35,9 +35,9 @@
     (keys.isRecording && keys.currentlyRecording === type
       ? keyComboTemp
       : [
-          ...currentModifiers.map(key => key.replace(isMac ? "Ctrl" : "Cmd", isMac ? "Cmd" : "Ctrl")),
-          ...currentNonModifiers
-        ]
+        ...currentModifiers.map(key => key.replace(isMac ? "Ctrl" : "Cmd", isMac ? "Cmd" : "Ctrl")),
+        ...currentNonModifiers
+      ]
     ).map(keyToModifier)
   );
   // @ts-expect-error Incompatible types

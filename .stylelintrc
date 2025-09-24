@@ -1,0 +1,14 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["@stylistic/stylelint-plugin"],
+  "rules": {
+    "@stylistic/indentation": 2,
+    "selector-pseudo-class-no-unknown": [true, {"ignorePseudoClasses":  ["global"]}]
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.svelte"],
+      "customSyntax": "postcss-html"
+    }
+  ]
+}

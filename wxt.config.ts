@@ -1,8 +1,5 @@
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
-import autoprefixer from "autoprefixer";
-import nesting from "postcss-nesting";
 import { defineConfig, type UserManifest } from "wxt";
-import fs from "fs";
+import fs from "node:fs";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -50,22 +47,6 @@ export default defineConfig({
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   modules: ["@wxt-dev/module-svelte"],
-  svelte: {
-    vite: {
-      preprocess: [
-        vitePreprocess({
-          script: true,
-          style: {
-            css: {
-              postcss: {
-                plugins: [autoprefixer, nesting()]
-              }
-            }
-          }
-        })
-      ]
-    }
-  },
   vite: () => ({
     build: {
       sourcemap: "inline"
