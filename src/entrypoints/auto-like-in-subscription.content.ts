@@ -1,4 +1,3 @@
-import { storage } from "#imports";
 import {
   addNavigationListener,
   getElementByMutationObserver,
@@ -11,6 +10,8 @@ import {
 import { getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 
 let OBSERVER_SUBSCRIPTION: MutationObserver;
+let lastUrl: string | undefined;
+let lastTitle: string | undefined;
 
 function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
   const [elLike] = getRateButtons();
@@ -26,12 +27,12 @@ function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver)
 }
 
 async function addTemporaryBodyListener() {
-  if (window.ytrLastUrl === location.href || window.ytrLastTitle === document.title) {
+  if (lastUrl === location.href || lastTitle === document.title) {
     return;
   }
 
-  window.ytrLastUrl = location.href;
-  window.ytrLastTitle = document.title;
+  lastUrl = location.href;
+  lastTitle = document.title;
 
   if (!window.ytrAutoLikeSubscribedChannels || !getIsPageCompatible()) {
     return;
@@ -60,41 +61,39 @@ async function addSubscribedEventListener() {
   OBSERVER_SUBSCRIPTION.observe(elSubscribed, { attributes: true, attributeFilter: ["subscribed"] });
 }
 
-async function init() {
-  window.ytrLastUrl = window.location?.href;
-  window.ytrLastTitle = document.title;
-
-  OBSERVER_SUBSCRIPTION = new MutationObserver(() => {
-    if (getIsSubscribed()) {
-      autoLikeIfSubscribed();
-      OBSERVER_SUBSCRIPTION.disconnect();
-    }
-  });
-
-  window.ytrAutoLikeSubscribedChannels = await getStorage({
-    area: "sync",
-    key: "isAutoLikeSubscribedChannels",
-    fallback: initial.isAutoLikeSubscribedChannels,
-    updateWindowKey: "ytrAutoLikeSubscribedChannels"
-  });
-
-  addStorageListener();
-  addNavigationListener(addTemporaryBodyListener);
-
-  if (!getIsPageCompatible()) {
-    return;
-  }
-
-  addSubscribedEventListener();
-
-  if (!window.ytrAutoLikeSubscribedChannels) {
-    return;
-  }
-
-  new MutationObserver(autoLikeIfSubscribed).observe(document, OBSERVER_OPTIONS);
-}
-
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
-  main: () => init()
+  async main () {
+    lastUrl = location.href;
+    lastTitle = document.title;
+
+    OBSERVER_SUBSCRIPTION = new MutationObserver(() => {
+      if (getIsSubscribed()) {
+        autoLikeIfSubscribed();
+        OBSERVER_SUBSCRIPTION.disconnect();
+      }
+    });
+
+    window.ytrAutoLikeSubscribedChannels = await getStorage({
+      area: "sync",
+      key: "isAutoLikeSubscribedChannels",
+      fallback: initial.isAutoLikeSubscribedChannels,
+      updateWindowKey: "ytrAutoLikeSubscribedChannels"
+    });
+
+    addStorageListener();
+    addNavigationListener(addTemporaryBodyListener);
+
+    if (!getIsPageCompatible()) {
+      return;
+    }
+
+    addSubscribedEventListener();
+
+    if (!window.ytrAutoLikeSubscribedChannels) {
+      return;
+    }
+
+    new MutationObserver(autoLikeIfSubscribed).observe(document, OBSERVER_OPTIONS);
+  }
 });
