@@ -30,19 +30,18 @@ export async function getStorage<T>({
 }
 
 export enum SELECTORS {
-  video = "video",
-  adOverlay = ".ytp-ad-player-overlay-layout",
-  liveBadge = ".ytp-live-badge, .ytp-offline-slate-bar",
-  percentageContainer = "#actions ytd-menu-renderer, #actions #like-button",
-  toggleButtonsNormalVideo = "#top-level-buttons-computed yt-smartimation, ytd-segmented-like-dislike-button-renderer yt-smartimation",
-  toggleButtonsShortsVideo = "ytd-like-button-renderer",
-  buttonSubscribe = "ytd-subscribe-button-renderer",
+  adOverlay = "ytd-player .ytp-ad-player-overlay-layout",
+  liveBadge = "ytd-player .ytp-live-badge, ytd-player .ytp-offline-slate-bar",
+  percentageContainer = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, ytd-page-manager #actions #like-button",
+  toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
+  toggleButtonsShortsVideo = "ytd-page-manager ytd-like-button-renderer",
+  buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
   title = "title",
   // Bezel classes
-  bezel = ".ytp-bezel",
-  bezelIcon = ".ytp-bezel-icon",
-  bezelTextWrapper = ".ytp-bezel-text-wrapper",
-  bezelTextHide = ".ytp-bezel-text-hide"
+  bezel = "ytd-page-manager .ytp-bezel",
+  bezelIcon = "ytd-page-manager .ytp-bezel-icon",
+  bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper",
+  bezelTextHide = "ytd-page-manager .ytp-bezel-text-hide"
 }
 
 export const initial = {
@@ -79,23 +78,25 @@ function getIsElementVisible(element: HTMLElement): boolean {
 }
 
 function getIsElementInViewport(element: HTMLElement): boolean {
-  const { bottom, left, right, top } = element.getBoundingClientRect();
+  const { top, left, bottom, right } = element.getBoundingClientRect();
   return top > 0 && left > 0 && bottom < innerHeight && right < innerWidth;
 }
 
 export function getVisibleElement<T extends HTMLElement>(selector: string): T {
-  const elements = [...document.querySelectorAll(selector)] as T[];
+  const elements = [...document.querySelectorAll<T>(selector)];
+  // Removed debug log per user request
   const isNormalVideo = location.pathname.startsWith("/watch");
+  // Removed debug log per user request
   return [...elements].find(isNormalVideo ? getIsElementVisible : getIsElementInViewport)!;
 }
 
 export async function getElementByMutationObserver<T extends HTMLElement>(selector: SELECTORS): Promise<T> {
   return new Promise(resolve => {
     new MutationObserver((_, observer) => {
-      const element = document.documentElement.querySelector<HTMLElement>(selector);
+      const element = document.documentElement.querySelector<T>(selector);
       if (element) {
         observer.disconnect();
-        resolve(element as T);
+        resolve(element);
       }
     }).observe(document, OBSERVER_OPTIONS);
   });

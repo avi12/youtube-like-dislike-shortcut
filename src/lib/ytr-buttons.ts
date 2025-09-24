@@ -1,5 +1,5 @@
 import { svgs } from "@/lib/icons";
-import { getVisibleElement, SELECTORS } from "@/lib/utils-initials";
+import { getVisibleElement, REGEX_SUPPORTED_PAGES, SELECTORS } from "@/lib/utils-initials";
 
 let gLastRating: "like" | "dislike";
 
@@ -7,36 +7,14 @@ function getIsActive(elButton: HTMLElement): boolean {
   return elButton.ariaPressed === "true";
 }
 
-function getIsInViewport(element: Element): boolean {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom > 0 &&
-    rect.bottom <= document.documentElement.clientHeight &&
-    rect.right > 0 &&
-    rect.right <= document.documentElement.clientWidth
-  );
-}
-
-function getIsVisible(element: Element): boolean {
-  const el = element as HTMLElement;
-  return el.offsetWidth > 0 && el.offsetHeight > 0;
-}
-
 export function getRateButtons(): HTMLButtonElement[] {
-  const elButtonsRate = getContainerRateButtons();
+  const elButtonsRate = document.querySelector<HTMLLIElement>(
+    `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`
+  );
   if (!elButtonsRate) {
     return [];
   }
   return [...elButtonsRate.querySelectorAll("button")] as HTMLButtonElement[];
-}
-
-function getContainerRateButtons(): HTMLButtonElement {
-  const elButtons = document.querySelectorAll(
-    `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`
-  );
-  return [...elButtons].find(getIsShorts() ? getIsInViewport : getIsVisible) as HTMLButtonElement;
 }
 
 export function getIsShorts(): boolean {
@@ -95,6 +73,9 @@ export function getIsSubscribed(): boolean {
  * Rates/un-rates a video on YouTube.com
  */
 export function rateVideo(isLike: boolean | null): void {
+  if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
+    return;
+  }
   const [elLike, elDislike] = getRateButtons();
   clearAnimationOnEnd();
 
