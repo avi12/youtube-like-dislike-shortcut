@@ -7,7 +7,7 @@ export enum ThemeMode {
 export const theme = $state<{
   selected: ThemeMode;
   current: Exclude<ThemeMode, ThemeMode.auto>;
-  }>({
-    selected: ThemeMode.auto,
-    current: ThemeMode.light
-  });
+}>({
+  selected: ThemeMode.auto,
+  current: ThemeMode.light
+});

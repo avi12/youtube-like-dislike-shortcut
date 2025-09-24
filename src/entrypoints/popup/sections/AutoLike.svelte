@@ -46,7 +46,7 @@
     </div>
     {#if autoLikeManager.isAutoLikeSubscribedChannels !== undefined}
       <ToggleSwitch disabled={keys.isRecording} bind:checked={autoLikeManager.isAutoLikeSubscribedChannels}
-        >Auto-like in subscribed channels
+      >Auto-like in subscribed channels
       </ToggleSwitch>
     {/if}
   </div>
@@ -54,7 +54,7 @@
 
 <style>
   h2 {
-    margin: 0 0 16px 0;
+    margin: 0 0 16px;
     font-weight: 600;
     font-size: 1rem;
   }
