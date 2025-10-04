@@ -79,6 +79,10 @@ export default defineContentScript({
       if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
         return;
       }
+      if (window.ytrUserInteracted) {
+        sharedState.isUserInteracted = true;
+        return;
+      }
 
       sharedState.isAdPlaying = getIsAdPlaying();
       sharedState.isLiveOrPremiere = getIsLiveOrPremiere();

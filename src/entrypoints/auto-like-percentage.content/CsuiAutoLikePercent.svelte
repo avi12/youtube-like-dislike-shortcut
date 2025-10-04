@@ -76,6 +76,7 @@
     isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.percentageWatched = 0;
     sharedState.isUserInteracted = false;
+    window.ytrUserInteracted = false;
     sharedState.isRatedInitially = Boolean(getRatedButton());
   }
 
