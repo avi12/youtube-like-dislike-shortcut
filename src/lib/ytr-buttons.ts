@@ -58,14 +58,11 @@ function clearAnimationOnEnd(): void {
 
 export function getRatedButton(): HTMLButtonElement {
   const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
-  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-  return getVisibleElement(`${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}`)?.querySelector(
-    "button[aria-pressed=true]"
-  )!;
+  return document.querySelector(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`)!;
 }
 
 export function getIsSubscribed(): boolean {
-  const elSubscribe = getVisibleElement(SELECTORS.buttonSubscribe);
+  const elSubscribe = document.querySelector(SELECTORS.buttonSubscribe);
   return elSubscribe?.getAttribute("subscribed") !== null;
 }
 
@@ -105,6 +102,7 @@ export function rateVideo(isLike: boolean | null): void {
   // isLike === null
   // Un-rate a video
   const elBtnActive = getRatedButton();
+
   if (!gLastRating) {
     gLastRating = elBtnActive === elDislike ? "dislike" : "like";
   }
