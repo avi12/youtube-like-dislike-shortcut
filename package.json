@@ -39,7 +39,6 @@
     "@wxt-dev/module-svelte": "^2.0.4",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.2.1",
-    "dotenv": "^17.2.3",
     "eslint": "^9.38.0",
     "eslint-config-avi12": "github:avi12/eslint-config-avi12",
     "eslint-plugin-import": "^2.32.0",

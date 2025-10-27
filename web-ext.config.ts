@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import { defineWebExtConfig } from "wxt";
 
 const path = (() => {
@@ -10,17 +9,14 @@ const path = (() => {
   return osMap[process.platform] || "";
 })();
 
-const env = dotenv.configDotenv({ path, quiet: true }).parsed as {
-  VITE_PATH_EDGE: string;
-  VITE_PATH_OPERA: string;
-};
+process.loadEnvFile(path);
 
 const { VITE_LANG = "en" } = process.env;
 
 export default defineWebExtConfig({
   binaries: {
-    edge: env.VITE_PATH_EDGE,
-    opera: env.VITE_PATH_OPERA.replace("USERPROFILE", process.env.HOME!)
+    edge: process.env.VITE_PATH_EDGE!,
+    opera: process.env.VITE_PATH_OPERA!.replace("USERPROFILE", process.env.HOME!)
   },
   disabled: true,
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
