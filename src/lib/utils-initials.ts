@@ -32,9 +32,9 @@ export async function getStorage<T>({
 export enum SELECTORS {
   adOverlay = "ytd-player .ytp-ad-player-overlay-layout",
   liveBadge = "ytd-player .ytp-live-badge, ytd-player .ytp-offline-slate-bar",
-  percentageContainer = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, ytd-page-manager #actions #like-button",
+  percentageContainer = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, reel-action-bar-view-model",
   toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
-  toggleButtonsShortsVideo = "ytd-page-manager ytd-like-button-renderer",
+  toggleButtonsShortsVideo = "reel-action-bar-view-model",
   buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
   title = "title",
   // Bezel classes
