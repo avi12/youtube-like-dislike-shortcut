@@ -1,14 +1,17 @@
 import { defineConfig, type UserManifest } from "wxt";
-import fs from "node:fs";
+import packageJson from "./package.json" assert { type: "json" };
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
   publicDir: "src/public",
   manifest({ browser, manifestVersion }) {
-    const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf-8"));
     const url = packageJson.repository;
-    const [, author, email] = packageJson.author.match(/(.+) <(.+)>/);
+    const match = packageJson.author.match(/(.+) <(.+)>/);
+    if (!match) {
+      return;
+    }
+    const [, author, email] = match;
     let manifest: UserManifest = {
       name: browser === "edge" ? "Like-Dislike Shortcut for YouTube" : "YouTube Like-Dislike Shortcut",
       description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
@@ -16,7 +19,7 @@ export default defineConfig({
       permissions: ["storage"]
     };
     if (browser === "opera") {
-      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/author
+      // @ts-expect-error https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/author
       manifest.author = packageJson.author;
     } else if (manifestVersion === 3 && (browser === "chrome" || browser === "edge")) {
       manifest.author = { email };
