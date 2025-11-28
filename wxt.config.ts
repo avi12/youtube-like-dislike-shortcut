@@ -46,7 +46,7 @@ export default defineConfig({
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
-    excludeSources: ["*.env", ".env*"],
+    excludeSources: ["*.env", ".env*", "build/*"],
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   modules: ["@wxt-dev/module-svelte"],
