@@ -30,12 +30,12 @@ Made by [Avi](https://avi12.com)
 
 ## Requirements for setting up
 
-Install [Node.js](https://nodejs.org) and [PNPM](https://pnpm.io/installation)
+Install [Node.js](https://nodejs.org) and [PNPM](https://bun run.io/installation)
 
 ## Install dependencies
 
 ```shell script
-pnpm i
+bun i
 ```
 
 ## Start the dev server & run in a test browser
@@ -43,19 +43,19 @@ pnpm i
 ### Chrome
 
 ```shell script
-pnpm dev
+bun run dev
 ```
 
 ### Edge
 
 ```shell
-pnpm dev:edge
+bun run dev:edge
 ```
 
 ### Opera
 
 ```shell
-pnpm dev:opera
+bun run dev:opera
 ```
 
 ### Firefox
@@ -68,25 +68,25 @@ Instead, after building you can follow [this guide](https://extensionworkshop.co
 ### Chrome
 
 ```shell script
-pnpm build
+bun run build
 ```
 
 ### Edge
 
 ```shell script
-pnpm build:edge
+bun run build:edge
 ```
 
 ### Opera
 
 ```shell
-pnpm build:opera
+bun run build:opera
 ```
 
 ### Firefox
 
 ```shell
-pnpm build:firefox
+bun run build:firefox
 ```
 
 ## Package
@@ -94,25 +94,25 @@ pnpm build:firefox
 ### Chrome
 
 ```shell
-pnpm package
+bun run package
 ```
 
 ### Edge
 
 ```shell
-pnpm package:edge
+bun run package:edge
 ````
 
 ### Opera
 
 ```shell
-pnpm package:opera
+bun run package:opera
 ```
 
 ### Firefox
 
 ```shell
-pnpm package:firefox
+bun run package:firefox
 ```
 
 ## Shorthands
@@ -120,25 +120,25 @@ pnpm package:firefox
 ### Chrome
 
 ```shell
-pnpm build:package
+bun run build:package
 ```
 
 ### Edge
 
 ```shell
-pnpm build:package:edge
+bun run build:package:edge
 ```
 
 ### Opera
 
 ```shell
-pnpm build:package:opera
+bun run build:package:opera
 ```
 
 ### Firefox
 
 ```shell
-pnpm build:package:firefox
+bun run build:package:firefox
 ```
 
 ## Contribution
