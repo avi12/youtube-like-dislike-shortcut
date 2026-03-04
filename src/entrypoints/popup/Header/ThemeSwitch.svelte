@@ -1,9 +1,15 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import { storage } from "#imports";
   import ThemeAuto from "@/entrypoints/popup/Header/themes/ThemeAuto.svelte";
   import ThemeDark from "@/entrypoints/popup/Header/themes/ThemeDark.svelte";
   import ThemeLight from "@/entrypoints/popup/Header/themes/ThemeLight.svelte";
   import { ThemeMode, theme } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
+
+  interface Props {
+    selectedTheme: ThemeMode;
+  }
+  const { selectedTheme }: Props = $props();
 
   const instanceDarkTheme = matchMedia("(prefers-color-scheme: dark)");
   const getIsDark = () => instanceDarkTheme.matches;
@@ -17,9 +23,9 @@
     theme.current = pTheme;
   }
 
-  storage.getItem<ThemeMode>("local:theme", { fallback: ThemeMode.auto }).then(pTheme => {
-    theme.selected = pTheme;
-    setTheme(pTheme);
+  untrack(() => {
+    theme.selected = selectedTheme;
+    setTheme(selectedTheme);
   });
 
   $effect(() => {
