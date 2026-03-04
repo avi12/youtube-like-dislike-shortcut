@@ -1,4 +1,4 @@
-export const defaultAdditionalShortcuts = {
+export const defaultAdditionalShortcuts: Record<string, string | undefined> = {
   "Shift + Equal": "NumpadAdd",
   "Shift + Minus": "NumpadSubtract",
   "Shift + Digit8": "NumpadMultiply",

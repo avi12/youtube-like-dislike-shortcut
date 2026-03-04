@@ -1,17 +1,18 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { SvelteSet } from "svelte/reactivity";
   import { fade } from "svelte/transition";
   import ButtonCancel from "@/entrypoints/popup/components/ButtonCancel.svelte";
   import ButtonReset from "@/entrypoints/popup/components/ButtonReset.svelte";
   import ButtonShortcut from "@/entrypoints/popup/components/ButtonShortcut.svelte";
   import Checkbox from "@/entrypoints/popup/components/Checkbox.svelte";
+  import type { ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import {
     defaultAdditionalShortcuts,
     defaultShortcuts,
-    keys,
-    ShortcutType
+    keys
   } from "@/entrypoints/popup/sections/keyboard.svelte.js";
-  import { keyToModifier, MODIFIER_KEYCODES, MODIFIER_KEYS, modifierToKey } from "@/lib/utils-initials";
+  import { isModifier, keyToModifier, MODIFIER_KEYCODES, modifierToKey } from "@/lib/utils-initials";
 
   interface Props {
     type: ShortcutType;
@@ -21,16 +22,19 @@
   const { type, children }: Props = $props();
 
   let error = $state("");
-  const pressedKeys = new Set<string>();
-  let lastShortcut = $state(keys.combos[type] || []);
-  let keyComboTemp = $state(lastShortcut);
+  const pressedKeys = new SvelteSet<string>();
+  // Tracks all modifiers pressed this session. Never cleared on keyup so that
+  // Windows's fake Shift injection (fired before/after Shift+NumpadDigit events)
+  // doesn't lose the modifier context. Reset only when recording starts/ends.
+  let comboModifiers = $state<string[]>([]);
+  let keyComboTemp = $state<string[]>([]);
   let debounceTimeout = $state<ReturnType<typeof setTimeout>>();
   const DEBOUNCE_DELAY = 500;
   const isMac = navigator.platform.includes("Mac");
 
   const active = $derived(keys.isRecording && keys.currentlyRecording === type);
-  const currentModifiers = $derived(keys.combos[type].filter(key => MODIFIER_KEYS.includes(key)));
-  const currentNonModifiers = $derived(keys.combos[type].filter(key => !MODIFIER_KEYS.includes(key)));
+  const currentModifiers = $derived(keys.combos[type].filter(isModifier));
+  const currentNonModifiers = $derived(keys.combos[type].filter(key => !isModifier(key)));
   const displayedKeyComboList = $derived(
     (keys.isRecording && keys.currentlyRecording === type
       ? keyComboTemp
@@ -40,29 +44,29 @@
       ]
     ).map(keyToModifier)
   );
-  // @ts-expect-error Incompatible types
   const isHasAnotherShortcut = $derived(defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]);
 
   const REGEX_MODIFIERS = new RegExp(`(${MODIFIER_KEYCODES.join("|")})`, "g");
+
+  const keyCombo = $derived.by(() => {
+    const nonModifiers = [...pressedKeys].filter(key => !isModifier(key)).sort();
+    return [...comboModifiers, ...nonModifiers];
+  });
+
+  function resetRecordingState() {
+    pressedKeys.clear();
+    comboModifiers = [];
+  }
 
   function processKey(event: KeyboardEvent) {
     if (event.key.startsWith("Control")) {
       return "ctrlKey";
     }
     const modifierCode = event.key.replace(REGEX_MODIFIERS, modifierToKey);
-    // @ts-expect-error Incompatible types
-    if (MODIFIER_KEYS.includes(modifierCode)) {
+    if (isModifier(modifierCode)) {
       return modifierCode;
     }
     return event.code;
-  }
-
-  function getKeyCombo(): string[] {
-    // @ts-expect-error Incompatible types
-    const modifiers = [...pressedKeys].filter(key => MODIFIER_KEYS.includes(key)).sort();
-    // @ts-expect-error Incompatible types
-    const nonModifiers = [...pressedKeys].filter(key => !MODIFIER_KEYS.includes(key)).sort();
-    return [...modifiers, ...nonModifiers];
   }
 
   function getIsKeyCombosTheSame(keyCombo1: string[], keyCombo2: string[]) {
@@ -70,57 +74,84 @@
   }
 
   function getHasConflicts(newKeyCombo: string[]) {
-    for (const currentType in keys.combos) {
-      // @ts-expect-error Incompatible types
-      if (currentType !== type && getIsKeyCombosTheSame(keys.combos[currentType], newKeyCombo)) {
-        error = `Conflicts with keysManager.{currentType}'s shortcut`;
+    for (const [currentType, combo] of Object.entries(keys.combos)) {
+      if (currentType !== type && getIsKeyCombosTheSame(combo, newKeyCombo)) {
+        error = `Conflicts with ${currentType}'s shortcut`;
         return true;
       }
     }
     error = "";
     return false;
   }
-</script>
 
-<svelte:window
-  onkeydown={event => {
-    if (!keys.isRecording || keys.currentlyRecording !== type) {
-      return;
-    }
-    event.preventDefault();
-    error = "";
-    const key = processKey(event);
-    pressedKeys.add(key);
-    keyComboTemp = getKeyCombo();
-  }}
-  onkeyup={event => {
-    if (!keys.isRecording || keys.currentlyRecording !== type) {
-      return;
-    }
-    const key = processKey(event);
-    pressedKeys.delete(key);
-    if (pressedKeys.size !== 0) {
-      return;
-    }
+  $effect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (!keys.isRecording || keys.currentlyRecording !== type) {
+        return;
+      }
+      event.preventDefault();
+      error = "";
+      const key = processKey(event);
+      if (pressedKeys.has(key)) {
+        return;
+      }
+      pressedKeys.add(key);
+      if (isModifier(key)) {
+        if (comboModifiers.includes(key)) {
+          // Windows fake Shift re-injection after a Shift+NumpadDigit event —
+          // the modifier was already tracked, so skip updating keyComboTemp.
+          return;
+        }
+        comboModifiers = [...comboModifiers, key].sort();
+      }
+      keyComboTemp = keyCombo;
+    };
 
-    clearTimeout(debounceTimeout);
+    const handleKeyup = (event: KeyboardEvent) => {
+      if (!keys.isRecording || keys.currentlyRecording !== type) {
+        return;
+      }
+      const key = processKey(event);
 
-    debounceTimeout = setTimeout(() => {
-      const isOnlyModifiers = keyComboTemp.every(key => MODIFIER_KEYS.includes(key));
-      if (isOnlyModifiers || getHasConflicts(keyComboTemp)) {
+      // If a non-modifier key's keydown was intercepted by the browser (e.g. Shift+Insert
+      // treated as paste), recover using the modifiers tracked so far this session.
+      if (!isModifier(key) && !pressedKeys.has(key) && comboModifiers.length > 0) {
+        keyComboTemp = [...comboModifiers, key];
+        pressedKeys.clear();
+      }
+
+      pressedKeys.delete(key);
+      if (pressedKeys.size !== 0) {
         return;
       }
 
-      lastShortcut = keys.combos[type];
-      keys.combos = { ...keys.combos, [type]: keyComboTemp };
-      keys.isRecording = false;
-      keys.currentlyRecording = null;
-      const isSecondaryShortcutExists = displayedKeyComboList.join(" + ") in defaultAdditionalShortcuts;
-      if (isSecondaryShortcutExists) {
-        keys.combosSecondary = { ...keys.combosSecondary, [type]: true };
-      }
-    }, DEBOUNCE_DELAY);
-  }} />
+      clearTimeout(debounceTimeout);
+
+      debounceTimeout = setTimeout(() => {
+        const isOnlyModifiers = keyComboTemp.every(isModifier);
+        if (isOnlyModifiers || getHasConflicts(keyComboTemp)) {
+          return;
+        }
+
+        comboModifiers = [];
+        keys.combos = { ...keys.combos, [type]: keyComboTemp };
+        keys.isRecording = false;
+        keys.currentlyRecording = null;
+        const isSecondaryShortcutExists = displayedKeyComboList.join(" + ") in defaultAdditionalShortcuts;
+        if (isSecondaryShortcutExists) {
+          keys.combosSecondary = { ...keys.combosSecondary, [type]: true };
+        }
+      }, DEBOUNCE_DELAY);
+    };
+
+    addEventListener("keydown", handleKeydown);
+    addEventListener("keyup", handleKeyup);
+    return () => {
+      removeEventListener("keydown", handleKeydown);
+      removeEventListener("keyup", handleKeyup);
+    };
+  });
+</script>
 
 <section class="shortcut-section">
   <div class="shortcut-wrapper">
@@ -133,10 +164,8 @@
           return;
         }
 
-        lastShortcut = keys.combos[type];
-        if (!keyComboTemp) {
-          keyComboTemp = lastShortcut;
-        }
+        resetRecordingState();
+        keyComboTemp = keys.combos[type];
         keys.isRecording = !keys.isRecording;
         keys.currentlyRecording = type;
       }}>
@@ -148,7 +177,7 @@
       <Checkbox
         bind:checked={keys.combosSecondary[type]}
         disabled={keys.isRecording && keys.currentlyRecording !== type}>
-        Also use {defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]}
+        Also use {isHasAnotherShortcut}
       </Checkbox>
     {/if}
   </div>
@@ -159,19 +188,19 @@
     {#if keys.isRecording && keys.currentlyRecording === type}
       <ButtonCancel
         onclick={() => {
+          resetRecordingState();
+          clearTimeout(debounceTimeout);
           keys.isRecording = false;
           keys.currentlyRecording = null;
-          keyComboTemp = lastShortcut;
+          keyComboTemp = keys.combos[type];
           error = "";
-          keys.combos = { ...keys.combos, [type]: lastShortcut };
         }} />
     {:else}
       <ButtonReset
         disabled={getIsKeyCombosTheSame(keys.combos[type], defaultShortcuts[type]) || keys.isRecording}
         onclick={() => {
-          lastShortcut = defaultShortcuts[type];
-          keyComboTemp = lastShortcut;
-          keys.combos = { ...keys.combos, [type]: keyComboTemp };
+          pressedKeys.clear();
+          keys.combos = { ...keys.combos, [type]: defaultShortcuts[type] };
           keys.combosSecondary = { ...keys.combosSecondary, [type]: true };
         }} />
     {/if}
