@@ -1,7 +1,7 @@
 import { type StorageArea } from "#imports";
-import { type ButtonTriggers } from "@/lib/types";
+import { type ButtonTriggers, type Modifier } from "@/lib/types";
 
-export async function getStorage<T>({
+export async function getStorage<K extends keyof typeof window>({
   area,
   key,
   fallback,
@@ -9,23 +9,16 @@ export async function getStorage<T>({
 }: {
   area: StorageArea;
   key: string;
-  fallback: T;
-  updateWindowKey: string;
-}): Promise<T> {
-  let value: T;
+  fallback: (typeof window)[K];
+  updateWindowKey: K;
+}) {
+  let value: (typeof window)[K];
   try {
-    value = await storage.getItem<T>(`${area}:${key}`, { fallback });
+    value = await storage.getItem<(typeof window)[K]>(`${area}:${key}`, { fallback });
   } catch {
     value = fallback;
   }
-  // @ts-expect-error Incompatible types
-  if (typeof window[updateWindowKey] !== "object") {
-    // @ts-expect-error Incompatible types
-    window[updateWindowKey] = value;
-  } else {
-    // @ts-expect-error Incompatible types
-    window[updateWindowKey] = { ...fallback, ...value };
-  }
+  window[updateWindowKey] = value;
   return value;
 }
 
@@ -40,28 +33,17 @@ export enum SELECTORS {
   // Bezel classes
   bezel = "ytd-page-manager .ytp-bezel",
   bezelIcon = "ytd-page-manager .ytp-bezel-icon",
-  bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper",
-  bezelTextHide = "ytd-page-manager .ytp-bezel-text-hide"
+  bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper"
 }
 
+const buttonTriggers: ButtonTriggers = {
+  like: { primary: ["Equal"], modifiers: ["shiftKey"], secondary: true },
+  dislike: { primary: ["Minus"], modifiers: ["shiftKey"], secondary: true },
+  unrate: { primary: ["Digit0"], modifiers: ["shiftKey"], secondary: true }
+};
+
 export const initial = {
-  buttonTriggers: {
-    like: {
-      primary: ["Equal"],
-      modifiers: ["shiftKey"],
-      secondary: true
-    },
-    dislike: {
-      primary: ["Minus"],
-      modifiers: ["shiftKey"],
-      secondary: true
-    },
-    unrate: {
-      primary: ["Digit0"],
-      modifiers: ["shiftKey"],
-      secondary: true
-    }
-  } as ButtonTriggers,
+  buttonTriggers,
   isAutoLike: false,
   isAutoLikeSubscribedChannels: false,
   autoLikeThreshold: 70
@@ -70,6 +52,10 @@ export const initial = {
 export const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts|live)/;
 export const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
+
+export function isModifier(key: string): key is Modifier {
+  return MODIFIER_KEYS.some(modifier => modifier === key);
+}
 
 export const OBSERVER_OPTIONS: MutationObserverInit = { childList: true, subtree: true };
 
@@ -109,23 +95,21 @@ export async function addNavigationListener(addTemporaryBodyListener: () => void
 }
 
 export function keyToModifier(key: string) {
-  const keyToModifierMap = {
+  const keyToModifierMap: Record<string, string> = {
     shiftKey: "Shift",
     ctrlKey: "Ctrl",
     altKey: "Alt",
     metaKey: "Meta"
   };
-  // @ts-expect-error Handled correctly
   return keyToModifierMap[key] || key;
 }
 
 export function modifierToKey(modifier: string) {
-  const modifierToKeyMap = {
+  const modifierToKeyMap: Record<string, string> = {
     Shift: "shiftKey",
     Cmd: "metaKey",
     Ctrl: "ctrlKey",
     Alt: "altKey"
   };
-  // @ts-expect-error Handled correctly
   return modifierToKeyMap[modifier] || modifier;
 }

@@ -102,8 +102,11 @@ export default defineContentScript({
         sharedState.percentageWatched = 0;
       }
 
-      const video = event.target as HTMLVideoElement;
-      const { duration, currentTime } = video;
+      const { target } = event;
+      if (!(target instanceof HTMLVideoElement)) {
+        return;
+      }
+      const { duration, currentTime } = target;
       // Block increment only if ad is currently playing
       if (isAdPlaying) {
         lastTimeUpdate = currentTime;
@@ -134,7 +137,10 @@ export default defineContentScript({
         return;
       }
 
-      const target = e.target as HTMLElement;
+      const { target } = e;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
 
       const elRatePressed = target
         .closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)

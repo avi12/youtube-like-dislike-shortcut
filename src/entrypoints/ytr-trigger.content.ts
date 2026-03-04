@@ -11,10 +11,9 @@ function getSecondaryKeyFromPrimary({
 }: {
   modifiers: Modifier[];
   primary: string[];
-}): string | null {
+}): string | undefined {
   const formattedModifiers = modifiers.map(keyToModifier).join(" + ");
   const formattedPrimary = formattedModifiers + " + " + primary.join(" + ");
-  // @ts-expect-error Incompatible types
   return defaultAdditionalShortcuts[formattedPrimary];
 }
 
@@ -33,25 +32,31 @@ function isComboPressed({
   return modifiers.every(modifier => event[modifier]);
 }
 
-function getActionPressed(event: KeyboardEvent): ShortcutType | null {
+function isShortcutType(value: string) {
+  return value === ShortcutType.like || value === ShortcutType.dislike || value === ShortcutType.unrate;
+}
+
+function getActionPressed(event: KeyboardEvent) {
   for (const actionName in window.ytrLastButtonTriggers) {
-    // @ts-expect-error Incompatible types
-    const { primary, modifiers, secondary } = window.ytrLastButtonTriggers[actionName]!;
+    if (!isShortcutType(actionName)) {
+      continue;
+    }
+    const { primary, modifiers, secondary } = window.ytrLastButtonTriggers[actionName];
     if (isComboPressed({ modifiers, primary, event })) {
-      return actionName as ShortcutType;
+      return actionName;
     }
 
     if (secondary) {
       const secondaryKey = getSecondaryKeyFromPrimary({ primary, modifiers });
       if (secondaryKey === event.code) {
-        return actionName as ShortcutType;
+        return actionName;
       }
     }
   }
   return null;
 }
 
-function rateIfNeeded(e: KeyboardEvent): void {
+function rateIfNeeded(e: KeyboardEvent) {
   switch (getActionPressed(e)) {
     case ShortcutType.like:
       e.stopPropagation();
