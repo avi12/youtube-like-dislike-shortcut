@@ -9,6 +9,7 @@
     SELECTORS
   } from "@/lib/utils-initials";
   import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+  import "./style.css";
 
   interface Props {
     isAutoLikeEnabled: boolean;
@@ -98,18 +99,9 @@
 {/if}
 
 <style>
-  :global {
-    body {
-      margin: 0;
-      color: var(--yt-spec-text-primary);
-      font: var(--ytd-tab-system-font-weight) var(--ytd-tab-system-font-size) Roboto, Arial, sans-serif;
-    }
-
-    html {
-      padding-right: var(--yt-button-icon-padding, 8px);
-      position: relative;
-      top: calc(25% - 1px);
-      letter-spacing: var(--ytd-tab-system-letter-spacing);
-    }
+  :host {
+    align-self: center !important;
+    padding-inline-end: 8px !important;
+    color: inherit !important;
   }
 </style>

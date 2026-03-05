@@ -7,7 +7,7 @@ import svelteParser from "svelte-eslint-parser";
 import tsEslint from "typescript-eslint";
 
 export default [
-  globalIgnores([".wxt/**", "build/**", "*.mjs"]),
+  globalIgnores([".wxt/**", "build/**"]),
   eslint.configs.recommended,
   ...tsEslint.configs.recommended,
   ...svelteEslint.configs["flat/recommended"],
@@ -21,8 +21,7 @@ export default [
       },
       globals: {
         ...globals.browser,
-        ...globals.node,
-        chrome: true
+        ...globals.node
       }
     },
     rules: {
@@ -36,8 +35,7 @@ export default [
       parser: tsEslint.parser,
       globals: {
         ...globals.browser,
-        ...globals.node,
-        chrome: true
+        ...globals.node
       }
     },
     rules: {
