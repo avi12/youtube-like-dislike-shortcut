@@ -33,8 +33,8 @@ export default defineContentScript({
     sharedState.isUserInteracted = Boolean(getRatedButton());
     sharedState.isRatedInitially = sharedState.isUserInteracted;
     sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
-    // Set isAdInitiallyPlaying true if ad is playing on initial load
     sharedState.isAdPlaying = getIsAdPlaying();
+    // Set isAdInitiallyPlaying true if an ad is playing on an initial load
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
 
     const [isAutoLike, autoLikeThreshold] = await Promise.all([
