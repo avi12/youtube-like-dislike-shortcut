@@ -1,4 +1,5 @@
 import eslint from "@eslint/js";
+import { globalIgnores } from "eslint/config";
 import avi12 from "eslint-config-avi12";
 import svelteEslint from "eslint-plugin-svelte";
 import globals from "globals";
@@ -6,12 +7,13 @@ import svelteParser from "svelte-eslint-parser";
 import tsEslint from "typescript-eslint";
 
 export default [
+  globalIgnores([".wxt/**", "build/**", "*.mjs"]),
   eslint.configs.recommended,
   ...tsEslint.configs.recommended,
   ...svelteEslint.configs["flat/recommended"],
   ...avi12,
   {
-    files: ["src/**/*.svelte"],
+    files: ["**/*.svelte"],
     languageOptions: {
       parser: svelteParser,
       parserOptions: {
@@ -22,6 +24,10 @@ export default [
         ...globals.node,
         chrome: true
       }
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
+      "prefer-const": ["error", { destructuring: "all" }]
     }
   },
   {
@@ -33,6 +39,10 @@ export default [
         ...globals.node,
         chrome: true
       }
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
+      "@stylistic/object-curly-spacing": ["error", "always"]
     }
   }
 ];

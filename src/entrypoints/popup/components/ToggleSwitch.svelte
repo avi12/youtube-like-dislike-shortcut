@@ -7,7 +7,7 @@
     children?: Snippet;
   }
 
-  // eslint-disable-next-line prefer-const
+   
   let { checked = $bindable(), disabled, children }: Props = $props();
   const id = $props.id();
 </script>
