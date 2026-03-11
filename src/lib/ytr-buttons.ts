@@ -1,5 +1,5 @@
 import { svgs } from "@/lib/icons";
-import { REGEX_SUPPORTED_PAGES, SELECTORS } from "@/lib/utils-initials";
+import { SELECTORS } from "@/lib/utils-initials";
 
 let gLastRating: "like" | "dislike";
 
@@ -7,14 +7,14 @@ function getIsActive(elButton: HTMLElement) {
   return elButton.ariaPressed === "true";
 }
 
-export function getRateButtons(): HTMLButtonElement[] {
+export function getRateButtons() {
   const elButtonsRate = document.querySelector<HTMLLIElement>(
     `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`
   );
   if (!elButtonsRate) {
     return [];
   }
-  return [...elButtonsRate.querySelectorAll<HTMLButtonElement>("button")];
+  return [...elButtonsRate.querySelectorAll<HTMLButtonElement>("button[aria-pressed]")];
 }
 
 function getIsShorts() {
@@ -61,10 +61,10 @@ export function getIsSubscribed() {
  * Rates/un-rates a video on YouTube.com
  */
 export function rateVideo(isLike: boolean | null) {
-  if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
+  const [elLike, elDislike] = getRateButtons();
+  if (!elLike) {
     return;
   }
-  const [elLike, elDislike] = getRateButtons();
   clearAnimationOnEnd();
 
   window.ytrUserInteracted = true;

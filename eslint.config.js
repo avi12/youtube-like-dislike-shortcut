@@ -7,7 +7,7 @@ import svelteParser from "svelte-eslint-parser";
 import tsEslint from "typescript-eslint";
 
 export default [
-  globalIgnores([".wxt/**", "build/**", "*.mjs"]),
+  globalIgnores([".wxt/**", "build/**"]),
   eslint.configs.recommended,
   ...tsEslint.configs.recommended,
   ...svelteEslint.configs["flat/recommended"],
@@ -21,8 +21,7 @@ export default [
       },
       globals: {
         ...globals.browser,
-        ...globals.node,
-        chrome: true
+        ...globals.node
       }
     },
     rules: {
@@ -36,13 +35,13 @@ export default [
       parser: tsEslint.parser,
       globals: {
         ...globals.browser,
-        ...globals.node,
-        chrome: true
+        ...globals.node
       }
     },
     rules: {
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-      "@stylistic/object-curly-spacing": ["error", "always"]
+      "@stylistic/object-curly-spacing": ["error", "always"],
+      "id-length": ["error", { min: 3, exceptions: ["_", "e", "i", "j", "k", "x", "y", "z", "id"] }]
     }
   }
 ];

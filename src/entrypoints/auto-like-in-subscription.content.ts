@@ -4,7 +4,6 @@ import {
   getStorage,
   initial,
   OBSERVER_OPTIONS,
-  REGEX_SUPPORTED_PAGES,
   SELECTORS
 } from "@/lib/utils-initials";
 import { getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
@@ -26,7 +25,7 @@ function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver)
   return false;
 }
 
-async function addTemporaryBodyListener() {
+function addTemporaryBodyListener() {
   if (lastUrl === location.href || lastTitle === document.title) {
     return;
   }
@@ -34,23 +33,32 @@ async function addTemporaryBodyListener() {
   lastUrl = location.href;
   lastTitle = document.title;
 
-  if (!window.ytrAutoLikeSubscribedChannels || !getIsPageCompatible()) {
+  if (!window.ytrAutoLikeSubscribedChannels) {
     return;
   }
-  await getElementByMutationObserver(SELECTORS.toggleButtonsNormalVideo);
+
   if (autoLikeIfSubscribed()) {
     OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
+    return;
   }
-}
 
-function getIsPageCompatible() {
-  return Boolean(location.pathname.match(REGEX_SUPPORTED_PAGES));
+  const navigationUrl = location.href;
+  new MutationObserver((_, observer) => {
+    if (location.href !== navigationUrl) {
+      observer.disconnect();
+      return;
+    }
+    if (autoLikeIfSubscribed()) {
+      OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
+      observer.disconnect();
+    }
+  }).observe(document, OBSERVER_OPTIONS);
 }
 
 function addStorageListener() {
   storage.watch<boolean>("sync:isAutoLikeSubscribedChannels", isAutoLike => {
     window.ytrAutoLikeSubscribedChannels = isAutoLike !== null ? isAutoLike : initial.isAutoLikeSubscribedChannels;
-    if (isAutoLike && getIsPageCompatible()) {
+    if (isAutoLike) {
       autoLikeIfSubscribed();
     }
   });
@@ -83,11 +91,6 @@ export default defineContentScript({
 
     addStorageListener();
     addNavigationListener(addTemporaryBodyListener);
-
-    if (!getIsPageCompatible()) {
-      return;
-    }
-
     addSubscribedEventListener();
 
     if (!window.ytrAutoLikeSubscribedChannels) {

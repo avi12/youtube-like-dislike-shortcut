@@ -1,5 +1,6 @@
 export const sharedState = $state({
   percentageWatched: 0,
+  lastTimeUpdate: 0,
   isUserInteracted: false,
   isRatedInitially: false,
   isAdPlaying: false,

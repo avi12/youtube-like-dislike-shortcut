@@ -1,21 +1,15 @@
 <script lang="ts">
   import { storage } from "#imports";
   import { sharedState } from "./states.svelte";
-  import {
-    addNavigationListener,
-    getVisibleElement,
-    initial,
-    REGEX_SUPPORTED_PAGES,
-    SELECTORS
-  } from "@/lib/utils-initials";
-  import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+  import { addNavigationListener, getVisibleElement, initial, SELECTORS } from "@/lib/utils-initials";
+  import { getRatedButton } from "@/lib/ytr-buttons";
+  import "./style.css";
 
   interface Props {
     isAutoLikeEnabled: boolean;
-    autoLikeThreshold: number
   }
 
-  let { isAutoLikeEnabled, autoLikeThreshold }: Props = $props();
+  let { isAutoLikeEnabled }: Props = $props();
 
   const percentageDisplay = $derived(
     Intl.NumberFormat("en-US", {
@@ -26,35 +20,20 @@
 
   let lastTitle = document.title;
   let lastUrl = location.href;
-  let isNormalVideo = $state(getIsNormalVideo());
+  let isShorts = $state(getIsShorts());
   let isLiveOrPremiere = $state(getIsLiveOrPremiere());
 
   const isDisplayPercentage = $derived(
-    isNormalVideo &&
+    !isShorts &&
     isAutoLikeEnabled &&
     !isLiveOrPremiere &&
     !sharedState.isRatedInitially &&
     (!sharedState.isAdInitiallyPlaying || !sharedState.isAdPlaying)
   );
 
-  const isRateVideo = $derived(
-    sharedState.percentageWatched >= autoLikeThreshold &&
-    isAutoLikeEnabled &&
-    !isLiveOrPremiere &&
-    !sharedState.isUserInteracted &&
-    !sharedState.isRatedInitially &&
-    !sharedState.isAdPlaying
-  );
-
-  function getIsNormalVideo() {
-    return location.pathname === "/watch";
+  function getIsShorts() {
+    return location.pathname.startsWith("/shorts");
   }
-
-  $effect(() => {
-    if (isRateVideo) {
-      rateVideo(true);
-    }
-  });
 
   function getIsLiveOrPremiere() {
     return Boolean(getVisibleElement(SELECTORS.liveBadge));
@@ -65,16 +44,12 @@
       return;
     }
 
-    const isPageCompatible = location.pathname.match(REGEX_SUPPORTED_PAGES);
-    if (!isPageCompatible) {
-      return;
-    }
-
     lastTitle = document.title;
     lastUrl = location.href;
-    isNormalVideo = getIsNormalVideo();
+    isShorts = getIsShorts();
     isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.percentageWatched = 0;
+    sharedState.lastTimeUpdate = 0;
     sharedState.isUserInteracted = false;
     window.ytrUserInteracted = false;
     sharedState.isRatedInitially = Boolean(getRatedButton());
@@ -83,9 +58,6 @@
   function addStorageListener() {
     storage.watch<typeof initial.isAutoLike>("sync:isAutoLike", pIsAutoLike => {
       isAutoLikeEnabled = pIsAutoLike !== null ? pIsAutoLike : initial.isAutoLike;
-    });
-    storage.watch<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", pAutoLikeThreshold => {
-      autoLikeThreshold = pAutoLikeThreshold || initial.autoLikeThreshold;
     });
   }
 
@@ -98,18 +70,9 @@
 {/if}
 
 <style>
-  :global {
-    body {
-      margin: 0;
-      color: var(--yt-spec-text-primary);
-      font: var(--ytd-tab-system-font-weight) var(--ytd-tab-system-font-size) Roboto, Arial, sans-serif;
-    }
-
-    html {
-      padding-right: var(--yt-button-icon-padding, 8px);
-      position: relative;
-      top: calc(25% - 1px);
-      letter-spacing: var(--ytd-tab-system-letter-spacing);
-    }
+  :host {
+    align-self: center !important;
+    padding-inline-end: 8px !important;
+    color: inherit !important;
   }
 </style>

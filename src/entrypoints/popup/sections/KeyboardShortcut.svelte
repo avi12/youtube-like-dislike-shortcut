@@ -6,11 +6,11 @@
   import ButtonReset from "@/entrypoints/popup/components/ButtonReset.svelte";
   import ButtonShortcut from "@/entrypoints/popup/components/ButtonShortcut.svelte";
   import Checkbox from "@/entrypoints/popup/components/Checkbox.svelte";
-  import type { ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import {
     defaultAdditionalShortcuts,
     defaultShortcuts,
-    keys
+    keys,
+    ShortcutType
   } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import { isModifier, keyToModifier, MODIFIER_KEYCODES, modifierToKey } from "@/lib/utils-initials";
 
@@ -74,8 +74,8 @@
   }
 
   function getHasConflicts(newKeyCombo: string[]) {
-    for (const [currentType, combo] of Object.entries(keys.combos)) {
-      if (currentType !== type && getIsKeyCombosTheSame(combo, newKeyCombo)) {
+    for (const currentType of Object.values(ShortcutType)) {
+      if (currentType !== type && getIsKeyCombosTheSame(keys.combos[currentType], newKeyCombo)) {
         error = `Conflicts with ${currentType}'s shortcut`;
         return true;
       }
