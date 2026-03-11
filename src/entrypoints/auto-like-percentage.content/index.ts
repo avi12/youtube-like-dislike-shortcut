@@ -60,8 +60,7 @@ export default defineContentScript({
           return mount(CsuiAutoLikePercent, {
             target: container,
             props: {
-              isAutoLikeEnabled: window.ytrAutoLikeEnabled ?? isAutoLike,
-              autoLikeThreshold: window.ytrAutoLikeThreshold ?? autoLikeThreshold
+              isAutoLikeEnabled: window.ytrAutoLikeEnabled ?? isAutoLike
             }
           });
         },
