@@ -5,10 +5,9 @@
     addNavigationListener,
     getVisibleElement,
     initial,
-    REGEX_SUPPORTED_PAGES,
     SELECTORS
   } from "@/lib/utils-initials";
-  import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+  import { rateVideo } from "@/lib/ytr-buttons";
   import "./style.css";
 
   interface Props {
@@ -66,19 +65,15 @@
       return;
     }
 
-    const isPageCompatible = location.pathname.match(REGEX_SUPPORTED_PAGES);
-    if (!isPageCompatible) {
-      return;
-    }
-
     lastTitle = document.title;
     lastUrl = location.href;
     isNormalVideo = getIsNormalVideo();
     isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.percentageWatched = 0;
+    sharedState.lastTimeUpdate = 0;
     sharedState.isUserInteracted = false;
     window.ytrUserInteracted = false;
-    sharedState.isRatedInitially = Boolean(getRatedButton());
+    sharedState.isRatedInitially = false;
   }
 
   function addStorageListener() {

@@ -1,14 +1,8 @@
 import { mount, unmount } from "svelte";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
 import { sharedState } from "./states.svelte";
-import {
-  getElementByMutationObserver,
-  getStorage,
-  getVisibleElement,
-  REGEX_SUPPORTED_PAGES,
-  SELECTORS
-} from "@/lib/utils-initials";
-import { getRatedButton } from "@/lib/ytr-buttons";
+import { getStorage, getVisibleElement, OBSERVER_OPTIONS, SELECTORS } from "@/lib/utils-initials";
+import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 
 function getIsAdPlaying() {
   return Boolean(document.querySelector(SELECTORS.adOverlay));
@@ -22,19 +16,14 @@ export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
-    let lastTimeUpdate = 0;
+    let isMounting = false;
+    let lastPathname = location.pathname;
     const elementNameToInject = "ytr-percentage";
-    const elWatchPercentage = document.querySelector(elementNameToInject);
-    const elContainer = await getElementByMutationObserver(SELECTORS.percentageContainer);
-    if (elWatchPercentage || !elContainer) {
-      return;
-    }
 
     sharedState.isUserInteracted = Boolean(getRatedButton());
     sharedState.isRatedInitially = sharedState.isUserInteracted;
     sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.isAdPlaying = getIsAdPlaying();
-    // Set isAdInitiallyPlaying true if an ad is playing on an initial load
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
 
     const [isAutoLike, autoLikeThreshold] = await Promise.all([
@@ -52,33 +41,56 @@ export default defineContentScript({
       })
     ]);
 
-    const ui = await createShadowRootUi(ctx, {
-      name: elementNameToInject,
-      position: "inline",
-      append: "first",
-      anchor: SELECTORS.percentageContainer,
-      onMount(container) {
-        return mount(CsuiAutoLikePercent, {
-          target: container,
-          props: {
-            isAutoLikeEnabled: isAutoLike,
-            autoLikeThreshold
-          }
-        });
-      },
-      onRemove(app) {
-        if (app) {
-          unmount(app);
-        }
-      }
-    });
-
-    ui.mount();
-
-    document.addEventListener("timeupdate", event => {
-      if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
+    async function mountUiIfNeeded() {
+      if (isMounting || document.querySelector(elementNameToInject)) {
         return;
       }
+      const elContainer = document.querySelector(SELECTORS.percentageContainer);
+      if (!elContainer) {
+        return;
+      }
+
+      isMounting = true;
+      const shadowUi = await createShadowRootUi(ctx, {
+        name: elementNameToInject,
+        position: "inline",
+        append: "first",
+        anchor: SELECTORS.percentageContainer,
+        onMount(container) {
+          return mount(CsuiAutoLikePercent, {
+            target: container,
+            props: {
+              isAutoLikeEnabled: window.ytrAutoLikeEnabled ?? isAutoLike,
+              autoLikeThreshold: window.ytrAutoLikeThreshold ?? autoLikeThreshold
+            }
+          });
+        },
+        onRemove(app) {
+          if (app) {
+            unmount(app);
+          }
+        }
+      });
+      shadowUi.mount();
+      isMounting = false;
+    }
+
+    await mountUiIfNeeded();
+    new MutationObserver(() => {
+      mountUiIfNeeded();
+    }).observe(document, OBSERVER_OPTIONS);
+
+    document.addEventListener("timeupdate", e => {
+      const isNewPage = location.pathname !== lastPathname;
+      if (isNewPage) {
+        lastPathname = location.pathname;
+        sharedState.percentageWatched = 0;
+        sharedState.lastTimeUpdate = 0;
+        sharedState.isUserInteracted = false;
+        sharedState.isRatedInitially = false;
+        window.ytrUserInteracted = false;
+      }
+
       if (window.ytrUserInteracted) {
         sharedState.isUserInteracted = true;
         return;
@@ -91,52 +103,55 @@ export default defineContentScript({
         return;
       }
 
-      // Reset percentage only if ad was playing on initial load and now finished
-      if (isAdInitiallyPlaying && !isAdPlaying) {
+      const isInitialAdFinished = isAdInitiallyPlaying && !isAdPlaying;
+      if (isInitialAdFinished) {
         sharedState.percentageWatched = 0;
         sharedState.isAdInitiallyPlaying = false;
       }
-      // If ad starts immediately after navigation, treat as initial ad
-      if (!isAdInitiallyPlaying && isAdPlaying && sharedState.percentageWatched === 0) {
+      const isImmediatePostNavigationAd = !isAdInitiallyPlaying && isAdPlaying && sharedState.percentageWatched === 0;
+      if (isImmediatePostNavigationAd) {
         sharedState.isAdInitiallyPlaying = true;
         sharedState.percentageWatched = 0;
       }
 
-      const { target } = event;
+      const { target } = e;
       if (!(target instanceof HTMLVideoElement)) {
         return;
       }
       const { duration, currentTime } = target;
-      // Block increment only if ad is currently playing
       if (isAdPlaying) {
-        lastTimeUpdate = currentTime;
+        sharedState.lastTimeUpdate = currentTime;
         return;
       }
 
-      // Only update percentage if not live/premiere
       if (sharedState.isLiveOrPremiere) {
-        lastTimeUpdate = currentTime;
+        sharedState.lastTimeUpdate = currentTime;
         return;
       }
 
-      if (!lastTimeUpdate) {
-        lastTimeUpdate = currentTime;
+      if (!sharedState.lastTimeUpdate) {
+        sharedState.lastTimeUpdate = currentTime;
       }
-      const prev = lastTimeUpdate;
+      const prev = sharedState.lastTimeUpdate;
       const delta = currentTime - prev;
       if (delta > 0 && delta < 1 && duration && duration !== Infinity) {
         sharedState.percentageWatched += (delta / duration) * 100;
+        const shouldAutoLike =
+          (window.ytrAutoLikeEnabled ?? isAutoLike) &&
+          sharedState.percentageWatched >= (window.ytrAutoLikeThreshold ?? autoLikeThreshold) &&
+          !sharedState.isLiveOrPremiere &&
+          !sharedState.isUserInteracted &&
+          !sharedState.isRatedInitially;
+        if (shouldAutoLike) {
+          rateVideo(true);
+        }
       }
-      lastTimeUpdate = currentTime;
+      sharedState.lastTimeUpdate = currentTime;
     },
     { capture: true }
     );
 
     document.addEventListener("click", e => {
-      if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
-        return;
-      }
-
       const { target } = e;
       if (!(target instanceof HTMLElement)) {
         return;
