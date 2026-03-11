@@ -22,7 +22,7 @@
     "package:edge": "bun run package -b edge",
     "package:opera": "bun run package -b opera",
     "package:firefox": "bun run package -b firefox --mv3",
-    "build:package": "bun build && bun package",
+    "build:package": "bun run build && bun run package",
     "build:package:edge": "bun build:edge && bun package:edge",
     "build:package:opera": "bun build:opera && bun package:opera",
     "build:package:firefox": "bun build:firefox && bun package:firefox",
