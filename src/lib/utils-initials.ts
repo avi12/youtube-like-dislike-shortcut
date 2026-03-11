@@ -1,6 +1,20 @@
 import { type StorageArea } from "#imports";
 import { type ButtonTriggers } from "@/lib/types";
 
+function isPlainObject(val: unknown): val is Record<string, unknown> {
+  return typeof val === "object" && val !== null && !Array.isArray(val);
+}
+
+function mergeWithFallback(fallback: Record<string, unknown>, stored: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...fallback };
+  for (const key in stored) {
+    result[key] = isPlainObject(fallback[key]) && isPlainObject(stored[key])
+      ? mergeWithFallback(fallback[key], stored[key])
+      : stored[key];
+  }
+  return result;
+}
+
 export async function getStorage<K extends keyof typeof window>({
   area,
   key,
@@ -17,6 +31,9 @@ export async function getStorage<K extends keyof typeof window>({
     value = await storage.getItem<(typeof window)[K]>(`${area}:${key}`, { fallback });
   } catch {
     value = fallback;
+  }
+  if (isPlainObject(value) && isPlainObject(fallback)) {
+    Object.assign(value, mergeWithFallback(fallback, value));
   }
   window[updateWindowKey] = value;
   return value;
