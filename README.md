@@ -60,8 +60,17 @@ bun run dev:opera
 
 ### Firefox
 
-Currently [unsupported](https://github.com/wxt-dev/wxt/issues/230#issuecomment-1806881653)  
-Instead, after building you can follow [this guide](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox)
+Continuously build with
+
+```shell
+bun dev:firefox
+```
+
+Run using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext):
+
+```shell
+bun run:firefox
+```
 
 ## Build
 
