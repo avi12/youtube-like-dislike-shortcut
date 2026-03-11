@@ -68,6 +68,13 @@ function rateIfNeeded(e: KeyboardEvent) {
 }
 
 async function init() {
+  window.ytrLastButtonTriggers = await getStorage({
+    area: "local",
+    key: "buttonTriggers",
+    fallback: initial.buttonTriggers,
+    updateWindowKey: "ytrLastButtonTriggers"
+  });
+
   document.addEventListener("keydown", e => {
     const isFocusedOnInput =
       document.activeElement!.matches("input") || document.activeElement!.getAttribute("contenteditable") === "true"; // A comment field
@@ -79,13 +86,6 @@ async function init() {
 
     rateIfNeeded(e);
   }, { capture: true });
-
-  window.ytrLastButtonTriggers = await getStorage({
-    area: "local",
-    key: "buttonTriggers",
-    fallback: initial.buttonTriggers,
-    updateWindowKey: "ytrLastButtonTriggers"
-  });
 
   storage.watch<typeof initial.buttonTriggers>("local:buttonTriggers", buttonTriggers => {
     window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;
