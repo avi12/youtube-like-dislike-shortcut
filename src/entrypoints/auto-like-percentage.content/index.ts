@@ -17,7 +17,7 @@ export default defineContentScript({
   cssInjectionMode: "ui",
   async main(ctx) {
     let isMounting = false;
-    let lastPathname = location.pathname;
+    let lastHref = location.href;
     const elementNameToInject = "ytr-percentage";
 
     sharedState.isUserInteracted = Boolean(getRatedButton());
@@ -81,14 +81,15 @@ export default defineContentScript({
     }).observe(document, OBSERVER_OPTIONS);
 
     document.addEventListener("timeupdate", e => {
-      const isNewPage = location.pathname !== lastPathname;
+      const isNewPage = location.href !== lastHref;
       if (isNewPage) {
-        lastPathname = location.pathname;
+        lastHref = location.href;
         sharedState.percentageWatched = 0;
         sharedState.lastTimeUpdate = 0;
-        sharedState.isUserInteracted = false;
-        sharedState.isRatedInitially = false;
-        window.ytrUserInteracted = false;
+        const isRated = Boolean(getRatedButton());
+        sharedState.isRatedInitially = isRated;
+        sharedState.isUserInteracted = isRated;
+        window.ytrUserInteracted = isRated;
       }
 
       if (window.ytrUserInteracted) {
