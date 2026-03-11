@@ -40,7 +40,8 @@ export default [
     },
     rules: {
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-      "@stylistic/object-curly-spacing": ["error", "always"]
+      "@stylistic/object-curly-spacing": ["error", "always"],
+      "id-length": ["error", { min: 3, exceptions: ["_", "e", "i", "j", "k", "x", "y", "z", "id"] }]
     }
   }
 ];

@@ -41,17 +41,17 @@
     storage.setItem<ButtonTriggers>("local:buttonTriggers", {
       like: {
         primary: keys.combos.like.filter(key => !isModifier(key)),
-        modifiers: keys.combos.like.filter(key => isModifier(key)),
+        modifiers: keys.combos.like.filter(isModifier),
         secondary: keys.combosSecondary.like
       },
       dislike: {
         primary: keys.combos.dislike.filter(key => !isModifier(key)),
-        modifiers: keys.combos.dislike.filter(key => isModifier(key)),
+        modifiers: keys.combos.dislike.filter(isModifier),
         secondary: keys.combosSecondary.dislike
       },
       unrate: {
         primary: keys.combos.unrate.filter(key => !isModifier(key)),
-        modifiers: keys.combos.unrate.filter(key => isModifier(key)),
+        modifiers: keys.combos.unrate.filter(isModifier),
         secondary: keys.combosSecondary.unrate
       }
     });
