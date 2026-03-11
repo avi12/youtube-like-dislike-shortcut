@@ -3,20 +3,19 @@
   import { storage } from "#imports";
   import AutoLike from "@/entrypoints/popup/sections/AutoLike.svelte";
   import KeyboardShortcut from "@/entrypoints/popup/sections/KeyboardShortcut.svelte";
-  import { autoLikeManager } from "@/entrypoints/popup/sections/autolike.svelte.js";
   import { defaultShortcuts, keys, ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import { type ButtonTriggers } from "@/lib/types";
-  import { initial, MODIFIER_KEYS } from "@/lib/utils-initials";
+  import { initial, isModifier } from "@/lib/utils-initials";
 
-  Promise.all([
-    storage.getItem<typeof defaultShortcuts>("local:keyboardShortcuts", { fallback: defaultShortcuts }),
-    storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
-    storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold })
-  ]).then(([pKeyboardShortcuts, pIsAutoLike, pAutoLikeThreshold]) => {
-    keys.combos = pKeyboardShortcuts;
-    autoLikeManager.isAutoLike = pIsAutoLike;
-    autoLikeManager.autoLikeThreshold = pAutoLikeThreshold;
+  storage.getItem<typeof defaultShortcuts>("local:keyboardShortcuts", { fallback: defaultShortcuts }).then(shortcuts => {
+    keys.combos = shortcuts;
   });
+
+  const autoLikePromise = Promise.all([
+    storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
+    storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold }),
+    storage.getItem<typeof initial.isAutoLikeSubscribedChannels>("sync:isAutoLikeSubscribedChannels", { fallback: initial.isAutoLikeSubscribedChannels })
+  ]);
 
   function getShortcut(obj: typeof initial.buttonTriggers.like) {
     return [...obj.modifiers, ...obj.primary];
@@ -41,18 +40,18 @@
   $effect(() => {
     storage.setItem<ButtonTriggers>("local:buttonTriggers", {
       like: {
-        primary: keys.combos.like.filter(key => !MODIFIER_KEYS.includes(key)),
-        modifiers: keys.combos.like.filter(key => MODIFIER_KEYS.includes(key)),
+        primary: keys.combos.like.filter(key => !isModifier(key)),
+        modifiers: keys.combos.like.filter(isModifier),
         secondary: keys.combosSecondary.like
       },
       dislike: {
-        primary: keys.combos.dislike.filter(key => !MODIFIER_KEYS.includes(key)),
-        modifiers: keys.combos.dislike.filter(key => MODIFIER_KEYS.includes(key)),
+        primary: keys.combos.dislike.filter(key => !isModifier(key)),
+        modifiers: keys.combos.dislike.filter(isModifier),
         secondary: keys.combosSecondary.dislike
       },
       unrate: {
-        primary: keys.combos.unrate.filter(key => !MODIFIER_KEYS.includes(key)),
-        modifiers: keys.combos.unrate.filter(key => MODIFIER_KEYS.includes(key)),
+        primary: keys.combos.unrate.filter(key => !isModifier(key)),
+        modifiers: keys.combos.unrate.filter(isModifier),
         secondary: keys.combosSecondary.unrate
       }
     });
@@ -65,7 +64,9 @@
     <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
     <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
   {/if}
-  <AutoLike />
+  {#await autoLikePromise then [isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels]}
+    <AutoLike {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
+  {/await}
 </main>
 
 <style>

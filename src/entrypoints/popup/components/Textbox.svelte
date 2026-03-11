@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { autoLikeManager } from "@/entrypoints/popup/sections/autolike.svelte.js";
-
   interface Props {
+    isAutoLike: boolean;
     value?: number;
     disabled: boolean;
   }
 
-  // eslint-disable-next-line prefer-const
-  let { value = $bindable(60), disabled }: Props = $props();
+  let { isAutoLike, value = $bindable(60), disabled }: Props = $props();
 
   $effect(() => {
     const num = value;
@@ -19,11 +17,11 @@
   });
 </script>
 
-<div class="textbox-wrapper" class:disabled={!autoLikeManager.isAutoLike}>
+<div class="textbox-wrapper" class:disabled={!isAutoLike}>
   <section class="text-wrapper">
     <input
       bind:value
-      disabled={disabled || !autoLikeManager.isAutoLike}
+      disabled={disabled || !isAutoLike}
       onkeydown={e => {
         const number = value;
         const isIncrement = e.key === "ArrowUp";

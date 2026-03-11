@@ -1,4 +1,4 @@
-export const defaultAdditionalShortcuts = {
+export const defaultAdditionalShortcuts: Record<string, string | undefined> = {
   "Shift + Equal": "NumpadAdd",
   "Shift + Minus": "NumpadSubtract",
   "Shift + Digit8": "NumpadMultiply",
@@ -10,11 +10,12 @@ export const defaultShortcuts = {
   dislike: ["shiftKey", "Minus"],
   unrate: ["shiftKey", "Digit0"]
 };
-export enum ShortcutType {
-  like = "like",
-  dislike = "dislike",
-  unrate = "unrate"
-}
+export const ShortcutType = {
+  like: "like",
+  dislike: "dislike",
+  unrate: "unrate"
+} as const;
+export type ShortcutType = (typeof ShortcutType)[keyof typeof ShortcutType];
 
 export const keys = $state<{
   combos: typeof defaultShortcuts;

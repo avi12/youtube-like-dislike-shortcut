@@ -1,32 +1,22 @@
-import { defineConfig, type UserManifest } from "wxt";
+import { defineConfig } from "wxt";
 import packageJson from "./package.json" assert { type: "json" };
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
   publicDir: "src/public",
-  manifest({ browser, manifestVersion }) {
+  manifest({ browser }) {
     const url = packageJson.repository;
-    const match = packageJson.author.match(/(.+) <(.+)>/);
-    if (!match) {
-      return;
-    }
-    const [, author, email] = match;
-    let manifest: UserManifest = {
-      name: browser === "edge" ? "Like-Dislike Shortcut for YouTube" : "YouTube Like-Dislike Shortcut",
+    const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
+
+    return {
+      name: "YouTube Like-Dislike Shortcut",
       description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
       homepage_url: url,
-      permissions: ["storage"]
-    };
-    if (browser === "opera") {
-      // @ts-expect-error https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/author
-      manifest.author = packageJson.author;
-    } else if (manifestVersion === 3 && (browser === "chrome" || browser === "edge")) {
-      manifest.author = { email };
-    }
-    if (browser === "firefox") {
-      manifest = {
-        ...manifest,
+      permissions: ["storage"],
+      author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
+      ...browser !== "firefox" && { offline_enabled: true },
+      ...browser === "firefox" && {
         browser_specific_settings: {
           gecko: {
             id: "youtube-like-dislike-shortcut@avi12.com"
@@ -36,12 +26,8 @@ export default defineConfig({
           name: author,
           url
         }
-      };
-    } else {
-      // if not Firefox
-      manifest.offline_enabled = true;
-    }
-    return manifest;
+      }
+    };
   },
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",

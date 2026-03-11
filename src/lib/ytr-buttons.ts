@@ -1,27 +1,27 @@
 import { svgs } from "@/lib/icons";
-import { getVisibleElement, REGEX_SUPPORTED_PAGES, SELECTORS } from "@/lib/utils-initials";
+import { SELECTORS } from "@/lib/utils-initials";
 
 let gLastRating: "like" | "dislike";
 
-function getIsActive(elButton: HTMLElement): boolean {
+function getIsActive(elButton: HTMLElement) {
   return elButton.ariaPressed === "true";
 }
 
-export function getRateButtons(): HTMLButtonElement[] {
+export function getRateButtons() {
   const elButtonsRate = document.querySelector<HTMLLIElement>(
     `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`
   );
   if (!elButtonsRate) {
     return [];
   }
-  return [...elButtonsRate.querySelectorAll("button")] as HTMLButtonElement[];
+  return [...elButtonsRate.querySelectorAll<HTMLButtonElement>("button[aria-pressed]")];
 }
 
-export function getIsShorts(): boolean {
+function getIsShorts() {
   return location.pathname.startsWith("/shorts/");
 }
 
-function showIndicator(isRated: boolean): void {
+function showIndicator(isRated: boolean) {
   if (getIsShorts()) {
     return;
   }
@@ -29,31 +29,22 @@ function showIndicator(isRated: boolean): void {
   const elBezelContainer = getBezelContainer();
   const elBezel = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezel);
   const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezelIcon);
-  const { parentElement: elBezelTextWrapperContainer } = elBezelContainer.querySelector<HTMLDivElement>(
-    SELECTORS.bezelTextWrapper
-  )!;
   const iconName: keyof typeof svgs = isRated ? gLastRating : `un${gLastRating}`;
   elBezelIcon!.innerHTML = svgs[iconName];
-
-  elBezelTextWrapperContainer!.className = SELECTORS.bezelTextHide.substring(1);
 
   elBezelContainer.style.display = "";
   elBezel!.ariaLabel = "";
 }
 
-function getBezelContainer(): HTMLDivElement {
-  return document.querySelector(SELECTORS.bezelTextWrapper)!.parentElement as HTMLDivElement;
+function getBezelContainer() {
+  return document.querySelector(SELECTORS.bezelTextWrapper)!.parentElement!;
 }
 
-function clearAnimationOnEnd(): void {
+function clearAnimationOnEnd() {
   const elBezelContainer = getBezelContainer();
-  elBezelContainer.addEventListener(
-    "animationend",
-    () => {
-      elBezelContainer.style.display = "none";
-    },
-    { once: true }
-  );
+  elBezelContainer.addEventListener("animationend", () => {
+    elBezelContainer.style.display = "none";
+  }, { once: true });
 }
 
 export function getRatedButton(): HTMLButtonElement {
@@ -61,7 +52,7 @@ export function getRatedButton(): HTMLButtonElement {
   return document.querySelector(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`)!;
 }
 
-export function getIsSubscribed(): boolean {
+export function getIsSubscribed() {
   const elSubscribe = document.querySelector(SELECTORS.buttonSubscribe);
   return elSubscribe?.getAttribute("subscribed") !== null;
 }
@@ -69,11 +60,11 @@ export function getIsSubscribed(): boolean {
 /**
  * Rates/un-rates a video on YouTube.com
  */
-export function rateVideo(isLike: boolean | null): void {
-  if (!location.pathname.match(REGEX_SUPPORTED_PAGES)) {
+export function rateVideo(isLike: boolean | null) {
+  const [elLike, elDislike] = getRateButtons();
+  if (!elLike) {
     return;
   }
-  const [elLike, elDislike] = getRateButtons();
   clearAnimationOnEnd();
 
   window.ytrUserInteracted = true;

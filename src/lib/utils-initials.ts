@@ -1,7 +1,21 @@
 import { type StorageArea } from "#imports";
 import { type ButtonTriggers } from "@/lib/types";
 
-export async function getStorage<T>({
+function isPlainObject(val: unknown): val is Record<string, unknown> {
+  return typeof val === "object" && val !== null && !Array.isArray(val);
+}
+
+function mergeWithFallback(fallback: Record<string, unknown>, stored: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...fallback };
+  for (const key in stored) {
+    result[key] = isPlainObject(fallback[key]) && isPlainObject(stored[key])
+      ? mergeWithFallback(fallback[key], stored[key])
+      : stored[key];
+  }
+  return result;
+}
+
+export async function getStorage<K extends keyof typeof window>({
   area,
   key,
   fallback,
@@ -9,23 +23,19 @@ export async function getStorage<T>({
 }: {
   area: StorageArea;
   key: string;
-  fallback: T;
-  updateWindowKey: string;
-}): Promise<T> {
-  let value: T;
+  fallback: (typeof window)[K];
+  updateWindowKey: K;
+}) {
+  let value: (typeof window)[K];
   try {
-    value = await storage.getItem<T>(`${area}:${key}`, { fallback });
+    value = await storage.getItem<(typeof window)[K]>(`${area}:${key}`, { fallback });
   } catch {
     value = fallback;
   }
-  // @ts-expect-error Incompatible types
-  if (typeof window[updateWindowKey] !== "object") {
-    // @ts-expect-error Incompatible types
-    window[updateWindowKey] = value;
-  } else {
-    // @ts-expect-error Incompatible types
-    window[updateWindowKey] = { ...fallback, ...value };
+  if (isPlainObject(value) && isPlainObject(fallback)) {
+    Object.assign(value, mergeWithFallback(fallback, value));
   }
+  window[updateWindowKey] = value;
   return value;
 }
 
@@ -40,58 +50,48 @@ export enum SELECTORS {
   // Bezel classes
   bezel = "ytd-page-manager .ytp-bezel",
   bezelIcon = "ytd-page-manager .ytp-bezel-icon",
-  bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper",
-  bezelTextHide = "ytd-page-manager .ytp-bezel-text-hide"
+  bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper"
 }
 
+const buttonTriggers: ButtonTriggers = {
+  like: { primary: ["Equal"], modifiers: ["shiftKey"], secondary: true },
+  dislike: { primary: ["Minus"], modifiers: ["shiftKey"], secondary: true },
+  unrate: { primary: ["Digit0"], modifiers: ["shiftKey"], secondary: true }
+};
+
 export const initial = {
-  buttonTriggers: {
-    like: {
-      primary: ["Equal"],
-      modifiers: ["shiftKey"],
-      secondary: true
-    },
-    dislike: {
-      primary: ["Minus"],
-      modifiers: ["shiftKey"],
-      secondary: true
-    },
-    unrate: {
-      primary: ["Digit0"],
-      modifiers: ["shiftKey"],
-      secondary: true
-    }
-  } as ButtonTriggers,
+  buttonTriggers,
   isAutoLike: false,
   isAutoLikeSubscribedChannels: false,
   autoLikeThreshold: 70
 };
 
-export const REGEX_SUPPORTED_PAGES = /^\/(?:watch|shorts|live)/;
 export const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
-export const OBSERVER_OPTIONS: MutationObserverInit = { childList: true, subtree: true };
+export function isModifier(key: string): key is typeof MODIFIER_KEYS[number] {
+  return MODIFIER_KEYS.some(item => item === key);
+}
 
-function getIsElementVisible(element: HTMLElement): boolean {
+export const OBSERVER_OPTIONS = Object.freeze<MutationObserverInit>({ childList: true, subtree: true });
+
+function getIsElementVisible(element: HTMLElement) {
   return element?.offsetWidth > 0 && element?.offsetHeight > 0;
 }
 
-function getIsElementInViewport(element: HTMLElement): boolean {
+function getIsElementInViewport(element: HTMLElement) {
   const { top, left, bottom, right } = element.getBoundingClientRect();
   return top > 0 && left > 0 && bottom < innerHeight && right < innerWidth;
 }
 
-export function getVisibleElement<T extends HTMLElement>(selector: string): T {
+export function getVisibleElement<T extends HTMLElement>(selector: string) {
   const elements = [...document.querySelectorAll<T>(selector)];
-  // Removed debug log per user request
-  const isNormalVideo = location.pathname.startsWith("/watch");
-  // Removed debug log per user request
-  return [...elements].find(isNormalVideo ? getIsElementVisible : getIsElementInViewport)!;
+  const isShorts = location.pathname.startsWith("/shorts");
+  return [...elements].find(isShorts ? getIsElementInViewport : getIsElementVisible)!;
 }
 
-export async function getElementByMutationObserver<T extends HTMLElement>(selector: SELECTORS): Promise<T> {
-  return new Promise(resolve => {
+export async function getElementByMutationObserver<T extends HTMLElement>(selector: SELECTORS) {
+  return new Promise<T>(resolve => {
     new MutationObserver((_, observer) => {
       const element = document.documentElement.querySelector<T>(selector);
       if (element) {
@@ -108,24 +108,17 @@ export async function addNavigationListener(addTemporaryBodyListener: () => void
   new MutationObserver(addTemporaryBodyListener).observe(elTitle, OBSERVER_OPTIONS);
 }
 
+const MODIFIER_KEY_DISPLAY = {
+  shiftKey: "Shift",
+  ctrlKey: "Ctrl",
+  altKey: "Alt",
+  metaKey: "Meta"
+} as const;
+
 export function keyToModifier(key: string) {
-  const keyToModifierMap = {
-    shiftKey: "Shift",
-    ctrlKey: "Ctrl",
-    altKey: "Alt",
-    metaKey: "Meta"
-  };
-  // @ts-expect-error Handled correctly
-  return keyToModifierMap[key] || key;
+  return Object.entries(MODIFIER_KEY_DISPLAY).find(([entryKey]) => entryKey === key)?.[1] ?? key;
 }
 
 export function modifierToKey(modifier: string) {
-  const modifierToKeyMap = {
-    Shift: "shiftKey",
-    Cmd: "metaKey",
-    Ctrl: "ctrlKey",
-    Alt: "altKey"
-  };
-  // @ts-expect-error Handled correctly
-  return modifierToKeyMap[modifier] || modifier;
+  return Object.entries(MODIFIER_KEY_DISPLAY).find(([, display]) => display === modifier)?.[0] ?? modifier;
 }

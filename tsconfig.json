@@ -2,6 +2,7 @@
   "extends": ["./.wxt/tsconfig.json"],
   "compilerOptions": {
     "types": ["svelte", "node", "chrome"],
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "noImplicitAny": true
   }
 }
