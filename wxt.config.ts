@@ -10,7 +10,7 @@ export default defineConfig({
     const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
 
     return {
-      name: browser === "edge" ? "Like-Dislike Shortcut for YouTube" : "YouTube Like-Dislike Shortcut",
+      name: "YouTube Like-Dislike Shortcut",
       description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
       homepage_url: url,
       permissions: ["storage"],
