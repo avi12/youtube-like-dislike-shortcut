@@ -7,7 +7,7 @@
     initial,
     SELECTORS
   } from "@/lib/utils-initials";
-  import { rateVideo } from "@/lib/ytr-buttons";
+  import { getRatedButton } from "@/lib/ytr-buttons";
   import "./style.css";
 
   interface Props {
@@ -37,24 +37,9 @@
     (!sharedState.isAdInitiallyPlaying || !sharedState.isAdPlaying)
   );
 
-  const isRateVideo = $derived(
-    sharedState.percentageWatched >= autoLikeThreshold &&
-    isAutoLikeEnabled &&
-    !isLiveOrPremiere &&
-    !sharedState.isUserInteracted &&
-    !sharedState.isRatedInitially &&
-    !sharedState.isAdPlaying
-  );
-
   function getIsNormalVideo() {
     return location.pathname === "/watch";
   }
-
-  $effect(() => {
-    if (isRateVideo) {
-      rateVideo(true);
-    }
-  });
 
   function getIsLiveOrPremiere() {
     return Boolean(getVisibleElement(SELECTORS.liveBadge));
@@ -73,7 +58,7 @@
     sharedState.lastTimeUpdate = 0;
     sharedState.isUserInteracted = false;
     window.ytrUserInteracted = false;
-    sharedState.isRatedInitially = false;
+    sharedState.isRatedInitially = Boolean(getRatedButton());
   }
 
   function addStorageListener() {
