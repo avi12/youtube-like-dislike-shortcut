@@ -22,136 +22,65 @@ Additionally:
 Available for:
 
 - [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?color=white&label=users&style=flat-square)
-- [Mozilla Firefox](https://addons.mozilla.org/addon/youtube-like-dislike-shortcut) 109+ ![Mozilla Add-on](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=users&style=flat-square)
+- [Mozilla Firefox](https://addons.mozilla.org/addon/youtube-like-dislike-shortcut)
+  109+ ![Mozilla Add-on](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=users&style=flat-square)
 - [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/pdoiddhhpjkclobjlomfkgfldjoggfig) ![users count](https://img.shields.io/badge/dynamic/json?label=users&query=activeInstallCount&style=flat-square&color=white&url=https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/pdoiddhhpjkclobjlomfkgfldjoggfig)
 - [Opera](https://addons.opera.com/en/extensions/details/youtube-like-dislike-shortcut)
 
 Made by [Avi](https://avi12.com)
 
-## Requirements for setting up
+## Claude Code
 
-Install [Node.js](https://nodejs.org) and [PNPM](https://bun run.io/installation)
+The repo includes `.mcp.json` with two MCP servers for browser automation:
 
-## Install dependencies
+- [chrome-devtools-mcp](https://npm.im/chrome-devtools-mcp) - connects to any Chromium-based browser via remote debugging on port 9225
+- [firefox-devtools-mcp](https://npm.im/firefox-devtools-mcp) - connects to Firefox via Marionette on port 2828
 
-```shell script
-bun i
-```
+## Requirements
 
-## Start the dev server & run in a test browser
+Install [Node.js](https://nodejs.org) and [Bun](https://bun.sh), then: `bun install`
 
-### Chrome
+## Dev
 
-```shell script
-bun run dev
-```
-
-### Edge
-
-```shell
-bun run dev:edge
-```
-
-### Opera
-
-```shell
-bun run dev:opera
-```
-
-### Firefox
-
-Continuously build with
-
-```shell
-bun dev:firefox
-```
-
-Run using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext):
-
-```shell
-bun run:firefox
-```
+| Browser                | Command                            |
+|------------------------|------------------------------------|
+| Chrome                 | `bun run dev`                      |
+| Chrome (with profile)  | `bun run dev:with-profile`         |
+| Edge                   | `bun run dev:edge`                 |
+| Opera                  | `bun run dev:opera`                |
+| Firefox                | `bun run dev:firefox`              |
+| Firefox (with profile) | `bun run dev:firefox:with-profile` |
 
 ## Build
 
-### Chrome
-
-```shell script
-bun run build
-```
-
-### Edge
-
-```shell script
-bun run build:edge
-```
-
-### Opera
-
-```shell
-bun run build:opera
-```
-
-### Firefox
-
-```shell
-bun run build:firefox
-```
+| Browser | Command                 |
+|---------|-------------------------|
+| Chrome  | `bun run build`         |
+| Edge    | `bun run build:edge`    |
+| Opera   | `bun run build:opera`   |
+| Firefox | `bun run build:firefox` |
 
 ## Package
 
-### Chrome
+| Browser | Command                   |
+|---------|---------------------------|
+| Chrome  | `bun run package`         |
+| Edge    | `bun run package:edge`    |
+| Opera   | `bun run package:opera`   |
+| Firefox | `bun run package:firefox` |
 
-```shell
-bun run package
-```
+## Build & Package
 
-### Edge
-
-```shell
-bun run package:edge
-````
-
-### Opera
-
-```shell
-bun run package:opera
-```
-
-### Firefox
-
-```shell
-bun run package:firefox
-```
-
-## Shorthands
-
-### Chrome
-
-```shell
-bun run build:package
-```
-
-### Edge
-
-```shell
-bun run build:package:edge
-```
-
-### Opera
-
-```shell
-bun run build:package:opera
-```
-
-### Firefox
-
-```shell
-bun run build:package:firefox
-```
+| Browser | Command                         |
+|---------|---------------------------------|
+| Chrome  | `bun run build:package`         |
+| Edge    | `bun run build:package:edge`    |
+| Opera   | `bun run build:package:opera`   |
+| Firefox | `bun run build:package:firefox` |
+| All     | `bun run build:package:all`     |
 
 ## Contribution
 
 Feel free to contribute! Keep in mind that the license I chose
 is [GPL v3](https://github.com/avi12/youtube-like-dislike-shortcut/blob/main/LICENSE)  
-If you want to fork, make sure to credit [Avi](https://avi12.com) and link to this repository.
+If you want to fork, make sure to credit [Avi](https://avi12.com) and link to this repository
