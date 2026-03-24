@@ -1,7 +1,0 @@
-/* Selecting the div because WXT create a div for the body */
-div {
-  font-variant-numeric: tabular-nums;
-  font-family: Roboto, sans-serif;
-  position: relative;
-  bottom: 4px;
-}
