@@ -1,7 +1,8 @@
 import eslint from "@eslint/js";
-import { globalIgnores } from "eslint/config";
 import avi12 from "eslint-config-avi12";
+import perfectionist from "eslint-plugin-perfectionist";
 import svelteEslint from "eslint-plugin-svelte";
+import { globalIgnores } from "eslint/config";
 import globals from "globals";
 import svelteParser from "svelte-eslint-parser";
 import tsEslint from "typescript-eslint";
@@ -21,27 +22,31 @@ export default [
       },
       globals: {
         ...globals.browser,
-        ...globals.node
+        ...globals.node,
+        chrome: true
       }
-    },
-    rules: {
-      "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-      "prefer-const": ["error", { destructuring: "all" }]
     }
   },
   {
     files: ["**/*.{ts,js}"],
+    plugins: {
+      perfectionist
+    },
     languageOptions: {
       parser: tsEslint.parser,
       globals: {
         ...globals.browser,
-        ...globals.node
+        ...globals.node,
+        chrome: true
       }
     },
     rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-      "@stylistic/object-curly-spacing": ["error", "always"],
-      "id-length": ["error", { min: 3, exceptions: ["_", "e", "i", "j", "k", "x", "y", "z", "id"] }]
+      "id-length": ["error", { min: 3, exceptions: ["_", "e", "i", "j", "k", "x", "y", "z", "id"] }],
+      "import/order": "off",
+      "perfectionist/sort-imports": ["warn", { internalPattern: ["^@/"] }]
     }
   }
 ];
