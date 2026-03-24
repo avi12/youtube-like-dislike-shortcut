@@ -12,6 +12,91 @@ function getIsLiveOrPremiere() {
   return Boolean(getVisibleElement(SELECTORS.liveBadge));
 }
 
+let ratingWatchObserver: MutationObserver | null = null;
+let ratingSettleTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function watchForInitialRating() {
+  ratingWatchObserver?.disconnect();
+  ratingWatchObserver = null;
+  if (ratingSettleTimeout !== null) {
+    clearTimeout(ratingSettleTimeout);
+    ratingSettleTimeout = null;
+  }
+
+  const ratedSelector = `:where(${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}) button[aria-pressed=true]`;
+  const anyButtonSelector = `:where(${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}) button[aria-pressed]`;
+
+  function applyState() {
+    const isRated = Boolean(getRatedButton());
+    sharedState.isRatedInitially = isRated;
+    sharedState.isUserInteracted = isRated;
+    sharedState.isRatingResolved = true;
+    window.ytrUserInteracted = isRated;
+  }
+
+  function stopWatching() {
+    ratingWatchObserver?.disconnect();
+    ratingWatchObserver = null;
+    if (ratingSettleTimeout !== null) {
+      clearTimeout(ratingSettleTimeout);
+      ratingSettleTimeout = null;
+    }
+  }
+
+  function startSettleTimer() {
+    if (ratingSettleTimeout === null) {
+      ratingSettleTimeout = setTimeout(() => {
+        ratingSettleTimeout = null;
+        stopWatching();
+        applyState();
+      }, 1500);
+    }
+  }
+
+  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
+
+  ratingWatchObserver = new MutationObserver(mutations => {
+    const hasAriaPressed = mutations.some(
+      mut =>
+        mut.type === "attributes" &&
+        mut.attributeName === "aria-pressed" &&
+        mut.target instanceof Element &&
+        Boolean(mut.target.closest(containerSelector))
+    );
+
+    if (hasAriaPressed) {
+      // A button's aria-pressed attribute changed — this is a real state change.
+      // Old stale buttons never fire this (their aria-pressed stays unchanged until removed).
+      if (!document.querySelector(anyButtonSelector)) {
+        return;
+      }
+      if (document.querySelector(ratedSelector)) {
+        stopWatching();
+        applyState();
+        return;
+      }
+      // Buttons present but unrated — start settle timer
+      startSettleTimer();
+      return;
+    }
+
+    // childList mutation only — DOM structure changed but aria-pressed didn't.
+    // Stale old buttons may still be in the DOM, so don't check ratedSelector immediately.
+    // Just start the settle timer; by the time it fires the DOM will have transitioned.
+    if (!document.querySelector(anyButtonSelector)) {
+      return;
+    }
+    startSettleTimer();
+  });
+
+  ratingWatchObserver.observe(document, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["aria-pressed"]
+  });
+}
+
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   cssInjectionMode: "ui",
@@ -20,8 +105,7 @@ export default defineContentScript({
     let lastHref = location.href;
     const elementNameToInject = "ytr-percentage";
 
-    sharedState.isUserInteracted = Boolean(getRatedButton());
-    sharedState.isRatedInitially = sharedState.isUserInteracted;
+    watchForInitialRating();
     sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.isAdPlaying = getIsAdPlaying();
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
@@ -79,16 +163,17 @@ export default defineContentScript({
       mountUiIfNeeded();
     }).observe(document, OBSERVER_OPTIONS);
 
-    document.addEventListener("timeupdate", e => {
+    document.addEventListener("timeupdate", evt => {
       const isNewPage = location.href !== lastHref;
       if (isNewPage) {
         lastHref = location.href;
         sharedState.percentageWatched = 0;
         sharedState.lastTimeUpdate = 0;
-        const isRated = Boolean(getRatedButton());
-        sharedState.isRatedInitially = isRated;
-        sharedState.isUserInteracted = isRated;
-        window.ytrUserInteracted = isRated;
+        sharedState.isRatingResolved = false;
+        sharedState.isRatedInitially = false;
+        sharedState.isUserInteracted = false;
+        window.ytrUserInteracted = false;
+        watchForInitialRating();
       }
 
       if (window.ytrUserInteracted) {
@@ -114,7 +199,7 @@ export default defineContentScript({
         sharedState.percentageWatched = 0;
       }
 
-      const { target } = e;
+      const { target } = evt;
       if (!(target instanceof HTMLVideoElement)) {
         return;
       }
@@ -151,8 +236,8 @@ export default defineContentScript({
     { capture: true }
     );
 
-    document.addEventListener("click", e => {
-      const { target } = e;
+    document.addEventListener("click", evt => {
+      const { target } = evt;
       if (!(target instanceof HTMLElement)) {
         return;
       }

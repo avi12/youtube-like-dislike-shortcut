@@ -2,8 +2,6 @@
   import { storage } from "#imports";
   import { sharedState } from "./states.svelte";
   import { addNavigationListener, getVisibleElement, initial, SELECTORS } from "@/lib/utils-initials";
-  import { getRatedButton } from "@/lib/ytr-buttons";
-  import "./style.css";
 
   interface Props {
     isAutoLikeEnabled: boolean;
@@ -27,6 +25,7 @@
     !isShorts &&
     isAutoLikeEnabled &&
     !isLiveOrPremiere &&
+    sharedState.isRatingResolved &&
     !sharedState.isRatedInitially &&
     (!sharedState.isAdInitiallyPlaying || !sharedState.isAdPlaying)
   );
@@ -50,9 +49,9 @@
     isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.percentageWatched = 0;
     sharedState.lastTimeUpdate = 0;
+    sharedState.isRatingResolved = false;
     sharedState.isUserInteracted = false;
     window.ytrUserInteracted = false;
-    sharedState.isRatedInitially = Boolean(getRatedButton());
   }
 
   function addStorageListener() {
@@ -71,8 +70,12 @@
 
 <style>
   :host {
-    align-self: center !important;
-    padding-inline-end: 8px !important;
     color: inherit !important;
+  }
+
+  :global(body) {
+    padding-bottom: 5px;
+    font: bold 14px Roboto, sans-serif;
+    font-variant-numeric: tabular-nums;
   }
 </style>
