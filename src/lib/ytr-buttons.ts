@@ -29,8 +29,12 @@ function showIndicator(isRated: boolean) {
   const elBezelContainer = getBezelContainer();
   const elBezel = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezel);
   const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezelIcon);
+  const elBezelTextWrapper = document.querySelector<HTMLElement>(SELECTORS.bezelTextWrapper);
   const iconName: keyof typeof svgs = isRated ? gLastRating : `un${gLastRating}`;
   elBezelIcon!.innerHTML = svgs[iconName];
+  if (elBezelTextWrapper) {
+    elBezelTextWrapper.style.display = "none";
+  }
 
   elBezelContainer.style.display = "";
   elBezel!.ariaLabel = "";
@@ -42,8 +46,12 @@ function getBezelContainer() {
 
 function clearAnimationOnEnd() {
   const elBezelContainer = getBezelContainer();
+  const elBezelTextWrapper = document.querySelector<HTMLElement>(SELECTORS.bezelTextWrapper);
   elBezelContainer.addEventListener("animationend", () => {
     elBezelContainer.style.display = "none";
+    if (elBezelTextWrapper) {
+      elBezelTextWrapper.style.display = "";
+    }
   }, { once: true });
 }
 
