@@ -14,7 +14,7 @@ const path = (() => {
 
 process.loadEnvFile(path);
 
-const { VITE_LANG = "en" } = process.env;
+const { LANG = "en" } = process.env;
 
 function findDefaultFirefoxProfile() {
   const profilesDir = (() => {
@@ -64,23 +64,21 @@ if (process.env.CHROME_WITH_PROFILE === "1") {
 
 export default defineWebExtConfig({
   binaries: {
-    edge: process.env.VITE_PATH_EDGE!,
-    opera: process.env.VITE_PATH_OPERA!.replace("USERPROFILE", homedir()!)
+    edge: process.env.PATH_EDGE!,
+    opera: process.env.PATH_OPERA!.replace("USERPROFILE", homedir()!)
   },
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
   ...process.env.CHROME_WITH_PROFILE === "1" && {
     keepProfileChanges: true,
     chromiumProfile: resolve(import.meta.dirname, "../User Data")
   },
-  ...process.env.FIREFOX_DEBUG === "1" && {
-    firefoxArgs: ["-marionette", "-marionette-port", "2828"]
-  },
+  firefoxArgs: ["-marionette", "-marionette-port", "2828"],
   ...process.env.FIREFOX_WITH_PROFILE === "1" && {
     firefoxProfile: findDefaultFirefoxProfile(),
     keepProfileChanges: true
   },
   chromiumArgs: [
-    `--lang=${VITE_LANG}`,
+    `--lang=${LANG}`,
     "--remote-debugging-port=9225",
     "--isolated",
     "--disable-blink-features=AutomationControlled",
