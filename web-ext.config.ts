@@ -3,18 +3,19 @@ import { homedir, platform } from "node:os";
 import { resolve, join, basename } from "node:path";
 import { defineWebExtConfig } from "wxt";
 
-const path = (() => {
-  const osMap: Partial<Record<NodeJS.Platform, string>> = {
-    win32: ".env.windows",
-    darwin: ".env.mac",
-    linux: ".env.linux"
-  };
-  return osMap[process.platform] || "";
-})();
-
-process.loadEnvFile(path);
-
 const { LANG = "en" } = process.env;
+
+const edgeByPlatform: Partial<Record<NodeJS.Platform, string>> = {
+  win32: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  darwin: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  linux: "/usr/bin/microsoft-edge-stable"
+};
+
+const operaByPlatform: Partial<Record<NodeJS.Platform, string>> = {
+  win32: join(homedir(), "AppData/Local/Programs/Opera/opera.exe"),
+  darwin: "/Applications/Opera.app/Contents/MacOS/Opera",
+  linux: "/usr/bin/opera"
+};
 
 function findDefaultFirefoxProfile() {
   const profilesDir = (() => {
@@ -64,8 +65,8 @@ if (process.env.CHROME_WITH_PROFILE === "1") {
 
 export default defineWebExtConfig({
   binaries: {
-    edge: process.env.PATH_EDGE!,
-    opera: process.env.PATH_OPERA!.replace("USERPROFILE", homedir()!)
+    edge: edgeByPlatform[process.platform]!,
+    opera: operaByPlatform[process.platform]!
   },
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
   ...process.env.CHROME_WITH_PROFILE === "1" && {
