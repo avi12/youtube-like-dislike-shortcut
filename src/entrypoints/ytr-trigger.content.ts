@@ -1,8 +1,8 @@
 import { storage } from "#imports";
-import { defaultAdditionalShortcuts, ShortcutType } from "./popup/sections/keyboard.svelte.js";
 import { type Modifier } from "@/lib/types";
 import { getStorage, initial, keyToModifier } from "@/lib/utils-initials";
 import { rateVideo } from "@/lib/ytr-buttons";
+import { defaultAdditionalShortcuts, ShortcutType } from "./popup/sections/keyboard.svelte.js";
 
 function getSecondaryKeyFromPrimary({
   modifiers,

@@ -1,8 +1,8 @@
 import { mount, unmount } from "svelte";
-import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
-import { sharedState } from "./states.svelte";
 import { getStorage, getVisibleElement, OBSERVER_OPTIONS, SELECTORS } from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
+import { sharedState } from "./states.svelte";
 
 function getIsAdPlaying() {
   return Boolean(document.querySelector(SELECTORS.adOverlay));
