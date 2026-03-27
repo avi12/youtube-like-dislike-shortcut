@@ -1,29 +1,30 @@
 import { readdirSync, existsSync, cpSync } from "node:fs";
-import { homedir, platform } from "node:os";
-import { resolve, join, basename } from "node:path";
+import { homedir } from "node:os";
+import { join, basename, resolve } from "node:path";
 import { defineWebExtConfig } from "wxt";
 
 const { LANG = "en" } = process.env;
+const osPlatform = process.platform;
+const home = homedir();
 
 const edgeByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  win32: join(process.env.ProgramFiles!, "Microsoft/Edge/Application/msedge.exe"),
   darwin: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
   linux: "/usr/bin/microsoft-edge-stable"
 };
 
 const operaByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: join(homedir(), "AppData/Local/Programs/Opera/opera.exe"),
+  win32: join(process.env.LOCALAPPDATA!, "Programs/Opera/opera.exe"),
   darwin: "/Applications/Opera.app/Contents/MacOS/Opera",
   linux: "/usr/bin/opera"
 };
 
 function findDefaultFirefoxProfile() {
   const profilesDir = (() => {
-    const home = homedir();
-    if (platform() === "win32") {
-      return join(home, "AppData/Roaming/Mozilla/Firefox/Profiles");
+    if (osPlatform === "win32") {
+      return join(process.env.APPDATA!, "Mozilla/Firefox/Profiles");
     }
-    if (platform() === "darwin") {
+    if (osPlatform === "darwin") {
       return join(home, "Library/Application Support/Firefox/Profiles");
     }
     return join(home, ".mozilla/firefox");
@@ -33,7 +34,9 @@ function findDefaultFirefoxProfile() {
   }
   const profiles = readdirSync(profilesDir);
   const found = profiles.find(dir => dir.endsWith(".default-release")) ?? profiles.find(dir => dir.includes("default")) ?? profiles[0];
-  return found ? join(profilesDir, found) : undefined;
+  if (found) {
+    return join(profilesDir, found);
+  }
 }
 
 const LOCK_FILES = new Set(["lockfile", "SingletonLock", "SingletonCookie", "SingletonSocket", "LOCK"]);
@@ -41,10 +44,10 @@ const LOCK_FILES = new Set(["lockfile", "SingletonLock", "SingletonCookie", "Sin
 function setupChromeProfile() {
   const chromeSrcByPlatform: Partial<Record<NodeJS.Platform, string>> = {
     win32: join(process.env.LOCALAPPDATA!, "Google", "Chrome", "User Data"),
-    darwin: join(homedir(), "Library", "Application Support", "Google", "Chrome"),
-    linux: join(homedir(), ".config", "google-chrome")
+    darwin: join(home, "Library", "Application Support", "Google", "Chrome"),
+    linux: join(home, ".config", "google-chrome")
   };
-  const src = chromeSrcByPlatform[process.platform];
+  const src = chromeSrcByPlatform[osPlatform];
   if (!src || !existsSync(src)) {
     return;
   }
@@ -65,8 +68,8 @@ if (process.env.CHROME_WITH_PROFILE === "1") {
 
 export default defineWebExtConfig({
   binaries: {
-    edge: edgeByPlatform[process.platform]!,
-    opera: operaByPlatform[process.platform]!
+    edge: edgeByPlatform[osPlatform] ?? "",
+    opera: operaByPlatform[osPlatform] ?? ""
   },
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
   ...process.env.CHROME_WITH_PROFILE === "1" && {
