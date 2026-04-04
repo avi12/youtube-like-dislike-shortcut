@@ -148,9 +148,9 @@ export default defineContentScript({
             }
           });
         },
-        onRemove(app) {
+        async onRemove(app) {
           if (app) {
-            unmount(app);
+            await unmount(app);
           }
         }
       });
@@ -159,11 +159,11 @@ export default defineContentScript({
     }
 
     await mountUiIfNeeded();
-    new MutationObserver(() => {
-      mountUiIfNeeded();
+    new MutationObserver(async () => {
+      await mountUiIfNeeded();
     }).observe(document, OBSERVER_OPTIONS);
 
-    document.addEventListener("timeupdate", evt => {
+    document.addEventListener("timeupdate", async evt => {
       const isNewPage = location.href !== lastHref;
       if (isNewPage) {
         lastHref = location.href;
@@ -228,7 +228,7 @@ export default defineContentScript({
           !sharedState.isUserInteracted &&
           !sharedState.isRatedInitially;
         if (shouldAutoLike) {
-          rateVideo(true);
+          await rateVideo(true);
         }
       }
       sharedState.lastTimeUpdate = currentTime;

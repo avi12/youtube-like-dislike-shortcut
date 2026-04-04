@@ -48,21 +48,21 @@ function getActionPressed(event: KeyboardEvent) {
   return null;
 }
 
-function rateIfNeeded(e: KeyboardEvent) {
+async function rateIfNeeded(e: KeyboardEvent) {
   switch (getActionPressed(e)) {
     case ShortcutType.like:
       e.stopPropagation();
-      rateVideo(true);
+      await rateVideo(true);
       break;
 
     case ShortcutType.dislike:
       e.stopPropagation();
-      rateVideo(false);
+      await rateVideo(false);
       break;
 
     case ShortcutType.unrate:
       e.stopPropagation();
-      rateVideo(null);
+      await rateVideo(null);
       break;
   }
 }
@@ -75,7 +75,7 @@ async function init() {
     updateWindowKey: "ytrLastButtonTriggers"
   });
 
-  document.addEventListener("keydown", e => {
+  document.addEventListener("keydown", async e => {
     const isFocusedOnInput =
       document.activeElement!.matches("input") || document.activeElement!.getAttribute("contenteditable") === "true"; // A comment field
 
@@ -84,7 +84,7 @@ async function init() {
       return;
     }
 
-    rateIfNeeded(e);
+    await rateIfNeeded(e);
   }, { capture: true });
 
   storage.watch<typeof initial.buttonTriggers>("local:buttonTriggers", buttonTriggers => {

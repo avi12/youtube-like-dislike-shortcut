@@ -1,4 +1,4 @@
-import { initial } from "@/lib/utils-initials";
+import { type initial } from "@/lib/utils-initials";
 
 export type Modifier = "shiftKey" | "ctrlKey" | "altKey" | "metaKey";
 

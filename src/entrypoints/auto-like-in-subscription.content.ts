@@ -12,11 +12,11 @@ let OBSERVER_SUBSCRIPTION: MutationObserver;
 let lastUrl: string | undefined;
 let lastTitle: string | undefined;
 
-function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
+async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
   const [elLike] = getRateButtons();
   const isSubscribed = getIsSubscribed();
   if (isSubscribed && elLike && !getRatedButton()) {
-    rateVideo(true);
+    await rateVideo(true);
     observer?.disconnect();
     return true;
   }
@@ -25,7 +25,7 @@ function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver)
   return false;
 }
 
-function addTemporaryBodyListener() {
+async function addTemporaryBodyListener() {
   if (lastUrl === location.href || lastTitle === document.title) {
     return;
   }
@@ -37,18 +37,18 @@ function addTemporaryBodyListener() {
     return;
   }
 
-  if (autoLikeIfSubscribed()) {
+  if (await autoLikeIfSubscribed()) {
     OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
     return;
   }
 
   const navigationUrl = location.href;
-  new MutationObserver((_, observer) => {
+  new MutationObserver(async (_, observer) => {
     if (location.href !== navigationUrl) {
       observer.disconnect();
       return;
     }
-    if (autoLikeIfSubscribed()) {
+    if (await autoLikeIfSubscribed()) {
       OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
       observer.disconnect();
     }
@@ -56,10 +56,10 @@ function addTemporaryBodyListener() {
 }
 
 function addStorageListener() {
-  storage.watch<boolean>("sync:isAutoLikeSubscribedChannels", isAutoLike => {
+  storage.watch<boolean>("sync:isAutoLikeSubscribedChannels", async isAutoLike => {
     window.ytrAutoLikeSubscribedChannels = isAutoLike !== null ? isAutoLike : initial.isAutoLikeSubscribedChannels;
     if (isAutoLike) {
-      autoLikeIfSubscribed();
+      await autoLikeIfSubscribed();
     }
   });
 }
@@ -75,9 +75,9 @@ export default defineContentScript({
     lastUrl = location.href;
     lastTitle = document.title;
 
-    OBSERVER_SUBSCRIPTION = new MutationObserver(() => {
+    OBSERVER_SUBSCRIPTION = new MutationObserver(async () => {
       if (getIsSubscribed()) {
-        autoLikeIfSubscribed();
+        await autoLikeIfSubscribed();
         OBSERVER_SUBSCRIPTION.disconnect();
       }
     });
@@ -90,8 +90,8 @@ export default defineContentScript({
     });
 
     addStorageListener();
-    addNavigationListener(addTemporaryBodyListener);
-    addSubscribedEventListener();
+    await addNavigationListener(addTemporaryBodyListener);
+    await addSubscribedEventListener();
 
     if (!window.ytrAutoLikeSubscribedChannels) {
       return;
