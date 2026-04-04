@@ -1,5 +1,6 @@
 import eslint from "@eslint/js";
 import avi12 from "eslint-config-avi12";
+import importNewlines from "eslint-plugin-import-newlines";
 import perfectionist from "eslint-plugin-perfectionist";
 import svelteEslint from "eslint-plugin-svelte";
 import { globalIgnores } from "eslint/config";
@@ -33,6 +34,11 @@ export default [
     files: ["src/**/*.{ts,js}"],
     languageOptions: {
       parser: tsEslint.parser,
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["eslint.config.*"]
+        }
+      },
       globals: {
         ...globals.browser,
         chrome: true
@@ -44,6 +50,11 @@ export default [
     ignores: ["src/**"],
     languageOptions: {
       parser: tsEslint.parser,
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["eslint.config.*"]
+        }
+      },
       globals: {
         ...globals.node
       }
@@ -52,13 +63,17 @@ export default [
   {
     files: ["**/*.{ts,js}"],
     plugins: {
+      "import-newlines": importNewlines,
       perfectionist
     },
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
+      "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports", fixStyle: "inline-type-imports" }],
+      "@typescript-eslint/no-floating-promises": "error",
       "id-length": ["error", { min: 3, exceptions: ["_", "e"], properties: "never" }],
+      "import-newlines/enforce": ["error", { items: 4, "max-len": 120, forceSingleLine: true }],
       "import/order": "off",
       "perfectionist/sort-imports": ["error", { internalPattern: ["^@/"], newlinesBetween: 0 }]
     }
