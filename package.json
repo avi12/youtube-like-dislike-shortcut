@@ -45,6 +45,7 @@
     "@wxt-dev/module-svelte": "2.0.4",
     "eslint": "^10.1.0",
     "eslint-config-avi12": "github:avi12/eslint-config-avi12",
+    "eslint-plugin-import-newlines": "^2.0.0",
     "eslint-plugin-perfectionist": "^5.7.0",
     "eslint-plugin-svelte": "^3.16.0",
     "globals": "^17.4.0",
@@ -56,5 +57,8 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.1",
     "wxt": "0.20.18"
+  },
+  "dependencies": {
+    "@webext-core/messaging": "^2.3.0"
   }
 }

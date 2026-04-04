@@ -1,5 +1,6 @@
 import { svgs } from "@/lib/icons";
 import { SELECTORS } from "@/lib/utils-initials";
+import { RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 
 let gLastRating: "like" | "dislike";
 
@@ -14,12 +15,13 @@ export function getRateButtons() {
   if (!elButtonsRate) {
     return [];
   }
-  return [...elButtonsRate.querySelectorAll<HTMLButtonElement>("button[aria-pressed]")];
+  return elButtonsRate.querySelectorAll<HTMLButtonElement>("button[aria-pressed]").values();
 }
 
 function getIsShorts() {
   return location.pathname.startsWith("/shorts/");
 }
+
 
 function showIndicator(isRated: boolean) {
   if (getIsShorts()) {
@@ -65,14 +67,32 @@ export function getIsSubscribed() {
   return elSubscribe?.getAttribute("subscribed") !== null;
 }
 
-/**
- * Rates/un-rates a video on YouTube.com
- */
-export function rateVideo(isLike: boolean | null) {
-  const [elLike, elDislike] = getRateButtons();
-  if (!elLike) {
+async function rateVideoViaApi(isLike: boolean | null) {
+  const action = isLike === true ? RateAction.like : isLike === false ? RateAction.dislike : RateAction.removelike;
+  const { success } = await ytrMessenger.sendMessage(YtrMessage.rateVideo, action);
+  if (!success) {
     return;
   }
+  if (isLike !== null) {
+    gLastRating = isLike ? "like" : "dislike";
+  }
+  clearAnimationOnEnd();
+  showIndicator(isLike !== null);
+}
+
+/**
+ * Rates/un-rates a video on YouTube.com
+ * Falls back to YouTube's innertube API when DOM buttons aren't available
+ * (channel trailers, embedded videos)
+ */
+export async function rateVideo(isLike: boolean | null) {
+  const [elLike, elDislike] = getRateButtons();
+
+  if (!elLike) {
+    await rateVideoViaApi(isLike);
+    return;
+  }
+
   clearAnimationOnEnd();
 
   window.ytrUserInteracted = true;
@@ -102,13 +122,16 @@ export function rateVideo(isLike: boolean | null) {
   // Un-rate a video
   const elBtnActive = getRatedButton();
 
+  if (!elBtnActive) {
+    await rateVideoViaApi(null);
+    return;
+  }
+
   if (!gLastRating) {
     gLastRating = elBtnActive === elDislike ? "dislike" : "like";
   }
   showIndicator(false);
 
-  if (elBtnActive) {
-    elBtnActive.click();
-    elBtnActive.blur();
-  }
+  elBtnActive.click();
+  elBtnActive.blur();
 }
