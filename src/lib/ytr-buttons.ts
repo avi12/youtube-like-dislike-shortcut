@@ -1,8 +1,9 @@
 import { svgs } from "@/lib/icons";
+import { Rating } from "@/lib/types";
 import { SELECTORS } from "@/lib/utils-initials";
 import { RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 
-let gLastRating: "like" | "dislike";
+let gLastRating = Rating.Like;
 
 function getIsActive(elButton: HTMLElement) {
   return elButton.ariaPressed === "true";
@@ -74,7 +75,7 @@ async function rateVideoViaApi(isLike: boolean | null) {
     return;
   }
   if (isLike !== null) {
-    gLastRating = isLike ? "like" : "dislike";
+    gLastRating = isLike ? Rating.Like : Rating.Dislike;
   }
   clearAnimationOnEnd();
   showIndicator(isLike !== null);
@@ -97,7 +98,7 @@ export async function rateVideo(isLike: boolean | null) {
 
   window.ytrUserInteracted = true;
   if (isLike) {
-    gLastRating = "like";
+    gLastRating = Rating.Like;
     showIndicator(true);
 
     if (!getIsActive(elLike)) {
@@ -108,7 +109,7 @@ export async function rateVideo(isLike: boolean | null) {
   }
 
   if (isLike === false) {
-    gLastRating = "dislike";
+    gLastRating = Rating.Dislike;
     showIndicator(true);
 
     if (!getIsActive(elDislike)) {
@@ -128,7 +129,7 @@ export async function rateVideo(isLike: boolean | null) {
   }
 
   if (!gLastRating) {
-    gLastRating = elBtnActive === elDislike ? "dislike" : "like";
+    gLastRating = elBtnActive === elDislike ? Rating.Dislike : Rating.Like;
   }
   showIndicator(false);
 

@@ -2,6 +2,11 @@ import { type initial } from "@/lib/utils-initials";
 
 export type Modifier = "shiftKey" | "ctrlKey" | "altKey" | "metaKey";
 
+export const enum Rating {
+  Like = "like",
+  Dislike = "dislike"
+}
+
 export type ButtonTrigger = {
   primary: string[];
   modifiers: Modifier[];
