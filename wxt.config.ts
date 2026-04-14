@@ -36,9 +36,9 @@ export default defineConfig({
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   modules: ["@wxt-dev/module-svelte"],
-  vite: () => ({
+  vite: ({ mode }) => ({
     build: {
-      sourcemap: "inline"
+      sourcemap: mode === "development" ? "inline" : false
     }
   })
 });
