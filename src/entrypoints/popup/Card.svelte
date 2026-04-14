@@ -77,15 +77,4 @@
     border-radius: 24px;
   }
 
-  /* noinspection CssUnusedSymbol */
-  :global(.shortcut-section:not(:first-child)),
-  :global(.auto-like-section) {
-    padding-top: 20px;
-  }
-
-  /* noinspection CssUnusedSymbol */
-  :global(.shortcut-section:not(:last-child)) {
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgb(121 129 145 / 20%);
-  }
 </style>

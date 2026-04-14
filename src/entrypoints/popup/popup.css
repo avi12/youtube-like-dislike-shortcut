@@ -45,6 +45,7 @@ html[data-theme="light"] {
   --textbox-bg-disabled: var(--button-disabled-bg);
   --checkbox-bg: var(--action-bg-color);
   --checkbox-bg-disabled: #bcc0c8;
+  --button-shortcut-error-disabled-filter: none;
 }
 
 html[data-theme="dark"] {
@@ -94,6 +95,7 @@ html[data-theme="dark"] {
   --textbox-bg-disabled: var(--button-disabled-bg);
   --checkbox-bg: var(--action-bg-color);
   --checkbox-bg-disabled: #707276;
+  --button-shortcut-error-disabled-filter: brightness(0.8);
 }
 
 body {

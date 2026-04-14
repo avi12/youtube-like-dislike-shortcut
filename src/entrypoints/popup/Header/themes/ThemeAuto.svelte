@@ -23,6 +23,13 @@
 
 <style>
   .theme-auto {
+    & path,
+    & circle {
+      transition:
+        fill 0.4s ease-in-out,
+        stroke 0.4s ease-in-out;
+    }
+
     & path {
       stroke: var(--theme-switcher-button-color-inactive);
     }

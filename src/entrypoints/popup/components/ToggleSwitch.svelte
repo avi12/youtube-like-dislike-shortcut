@@ -95,11 +95,4 @@
       }
     }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    /* noinspection CssUnusedSymbol */
-    :global(.theme-auto) label::after {
-      transition: none;
-    }
-  }
 </style>

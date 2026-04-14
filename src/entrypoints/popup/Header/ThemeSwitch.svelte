@@ -82,24 +82,10 @@
       background-color: transparent;
       display: flex;
       align-items: center;
-
-      & :global(path),
-      & :global(circle) {
-        transition:
-          fill 0.4s ease-in-out,
-          stroke 0.4s ease-in-out;
-      }
     }
 
     & button.selected {
       background-color: var(--theme-switcher-button-bg);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .themes button :global(path),
-    .themes button :global(circle) {
-      transition: none;
     }
   }
 </style>

@@ -38,6 +38,10 @@
 </section>
 
 <style>
+  .auto-like-section {
+    padding-top: 20px;
+  }
+
   h2 {
     margin: 0 0 16px;
     font-weight: 600;

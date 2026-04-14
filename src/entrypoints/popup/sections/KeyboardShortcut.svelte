@@ -205,6 +205,15 @@
     display: flex;
     flex-direction: column-reverse;
     align-items: start;
+
+    &:not(:first-child) {
+      padding-top: 20px;
+    }
+
+    &:not(:last-child) {
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgb(121 129 145 / 20%);
+    }
   }
 
   .head-wrapper {

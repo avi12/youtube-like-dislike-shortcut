@@ -27,6 +27,9 @@
   .theme-dark {
     & path {
       stroke: var(--theme-switcher-button-color-inactive);
+      transition:
+        fill 0.4s ease-in-out,
+        stroke 0.4s ease-in-out;
     }
 
     &.checked {

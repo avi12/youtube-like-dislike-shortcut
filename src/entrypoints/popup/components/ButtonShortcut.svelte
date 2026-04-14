@@ -47,14 +47,7 @@
       &:disabled {
         color: var(--button-shortcut-error-color);
         background-color: var(--button-shortcut-error-bg);
-      }
-    }
-  }
-
-  :global([data-theme="dark"]) {
-    & .button-shortcut {
-      &.error:disabled {
-        filter: brightness(0.8);
+        filter: var(--button-shortcut-error-disabled-filter);
       }
     }
   }
