@@ -1,5 +1,11 @@
 import { mount, unmount } from "svelte";
-import { getStorage, getVisibleElement, OBSERVER_OPTIONS, SELECTORS } from "@/lib/utils-initials";
+import {
+  getStorage,
+  getVisibleElement,
+  OBSERVER_OPTIONS,
+  SELECTORS,
+  StorageKey
+} from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
 import { sharedState } from "./states.svelte";
@@ -13,15 +19,13 @@ function getIsLiveOrPremiere() {
 }
 
 let ratingWatchObserver: MutationObserver | null = null;
-let ratingSettleTimeout: ReturnType<typeof setTimeout> | null = null;
+let navigateFinishController: AbortController | null = null;
 
 function watchForInitialRating() {
   ratingWatchObserver?.disconnect();
   ratingWatchObserver = null;
-  if (ratingSettleTimeout !== null) {
-    clearTimeout(ratingSettleTimeout);
-    ratingSettleTimeout = null;
-  }
+  navigateFinishController?.abort();
+  navigateFinishController = null;
 
   const ratedSelector = `:where(${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}) button[aria-pressed=true]`;
   const anyButtonSelector = `:where(${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}) button[aria-pressed]`;
@@ -37,56 +41,39 @@ function watchForInitialRating() {
   function stopWatching() {
     ratingWatchObserver?.disconnect();
     ratingWatchObserver = null;
-    if (ratingSettleTimeout !== null) {
-      clearTimeout(ratingSettleTimeout);
-      ratingSettleTimeout = null;
-    }
+    navigateFinishController?.abort();
+    navigateFinishController = null;
   }
 
-  function startSettleTimer() {
-    if (ratingSettleTimeout === null) {
-      ratingSettleTimeout = setTimeout(() => {
-        ratingSettleTimeout = null;
-        stopWatching();
-        applyState();
-      }, 1500);
-    }
-  }
+  navigateFinishController = new AbortController();
+  document.addEventListener(
+    "yt-navigate-finish",
+    () => {
+      stopWatching();
+      applyState();
+    },
+    { once: true, signal: navigateFinishController.signal }
+  );
 
   const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
 
   ratingWatchObserver = new MutationObserver(mutations => {
-    const hasAriaPressed = mutations.some(
-      mut =>
-        mut.type === "attributes" &&
-        mut.attributeName === "aria-pressed" &&
-        mut.target instanceof Element &&
-        Boolean(mut.target.closest(containerSelector))
+    const hasRatedButtonChange = mutations.some(
+      mutation =>
+        mutation.type === "attributes" &&
+        mutation.attributeName === "aria-pressed" &&
+        mutation.target instanceof Element &&
+        Boolean(mutation.target.closest(containerSelector))
     );
 
-    if (hasAriaPressed) {
-      // A button's aria-pressed attribute changed — this is a real state change.
-      // Old stale buttons never fire this (their aria-pressed stays unchanged until removed).
-      if (!document.querySelector(anyButtonSelector)) {
-        return;
-      }
-      if (document.querySelector(ratedSelector)) {
-        stopWatching();
-        applyState();
-        return;
-      }
-      // Buttons present but unrated — start settle timer
-      startSettleTimer();
+    if (!hasRatedButtonChange || !document.querySelector(anyButtonSelector)) {
       return;
     }
-
-    // childList mutation only — DOM structure changed but aria-pressed didn't.
-    // Stale old buttons may still be in the DOM, so don't check ratedSelector immediately.
-    // Just start the settle timer; by the time it fires the DOM will have transitioned.
-    if (!document.querySelector(anyButtonSelector)) {
+    if (!document.querySelector(ratedSelector)) {
       return;
     }
-    startSettleTimer();
+    stopWatching();
+    applyState();
   });
 
   ratingWatchObserver.observe(document, {
@@ -112,14 +99,12 @@ export default defineContentScript({
 
     const [isAutoLike, autoLikeThreshold] = await Promise.all([
       getStorage({
-        area: "sync",
-        key: "isAutoLike",
+        storageKey: StorageKey.isAutoLike,
         fallback: false,
         updateWindowKey: "ytrAutoLikeEnabled"
       }),
       getStorage({
-        area: "sync",
-        key: "autoLikeThreshold",
+        storageKey: StorageKey.autoLikeThreshold,
         fallback: 70,
         updateWindowKey: "ytrAutoLikeThreshold"
       })
@@ -148,9 +133,9 @@ export default defineContentScript({
             }
           });
         },
-        async onRemove(app) {
+        onRemove(app) {
           if (app) {
-            await unmount(app);
+            void unmount(app);
           }
         }
       });
@@ -159,11 +144,11 @@ export default defineContentScript({
     }
 
     await mountUiIfNeeded();
-    new MutationObserver(async () => {
-      await mountUiIfNeeded();
+    new MutationObserver(() => {
+      void mountUiIfNeeded();
     }).observe(document, OBSERVER_OPTIONS);
 
-    document.addEventListener("timeupdate", async evt => {
+    document.addEventListener("timeupdate", async e => {
       const isNewPage = location.href !== lastHref;
       if (isNewPage) {
         lastHref = location.href;
@@ -199,7 +184,7 @@ export default defineContentScript({
         sharedState.percentageWatched = 0;
       }
 
-      const { target } = evt;
+      const { target } = e;
       if (!(target instanceof HTMLVideoElement)) {
         return;
       }
@@ -217,8 +202,8 @@ export default defineContentScript({
       if (!sharedState.lastTimeUpdate) {
         sharedState.lastTimeUpdate = currentTime;
       }
-      const prev = sharedState.lastTimeUpdate;
-      const delta = currentTime - prev;
+      const previousTimeUpdate = sharedState.lastTimeUpdate;
+      const delta = currentTime - previousTimeUpdate;
       if (delta > 0 && delta < 1 && duration && duration !== Infinity) {
         sharedState.percentageWatched += (delta / duration) * 100;
         const shouldAutoLike =
@@ -236,8 +221,8 @@ export default defineContentScript({
     { capture: true }
     );
 
-    document.addEventListener("click", evt => {
-      const { target } = evt;
+    document.addEventListener("click", e => {
+      const { target } = e;
       if (!(target instanceof HTMLElement)) {
         return;
       }

@@ -2,8 +2,9 @@
   import { storage } from "#imports";
   import ThemeSwitch from "@/entrypoints/popup/Header/ThemeSwitch.svelte";
   import { ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
+  import { StorageKey } from "@/lib/utils-initials";
 
-  const themePromise = storage.getItem<ThemeMode>("local:theme", { fallback: ThemeMode.auto });
+  const themePromise = storage.getItem<ThemeMode>(StorageKey.theme, { fallback: ThemeMode.auto });
 </script>
 
 <header>

@@ -2,6 +2,7 @@
   import { storage } from "#imports";
   import { sharedState } from "./states.svelte";
   import { addNavigationListener, getVisibleElement, initial, SELECTORS } from "@/lib/utils-initials";
+  import { StorageKey } from "@/lib/utils-initials";
 
   interface Props {
     isAutoLikeEnabled: boolean;
@@ -55,8 +56,8 @@
   }
 
   function addStorageListener() {
-    storage.watch<typeof initial.isAutoLike>("sync:isAutoLike", pIsAutoLike => {
-      isAutoLikeEnabled = pIsAutoLike !== null ? pIsAutoLike : initial.isAutoLike;
+    storage.watch<typeof initial.isAutoLike>(StorageKey.isAutoLike, isAutoLike => {
+      isAutoLikeEnabled = isAutoLike !== null ? isAutoLike : initial.isAutoLike;
     });
   }
 

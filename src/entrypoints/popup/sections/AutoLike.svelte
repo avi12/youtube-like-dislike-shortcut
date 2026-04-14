@@ -3,6 +3,7 @@
   import Textbox from "@/entrypoints/popup/components/Textbox.svelte";
   import ToggleSwitch from "@/entrypoints/popup/components/ToggleSwitch.svelte";
   import { keys } from "@/entrypoints/popup/sections/keyboard.svelte.js";
+  import { StorageKey } from "@/lib/utils-initials";
 
   interface Props {
     isAutoLike: boolean;
@@ -13,15 +14,15 @@
   let { isAutoLike = $bindable(), autoLikeThreshold = $bindable(), isAutoLikeSubscribedChannels = $bindable() }: Props = $props();
 
   $effect(() => {
-    storage.setItem("sync:isAutoLike", isAutoLike);
+    storage.setItem(StorageKey.isAutoLike, isAutoLike);
   });
 
   $effect(() => {
-    storage.setItem("sync:autoLikeThreshold", autoLikeThreshold);
+    storage.setItem(StorageKey.autoLikeThreshold, autoLikeThreshold);
   });
 
   $effect(() => {
-    storage.setItem("sync:isAutoLikeSubscribedChannels", isAutoLikeSubscribedChannels);
+    storage.setItem(StorageKey.isAutoLikeSubscribedChannels, isAutoLikeSubscribedChannels);
   });
 </script>
 

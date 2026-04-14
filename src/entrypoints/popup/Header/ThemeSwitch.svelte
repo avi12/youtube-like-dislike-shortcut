@@ -5,6 +5,9 @@
   import ThemeDark from "@/entrypoints/popup/Header/themes/ThemeDark.svelte";
   import ThemeLight from "@/entrypoints/popup/Header/themes/ThemeLight.svelte";
   import { ThemeMode, theme } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
+  import { StorageKey } from "@/lib/utils-initials";
+
+  const CSS_CLASS_QUICK_TRANSITION = "quick-transition";
 
   interface Props {
     selectedTheme: ThemeMode;
@@ -14,13 +17,13 @@
   const instanceDarkTheme = matchMedia("(prefers-color-scheme: dark)");
   const getIsDark = () => instanceDarkTheme.matches;
 
-  function setTheme(pTheme = ThemeMode.auto) {
-    if (pTheme === ThemeMode.auto) {
+  function setTheme(themeMode = ThemeMode.auto) {
+    if (themeMode === ThemeMode.auto) {
       theme.current = getIsDark() ? ThemeMode.dark : ThemeMode.light;
       return;
     }
 
-    theme.current = pTheme;
+    theme.current = themeMode;
   }
 
   untrack(() => {
@@ -30,20 +33,20 @@
 
   $effect(() => {
     setTheme(theme.selected);
-    storage.setItem("local:theme", theme.selected);
+    storage.setItem(StorageKey.theme, theme.selected);
     document.documentElement.dataset.theme = theme.current;
 
     if (theme.selected === ThemeMode.auto) {
       instanceDarkTheme.addEventListener("change", () => {
-        const elQuickTransitions = document.querySelectorAll(".quick-transition");
+        const elQuickTransitions = document.querySelectorAll(`.${CSS_CLASS_QUICK_TRANSITION}`);
         for (const elQuickTransition of elQuickTransitions) {
-          elQuickTransition.classList.remove("quick-transition");
+          elQuickTransition.classList.remove(CSS_CLASS_QUICK_TRANSITION);
         }
 
         setTheme();
 
         for (const elQuickTransition of elQuickTransitions) {
-          elQuickTransition.classList.add("quick-transition");
+          elQuickTransition.classList.add(CSS_CLASS_QUICK_TRANSITION);
         }
       });
     }

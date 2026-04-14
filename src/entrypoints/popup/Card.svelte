@@ -5,16 +5,12 @@
   import KeyboardShortcut from "@/entrypoints/popup/sections/KeyboardShortcut.svelte";
   import { defaultShortcuts, keys, ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import { type ButtonTriggers } from "@/lib/types";
-  import { initial, isModifier } from "@/lib/utils-initials";
-
-  storage.getItem<typeof defaultShortcuts>("local:keyboardShortcuts", { fallback: defaultShortcuts }).then(shortcuts => {
-    keys.combos = shortcuts;
-  });
+  import { initial, isModifier, StorageKey } from "@/lib/utils-initials";
 
   const autoLikePromise = Promise.all([
-    storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
-    storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold }),
-    storage.getItem<typeof initial.isAutoLikeSubscribedChannels>("sync:isAutoLikeSubscribedChannels", { fallback: initial.isAutoLikeSubscribedChannels })
+    storage.getItem<typeof initial.isAutoLike>(StorageKey.isAutoLike, { fallback: initial.isAutoLike }),
+    storage.getItem<typeof initial.autoLikeThreshold>(StorageKey.autoLikeThreshold, { fallback: initial.autoLikeThreshold }),
+    storage.getItem<typeof initial.isAutoLikeSubscribedChannels>(StorageKey.isAutoLikeSubscribedChannels, { fallback: initial.isAutoLikeSubscribedChannels })
   ]);
 
   function getShortcut(obj: typeof initial.buttonTriggers.like) {
@@ -22,7 +18,10 @@
   }
 
   onMount(async () => {
-    const buttonTriggers = await storage.getItem<ButtonTriggers>("local:buttonTriggers", {
+    const shortcuts = await storage.getItem<typeof defaultShortcuts>(StorageKey.keyboardShortcuts, { fallback: defaultShortcuts });
+    keys.combos = shortcuts;
+
+    const buttonTriggers = await storage.getItem<ButtonTriggers>(StorageKey.buttonTriggers, {
       fallback: initial.buttonTriggers
     });
     keys.combos = {
@@ -38,7 +37,7 @@
   });
 
   $effect(() => {
-    storage.setItem<ButtonTriggers>("local:buttonTriggers", {
+    storage.setItem<ButtonTriggers>(StorageKey.buttonTriggers, {
       like: {
         primary: keys.combos.like.filter(key => !isModifier(key)),
         modifiers: keys.combos.like.filter(isModifier),

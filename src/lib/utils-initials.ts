@@ -1,11 +1,10 @@
-import { type StorageArea } from "#imports";
 import { type ButtonTriggers } from "@/lib/types";
 
 function isPlainObject(val: unknown): val is Record<string, unknown> {
   return typeof val === "object" && val !== null && !Array.isArray(val);
 }
 
-function mergeWithFallback(fallback: Record<string, unknown>, stored: Record<string, unknown>): Record<string, unknown> {
+function mergeWithFallback(fallback: Record<string, unknown>, stored: Record<string, unknown>) {
   const result = { ...fallback };
   for (const key in stored) {
     result[key] = isPlainObject(fallback[key]) && isPlainObject(stored[key])
@@ -15,20 +14,27 @@ function mergeWithFallback(fallback: Record<string, unknown>, stored: Record<str
   return result;
 }
 
+export enum StorageKey {
+  keyboardShortcuts = "local:keyboardShortcuts",
+  isAutoLike = "sync:isAutoLike",
+  autoLikeThreshold = "sync:autoLikeThreshold",
+  isAutoLikeSubscribedChannels = "sync:isAutoLikeSubscribedChannels",
+  buttonTriggers = "local:buttonTriggers",
+  theme = "local:theme"
+}
+
 export async function getStorage<K extends keyof typeof window>({
-  area,
-  key,
+  storageKey,
   fallback,
   updateWindowKey
 }: {
-  area: StorageArea;
-  key: string;
+  storageKey: StorageKey;
   fallback: (typeof window)[K];
   updateWindowKey: K;
 }) {
   let value: (typeof window)[K];
   try {
-    value = await storage.getItem<(typeof window)[K]>(`${area}:${key}`, { fallback });
+    value = await storage.getItem<(typeof window)[K]>(storageKey, { fallback });
   } catch {
     value = fallback;
   }
@@ -66,7 +72,7 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
-export const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
+const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
 export function isModifier(key: string): key is typeof MODIFIER_KEYS[number] {

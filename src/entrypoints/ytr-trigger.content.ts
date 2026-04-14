@@ -1,6 +1,6 @@
 import { storage } from "#imports";
 import { type Modifier } from "@/lib/types";
-import { getStorage, initial, keyToModifier } from "@/lib/utils-initials";
+import { getStorage, initial, keyToModifier, StorageKey } from "@/lib/utils-initials";
 import { rateVideo } from "@/lib/ytr-buttons";
 import { defaultAdditionalShortcuts, ShortcutType } from "./popup/sections/keyboard.svelte.js";
 
@@ -69,8 +69,7 @@ async function rateIfNeeded(e: KeyboardEvent) {
 
 async function init() {
   window.ytrLastButtonTriggers = await getStorage({
-    area: "local",
-    key: "buttonTriggers",
+    storageKey: StorageKey.buttonTriggers,
     fallback: initial.buttonTriggers,
     updateWindowKey: "ytrLastButtonTriggers"
   });
@@ -79,7 +78,6 @@ async function init() {
     const isFocusedOnInput =
       document.activeElement!.matches("input") || document.activeElement!.getAttribute("contenteditable") === "true"; // A comment field
 
-    // We want the shortcut keys to apply only when no text field is focused
     if (isFocusedOnInput) {
       return;
     }
@@ -87,7 +85,7 @@ async function init() {
     await rateIfNeeded(e);
   }, { capture: true });
 
-  storage.watch<typeof initial.buttonTriggers>("local:buttonTriggers", buttonTriggers => {
+  storage.watch<typeof initial.buttonTriggers>(StorageKey.buttonTriggers, buttonTriggers => {
     window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;
   });
 }

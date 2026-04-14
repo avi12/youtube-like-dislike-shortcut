@@ -4,7 +4,8 @@ import {
   getStorage,
   initial,
   OBSERVER_OPTIONS,
-  SELECTORS
+  SELECTORS,
+  StorageKey
 } from "@/lib/utils-initials";
 import { getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 
@@ -56,7 +57,7 @@ async function addTemporaryBodyListener() {
 }
 
 function addStorageListener() {
-  storage.watch<boolean>("sync:isAutoLikeSubscribedChannels", async isAutoLike => {
+  storage.watch<boolean>(StorageKey.isAutoLikeSubscribedChannels, async isAutoLike => {
     window.ytrAutoLikeSubscribedChannels = isAutoLike !== null ? isAutoLike : initial.isAutoLikeSubscribedChannels;
     if (isAutoLike) {
       await autoLikeIfSubscribed();
@@ -83,8 +84,7 @@ export default defineContentScript({
     });
 
     window.ytrAutoLikeSubscribedChannels = await getStorage({
-      area: "sync",
-      key: "isAutoLikeSubscribedChannels",
+      storageKey: StorageKey.isAutoLikeSubscribedChannels,
       fallback: initial.isAutoLikeSubscribedChannels,
       updateWindowKey: "ytrAutoLikeSubscribedChannels"
     });
