@@ -7,11 +7,13 @@
 
   let { isAutoLike, value = $bindable(60), disabled }: Props = $props();
 
+  const KEY_ARROW_UP = "ArrowUp";
+  const KEY_ARROW_DOWN = "ArrowDown";
+
   $effect(() => {
-    const num = value;
-    if (num < 1) {
+    if (value < 1) {
       value = 1;
-    } else if (num > 99) {
+    } else if (value > 99) {
       value = 99;
     }
   });
@@ -24,8 +26,8 @@
       disabled={disabled || !isAutoLike}
       onkeydown={e => {
         const number = value;
-        const isIncrement = e.key === "ArrowUp";
-        const isDecrement = e.key === "ArrowDown";
+        const isIncrement = e.key === KEY_ARROW_UP;
+        const isDecrement = e.key === KEY_ARROW_DOWN;
         if ((isIncrement && number >= 99) || (isDecrement && number <= 1)) {
           e.preventDefault();
         }

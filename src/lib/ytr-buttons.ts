@@ -58,9 +58,9 @@ function clearAnimationOnEnd() {
   }, { once: true });
 }
 
-export function getRatedButton(): HTMLButtonElement {
+export function getRatedButton() {
   const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
-  return document.querySelector(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`)!;
+  return document.querySelector<HTMLButtonElement>(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`)!;
 }
 
 export function getIsSubscribed() {
@@ -119,8 +119,6 @@ export async function rateVideo(isLike: boolean | null) {
     return;
   }
 
-  // isLike === null
-  // Un-rate a video
   const elBtnActive = getRatedButton();
 
   if (!elBtnActive) {

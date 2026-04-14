@@ -16,12 +16,12 @@ enum LIKE_STATUSES {
   removelike = "INDIFFERENT"
 }
 
-function getVideoId(): string {
+function getVideoId() {
   const player = document.getElementById("movie_player");
   if (player && "getVideoData" in player) {
     const { getVideoData } = player;
     if (typeof getVideoData === "function") {
-      const videoId = getVideoData.call(player)?.video_id;
+      const videoId = String(getVideoData.call(player)?.video_id);
       if (videoId) {
         return videoId;
       }

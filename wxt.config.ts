@@ -18,14 +18,16 @@ export default defineConfig({
     ...browser === "firefox" && {
       browser_specific_settings: {
         gecko: {
-          id: "youtube-like-dislike-shortcut@avi12.com"
+          id: "youtube-like-dislike-shortcut@avi12.com",
+          strict_min_version: "82.0"
         }
       },
       developer: {
         name: author,
         url
       }
-    }
+    },
+    minimum_chrome_version: "88.0"
   }),
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
