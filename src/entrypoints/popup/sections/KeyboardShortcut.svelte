@@ -28,8 +28,6 @@
   // doesn't lose the modifier context. Reset only when recording starts/ends.
   let comboModifiers = $state<string[]>([]);
   let keyComboTemp = $state<string[]>([]);
-  let debounceTimeout = $state<ReturnType<typeof setTimeout>>();
-  const DEBOUNCE_DELAY = 500;
   const isMac = navigator.platform.includes("Mac");
 
   const active = $derived(keys.isRecording && keys.currentlyRecording === type);
@@ -85,33 +83,33 @@
   }
 
   $effect(() => {
-    const handleKeydown = (event: KeyboardEvent) => {
+    function handleKeydown(e: KeyboardEvent) {
       if (!keys.isRecording || keys.currentlyRecording !== type) {
         return;
       }
-      event.preventDefault();
+      e.preventDefault();
       error = "";
-      const key = processKey(event);
+      const key = processKey(e);
       if (pressedKeys.has(key)) {
         return;
       }
       pressedKeys.add(key);
       if (isModifier(key)) {
         if (comboModifiers.includes(key)) {
-          // Windows fake Shift re-injection after a Shift+NumpadDigit event —
+          // Windows fake Shift re-injection after a Shift+NumpadDigit event -
           // the modifier was already tracked, so skip updating keyComboTemp.
           return;
         }
         comboModifiers = [...comboModifiers, key].sort();
       }
       keyComboTemp = keyCombo;
-    };
+    }
 
-    const handleKeyup = (event: KeyboardEvent) => {
+    function handleKeyup(e: KeyboardEvent) {
       if (!keys.isRecording || keys.currentlyRecording !== type) {
         return;
       }
-      const key = processKey(event);
+      const key = processKey(e);
 
       // If a non-modifier key's keydown was intercepted by the browser (e.g. Shift+Insert
       // treated as paste), recover using the modifiers tracked so far this session.
@@ -125,23 +123,19 @@
         return;
       }
 
-      clearTimeout(debounceTimeout);
+      const isOnlyModifiers = keyComboTemp.every(isModifier);
+      if (isOnlyModifiers || getHasConflicts(keyComboTemp)) {
+        return;
+      }
 
-      debounceTimeout = setTimeout(() => {
-        const isOnlyModifiers = keyComboTemp.every(isModifier);
-        if (isOnlyModifiers || getHasConflicts(keyComboTemp)) {
-          return;
-        }
-
-        comboModifiers = [];
-        keys.combos = { ...keys.combos, [type]: keyComboTemp };
-        keys.isRecording = false;
-        keys.currentlyRecording = null;
-        const isSecondaryShortcutExists = displayedKeyComboList.join(" + ") in defaultAdditionalShortcuts;
-        if (isSecondaryShortcutExists) {
-          keys.combosSecondary = { ...keys.combosSecondary, [type]: true };
-        }
-      }, DEBOUNCE_DELAY);
+      comboModifiers = [];
+      keys.combos = { ...keys.combos, [type]: keyComboTemp };
+      keys.isRecording = false;
+      keys.currentlyRecording = null;
+      const isSecondaryShortcutExists = displayedKeyComboList.join(" + ") in defaultAdditionalShortcuts;
+      if (isSecondaryShortcutExists) {
+        keys.combosSecondary = { ...keys.combosSecondary, [type]: true };
+      }
     };
 
     addEventListener("keydown", handleKeydown);
@@ -189,7 +183,6 @@
       <ButtonCancel
         onclick={() => {
           resetRecordingState();
-          clearTimeout(debounceTimeout);
           keys.isRecording = false;
           keys.currentlyRecording = null;
           keyComboTemp = keys.combos[type];
