@@ -23,9 +23,10 @@ opera.env
 .vscode/*
 !.vscode/extensions.json
 .idea/
-.DS_Store/
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+user-data/
