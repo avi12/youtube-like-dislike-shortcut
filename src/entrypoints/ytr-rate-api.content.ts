@@ -49,8 +49,12 @@ function rateVideoViaResolveCommand(action: RateAction) {
     return { success: false, error: "No video ID found" };
   }
 
+  const ytdApp = document.querySelector<YtdAppElement>("ytd-app");
+  if (!ytdApp) {
+    return { success: false, error: "ytd-app not found" };
+  }
+
   try {
-    const ytdApp = document.querySelector<YtdAppElement>("ytd-app")!;
     ytdApp.resolveCommand(
       {
         commandMetadata: {

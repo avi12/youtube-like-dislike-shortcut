@@ -36,15 +36,19 @@ function showIndicator(isRated: boolean) {
 
   const elBezel = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezel);
   const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezelIcon);
+  if (!elBezel || !elBezelIcon) {
+    return;
+  }
+
   const elBezelTextWrapper = document.querySelector<HTMLElement>(SELECTORS.bezelTextWrapper);
   const iconName: keyof typeof svgs = isRated ? gLastRating : `un${gLastRating}`;
-  elBezelIcon!.innerHTML = svgs[iconName];
+  elBezelIcon.innerHTML = svgs[iconName];
   if (elBezelTextWrapper) {
     elBezelTextWrapper.style.display = "none";
   }
 
   elBezelContainer.style.display = "";
-  elBezel!.ariaLabel = "";
+  elBezel.ariaLabel = "";
 }
 
 function getBezelContainer() {
@@ -67,7 +71,7 @@ function clearAnimationOnEnd() {
 
 export function getRatedButton() {
   const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
-  return document.querySelector<HTMLButtonElement>(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`)!;
+  return document.querySelector<HTMLButtonElement>(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`);
 }
 
 export function getIsSubscribed() {

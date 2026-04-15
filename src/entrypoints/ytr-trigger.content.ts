@@ -75,8 +75,7 @@ async function init() {
   });
 
   document.addEventListener("keydown", async e => {
-    const isFocusedOnInput =
-      document.activeElement!.matches("input") || document.activeElement!.getAttribute("contenteditable") === "true"; // A comment field
+    const isFocusedOnInput = document.activeElement?.matches("input, [contenteditable='true']") ?? false;
 
     if (isFocusedOnInput) {
       return;

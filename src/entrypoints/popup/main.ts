@@ -18,7 +18,7 @@ const [buttonTriggers, selectedTheme, isAutoLike, autoLikeThreshold, isAutoLikeS
 initializeKeys(buttonTriggers ?? initial.buttonTriggers);
 
 mount(Popup, {
-  target: document.getElementById("app")!,
+  target: document.getElementById("app") ?? document.body,
   props: {
     selectedTheme: selectedTheme ?? ThemeMode.auto,
     isAutoLike: isAutoLike ?? initial.isAutoLike,

@@ -93,7 +93,7 @@ function getIsElementInViewport(element: HTMLElement) {
 export function getVisibleElement<T extends HTMLElement>(selector: string) {
   const elements = [...document.querySelectorAll<T>(selector)];
   const isShorts = location.pathname.startsWith("/shorts");
-  return [...elements].find(isShorts ? getIsElementInViewport : getIsElementVisible)!;
+  return [...elements].find(isShorts ? getIsElementInViewport : getIsElementVisible);
 }
 
 export async function getElementByMutationObserver<T extends HTMLElement>(selector: SELECTORS) {
