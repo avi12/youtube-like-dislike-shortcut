@@ -1,0 +1,20 @@
+{
+  "entry": [
+    "wxt.config.ts",
+    "src/entrypoints/popup/main.ts",
+    "src/entrypoints/ytr-trigger.content.ts",
+    "src/entrypoints/ytr-rate-api.content.ts",
+    "src/entrypoints/auto-like-percentage.content/index.ts",
+    "src/entrypoints/auto-like-in-subscription.content.ts"
+  ],
+  "project": ["src/**/*.{ts,svelte}"],
+  "paths": {
+    "#imports": [".wxt/types/imports.d.ts"]
+  },
+  "ignoreDependencies": [
+    "@stylistic/stylelint-plugin",
+    "@sveltejs/vite-plugin-svelte",
+    "@wxt-dev/module-svelte"
+  ],
+  "exclude": ["enumMembers"]
+}

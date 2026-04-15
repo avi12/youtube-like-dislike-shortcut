@@ -67,6 +67,7 @@ export default [
       perfectionist
     },
     rules: {
+      "@stylistic/linebreak-style": ["error", "unix"],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],

@@ -20,7 +20,8 @@
     "declaration-property-unit-allowed-list": null,
     "property-disallowed-list": null,
     "max-nesting-depth": null,
-    "plugin/no-unsupported-browser-features": null
+    "plugin/no-unsupported-browser-features": null,
+    "prettier/prettier": null
   },
   "overrides": [
     {

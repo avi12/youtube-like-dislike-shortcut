@@ -51,7 +51,6 @@
     "globals": "^17.5.0",
     "knip": "^6.4.1",
     "postcss-html": "^1.8.1",
-    "prettier-plugin-svelte": "^3.5.1",
     "stylelint": "^17.7.0",
     "stylelint-config-ccb": "^3.31.2",
     "svelte": "5.55.4",
