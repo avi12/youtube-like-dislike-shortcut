@@ -1,5 +1,14 @@
+import { readFileSync } from "fs";
 import { defineConfig } from "wxt";
 import packageJson from "./package.json" with { type: "json" };
+
+function parseGitignoreAsExcludes() {
+  return readFileSync(".gitignore", "utf-8")
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line && !line.startsWith("#") && !line.startsWith("!"))
+    .map(pattern => (pattern.endsWith("/") ? `${pattern}**` : pattern));
+}
 
 const url = packageJson.repository;
 const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
@@ -36,7 +45,7 @@ export default defineConfig({
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
-    excludeSources: ["*.env", "build/*"],
+    excludeSources: parseGitignoreAsExcludes(),
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   modules: ["@wxt-dev/module-svelte"],
