@@ -232,8 +232,8 @@
 
   .shortcut-wrapper {
     display: flex;
-    align-items: center;
     gap: 40px;
+    align-items: center;
   }
 
   .error {

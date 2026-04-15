@@ -26,21 +26,20 @@
     position: relative;
 
     & label {
-      cursor: pointer;
       display: flex;
-      align-items: center;
       gap: 8px;
+      align-items: center;
+      cursor: pointer;
 
       & .checkbox-custom {
+        --transition-time: 0.2s;
+
+        position: relative;
         width: 16px;
         height: 16px;
         border: 1px solid var(--checkbox-bg);
-        position: relative;
         border-radius: 2px;
-
-        --transition-time: 0.2s;
-
-        transition: border var(--transition-time) ease-in-out;
+        transition: border-color var(--transition-time) ease-in-out;
 
         &::before {
           transition: background-color var(--transition-time) ease-in-out;
@@ -53,18 +52,17 @@
         background-color: var(--card-bg);
 
         &::before {
-          border-radius: 2px;
+          --padding: 2px;
+
           content: "";
           position: absolute;
           top: 50%;
           left: 50%;
-          translate: -50% -50%;
-
-          --padding: 2px;
-
           width: calc(100% - var(--padding) * 2);
           height: calc(100% - var(--padding) * 2);
+          border-radius: 2px;
           background-color: var(--checkbox-bg);
+          translate: -50% -50%;
         }
       }
 

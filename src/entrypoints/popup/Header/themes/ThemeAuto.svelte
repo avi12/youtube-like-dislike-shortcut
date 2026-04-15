@@ -36,8 +36,8 @@
 
     &.checked {
       & path[mask] {
-        stroke: var(--theme-switcher-button-color-active);
         fill: var(--theme-switcher-button-color-active);
+        stroke: var(--theme-switcher-button-color-active);
       }
 
       & circle {

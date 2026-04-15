@@ -17,14 +17,14 @@
 
 <style>
   .button-cancel {
-    color: var(--button-cancel-color);
-    background-color: var(--button-cancel-bg);
-    border: 1.5px solid var(--button-cancel-border-color);
-    padding: 0.65625rem 1rem;
-    border-radius: 32px;
     display: flex;
-    align-items: center;
     gap: 8px;
+    align-items: center;
+    padding: 0.65625rem 1rem;
+    border: 1.5px solid var(--button-cancel-border-color);
+    border-radius: 32px;
+    background-color: var(--button-cancel-bg);
+    color: var(--button-cancel-color);
     font-size: 0.875rem;
   }
 </style>

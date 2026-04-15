@@ -68,20 +68,20 @@
 <style>
   .themes {
     display: flex;
-    align-items: center;
-    background-color: var(--theme-switcher-bg);
-    border-radius: 24px;
     gap: 4px;
+    align-items: center;
     padding: 8px;
+    border-radius: 24px;
+    background-color: var(--theme-switcher-bg);
 
     & button {
-      border-radius: 50%;
+      display: flex;
+      align-items: center;
       width: 30px;
       height: 30px;
       border: none;
+      border-radius: 50%;
       background-color: transparent;
-      display: flex;
-      align-items: center;
     }
 
     & button.selected {

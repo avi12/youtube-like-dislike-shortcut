@@ -1,77 +1,77 @@
 html[data-theme="light"] {
-  --color-text: #1b1b1b;
-  --color-text-disabled: #bcc0c8;
-  --color-bg: #fff;
-  --action-bg-color: #7061ed;
-  --card-bg: #fff;
+  --color-text: rgb(27 27 27);
+  --color-text-disabled: rgb(188 192 200);
+  --color-bg: rgb(255 255 255);
+  --action-bg-color: rgb(112 97 237);
+  --card-bg: rgb(255 255 255);
   --card-border: rgb(188 192 200 / 50%);
-  --theme-switcher-bg: #f5f6fc;
+  --theme-switcher-bg: rgb(245 246 252);
   --theme-switcher-button-bg: var(--action-bg-color);
-  --theme-switcher-button-color-active: #fff;
-  --theme-switcher-button-color-inactive: #798191;
-  --button-shortcut-color: #1b1b1b;
-  --button-shortcut-bg: #fff;
+  --theme-switcher-button-color-active: rgb(255 255 255);
+  --theme-switcher-button-color-inactive: rgb(121 129 145);
+  --button-shortcut-color: rgb(27 27 27);
+  --button-shortcut-bg: rgb(255 255 255);
   --button-shortcut-border: rgb(188 192 200 / 50%);
   --button-shortcut-shadow: 0px 4px 4px 0px rgb(0 0 0 / 9%);
-  --button-shortcut-active-color: #fff;
+  --button-shortcut-active-color: rgb(255 255 255);
   --button-shortcut-active-bg: var(--action-bg-color);
   --button-shortcut-active-border-color: var(--button-shortcut-active-bg);
-  --button-shortcut-error-color: #fff;
-  --button-shortcut-error-bg: #ff4d4f;
+  --button-shortcut-error-color: rgb(255 255 255);
+  --button-shortcut-error-bg: rgb(255 77 79);
   --button-shortcut-error-border-color: var(--button-shortcut-error-bg);
-  --button-reset-color: #1b1b1b;
-  --button-reset-bg: #fff;
+  --button-reset-color: rgb(27 27 27);
+  --button-reset-bg: rgb(255 255 255);
   --button-reset-border-color: rgb(188 192 200 / 50%);
-  --button-cancel-color: #fff;
-  --button-cancel-bg: #1b1b1b;
+  --button-cancel-color: rgb(255 255 255);
+  --button-cancel-bg: rgb(27 27 27);
   --button-cancel-border-color: var(--button-cancel-bg);
-  --button-disabled-color: #bcc0c8;
-  --button-disabled-icon-color: #bcc0c8;
-  --button-disabled-bg: #f5f6fc;
+  --button-disabled-color: rgb(188 192 200);
+  --button-disabled-icon-color: rgb(188 192 200);
+  --button-disabled-bg: rgb(245 246 252);
   --button-disabled-border-color: rgb(188 192 200 / 50%);
   --switch-thumb-bg: var(--action-bg-color);
   --switch-thumb-shadow: 0px 4px 4px 0px rgb(112 97 237 / 25%);
-  --switch-track-bg: #f5f6fc;
+  --switch-track-bg: rgb(245 246 252);
   --switch-track-bg-shadow: 0px 4px 12px 0px rgb(0 0 0 / 4%) inset;
-  --switch-disabled-thumb-bg: #bcc0c8;
+  --switch-disabled-thumb-bg: rgb(188 192 200);
   --switch-disabled-thumb-shadow: 0px 4px 4px 0px rgb(188 192 200 / 25%);
-  --switch-disabled-track-bg: #f5f6fc;
+  --switch-disabled-track-bg: rgb(245 246 252);
   --switch-disabled-track-bg-shadow: 0px 4px 12px 0px rgb(0 0 0 / 4%) inset;
-  --textbox-color: #1b1b1b;
-  --textbox-bg: #fff;
+  --textbox-color: rgb(27 27 27);
+  --textbox-bg: rgb(255 255 255);
   --textbox-border: rgb(188 192 200 / 50%);
   --textbox-suffix-color: var(--action-bg-color);
   --textbox-color-disabled: var(--button-disabled-color);
   --textbox-bg-disabled: var(--button-disabled-bg);
   --checkbox-bg: var(--action-bg-color);
-  --checkbox-bg-disabled: #bcc0c8;
+  --checkbox-bg-disabled: rgb(188 192 200);
   --button-shortcut-error-disabled-filter: none;
 }
 
 html[data-theme="dark"] {
-  --color-text: #fff;
-  --color-text-disabled: #bcc0c8;
-  --color-bg: #1b1b1b;
-  --action-bg-color: #7061ed;
-  --card-bg: #242424;
-  --card-border: #242424;
+  --color-text: rgb(255 255 255);
+  --color-text-disabled: rgb(188 192 200);
+  --color-bg: rgb(27 27 27);
+  --action-bg-color: rgb(112 97 237);
+  --card-bg: rgb(36 36 36);
+  --card-border: rgb(36 36 36);
   --theme-switcher-bg: var(--card-bg);
   --theme-switcher-button-bg: var(--action-bg-color);
-  --theme-switcher-button-color-active: #1b1b1b;
-  --theme-switcher-button-color-inactive: #798191;
-  --button-shortcut-color: #fff;
-  --button-shortcut-bg: #1b1b1b;
-  --button-shortcut-border: #35373a;
+  --theme-switcher-button-color-active: rgb(27 27 27);
+  --theme-switcher-button-color-inactive: rgb(121 129 145);
+  --button-shortcut-color: rgb(255 255 255);
+  --button-shortcut-bg: rgb(27 27 27);
+  --button-shortcut-border: rgb(53 55 58);
   --button-shortcut-shadow: 0px 4px 4px 0px rgb(0 0 0 / 9%);
-  --button-shortcut-active-color: #fff;
+  --button-shortcut-active-color: rgb(255 255 255);
   --button-shortcut-active-bg: var(--action-bg-color);
   --button-shortcut-active-border-color: var(--button-shortcut-active-bg);
-  --button-shortcut-error-color: #fff;
-  --button-shortcut-error-bg: #ff4d4f;
-  --button-shortcut-error-border-color: currentcolor;
-  --button-reset-color: #fff;
-  --button-reset-bg: #1b1b1b;
-  --button-reset-border-color: #35373a;
+  --button-shortcut-error-color: rgb(255 255 255);
+  --button-shortcut-error-bg: rgb(255 77 79);
+  --button-shortcut-error-border-color: currentColor;
+  --button-reset-color: rgb(255 255 255);
+  --button-reset-bg: rgb(27 27 27);
+  --button-reset-border-color: rgb(53 55 58);
   --button-cancel-color: var(--button-reset-color);
   --button-cancel-bg: var(--button-reset-bg);
   --button-cancel-border-color: var(--button-reset-border-color);
@@ -80,30 +80,30 @@ html[data-theme="dark"] {
   --button-disabled-bg: rgb(27 27 27 / 50%);
   --button-disabled-border-color: rgb(188 192 200 / 50%);
   --switch-thumb-bg: var(--action-bg-color);
-  --switch-thumb-shadow: #7061ed;
-  --switch-track-bg: #1b1b1b;
+  --switch-thumb-shadow: rgb(112 97 237);
+  --switch-track-bg: rgb(27 27 27);
   --switch-track-bg-shadow: 0px 4px 12px 0px rgb(0 0 0 / 4%) inset;
-  --switch-disabled-thumb-bg: #35373a;
+  --switch-disabled-thumb-bg: rgb(53 55 58);
   --switch-disabled-thumb-shadow: 0px 4px 12px 0px rgb(0 0 0 / 4%) inset;
-  --switch-disabled-track-bg: #1b1b1b;
+  --switch-disabled-track-bg: rgb(27 27 27);
   --switch-disabled-track-bg-shadow: 0px 4px 12px 0px rgb(0 0 0 / 4%) inset;
-  --textbox-color: #fff;
-  --textbox-bg: #1b1b1b;
-  --textbox-border: #35373a;
+  --textbox-color: rgb(255 255 255);
+  --textbox-bg: rgb(27 27 27);
+  --textbox-border: rgb(53 55 58);
   --textbox-suffix-color: var(--action-bg-color);
   --textbox-color-disabled: var(--button-disabled-color);
   --textbox-bg-disabled: var(--button-disabled-bg);
   --checkbox-bg: var(--action-bg-color);
-  --checkbox-bg-disabled: #707276;
+  --checkbox-bg-disabled: rgb(112 114 118);
   --button-shortcut-error-disabled-filter: brightness(0.8);
 }
 
 body {
   width: 752px;
   margin: 0;
-  font-family: Inter, sans-serif;
   padding: 16px 24px 6px;
-  font-size: max(16px, 1rem);
+  font-family: Inter, sans-serif;
+  font-size: 1rem;
   user-select: none;
   transition:
     color 0.02s ease-in-out,
@@ -113,6 +113,7 @@ body {
 html {
   background-color: var(--color-bg);
   color: var(--color-text);
+  scrollbar-width: none;
 }
 
 ::-webkit-scrollbar {
@@ -146,9 +147,4 @@ button,
   .quick-transition {
     transition: none;
   }
-}
-
-/* Firefox */
-html {
-  scrollbar-width: none;
 }

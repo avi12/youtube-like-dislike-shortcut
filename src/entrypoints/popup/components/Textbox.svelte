@@ -7,9 +7,6 @@
 
   let { isAutoLike, value = $bindable(60), disabled }: Props = $props();
 
-  const KEY_ARROW_UP = "ArrowUp";
-  const KEY_ARROW_DOWN = "ArrowDown";
-
   $effect(() => {
     if (value < 1) {
       value = 1;
@@ -26,8 +23,8 @@
       disabled={disabled || !isAutoLike}
       onkeydown={e => {
         const number = value;
-        const isIncrement = e.key === KEY_ARROW_UP;
-        const isDecrement = e.key === KEY_ARROW_DOWN;
+        const isIncrement = e.key === "ArrowUp";
+        const isDecrement = e.key === "ArrowDown";
         if ((isIncrement && number >= 99) || (isDecrement && number <= 1)) {
           e.preventDefault();
         }
@@ -39,9 +36,9 @@
 <style>
   .textbox-wrapper {
     display: flex;
+    gap: 24px;
     align-items: center;
     color: var(--textbox-label-color);
-    gap: 24px;
 
     &.disabled {
       color: var(--button-disabled-color);
@@ -49,21 +46,21 @@
   }
 
   input[type="number"] {
-    border-radius: 12px;
-    border: 1.5px solid var(--textbox-border);
-    color: var(--textbox-color);
-    background-color: var(--textbox-bg);
-    font-size: 0.875rem;
-    padding: 14.5px 6px 14.5px 16px;
     width: 3.5rem;
+    padding: 14.5px 6px 14.5px 16px;
+    border: 1.5px solid var(--textbox-border);
+    border-radius: 12px;
+    background-color: var(--textbox-bg);
+    color: var(--textbox-color);
+    font-size: 0.875rem;
 
     &:focus {
       outline: none;
     }
 
     &:disabled {
-      color: var(--textbox-color-disabled);
       background-color: var(--textbox-bg-disabled);
+      color: var(--textbox-color-disabled);
       cursor: not-allowed;
     }
   }
@@ -73,14 +70,14 @@
     display: inline-block;
 
     &::after {
-      pointer-events: none;
       content: "%";
-      color: var(--textbox-suffix-color);
       position: absolute;
       top: 50%;
       right: 0;
-      translate: -150% -50%;
       width: 1rem;
+      color: var(--textbox-suffix-color);
+      pointer-events: none;
+      translate: -150% -50%;
     }
   }
 </style>

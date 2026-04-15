@@ -19,34 +19,34 @@
 
 <style>
   .button-shortcut {
-    color: var(--button-shortcut-color);
-    background-color: var(--button-shortcut-bg);
-    border: 1.5px solid var(--button-shortcut-border);
-    box-shadow: var(--button-shortcut-shadow);
     padding: 14.5px 16px;
+    border: 1.5px solid var(--button-shortcut-border);
     border-radius: 12px;
+    background-color: var(--button-shortcut-bg);
+    color: var(--button-shortcut-color);
+    box-shadow: var(--button-shortcut-shadow);
 
     &.active {
-      color: var(--button-shortcut-active-color);
-      background-color: var(--button-shortcut-active-bg);
       border: 1.5px solid var(--button-shortcut-active-border-color);
+      background-color: var(--button-shortcut-active-bg);
+      color: var(--button-shortcut-active-color);
     }
 
     &:disabled {
-      color: var(--button-disabled-color);
-      background-color: var(--button-disabled-bg);
       border: 1.5px solid var(--button-disabled-border-color);
+      background-color: var(--button-disabled-bg);
+      color: var(--button-disabled-color);
       cursor: not-allowed;
     }
 
     &.error {
-      color: var(--button-shortcut-error-color);
-      background-color: var(--button-shortcut-error-bg);
       border: 1.5px solid var(--button-shortcut-error-border-color);
+      background-color: var(--button-shortcut-error-bg);
+      color: var(--button-shortcut-error-color);
 
       &:disabled {
-        color: var(--button-shortcut-error-color);
         background-color: var(--button-shortcut-error-bg);
+        color: var(--button-shortcut-error-color);
         filter: var(--button-shortcut-error-disabled-filter);
       }
     }

@@ -18,20 +18,20 @@
 
 <style>
   .button-reset {
-    color: var(--button-reset-color);
-    background-color: var(--button-reset-bg);
-    border: 1.5px solid var(--button-reset-border-color);
-    padding: 0.65625rem 1rem;
-    border-radius: 32px;
     display: flex;
-    align-items: center;
     gap: 8px;
+    align-items: center;
+    padding: 0.65625rem 1rem;
+    border: 1.5px solid var(--button-reset-border-color);
+    border-radius: 32px;
+    background-color: var(--button-reset-bg);
+    color: var(--button-reset-color);
     font-size: 0.875rem;
 
     &:disabled {
-      color: var(--button-disabled-color);
-      background-color: var(--button-disabled-bg);
       border: 1.5px solid var(--button-disabled-border-color);
+      background-color: var(--button-disabled-bg);
+      color: var(--button-disabled-color);
       cursor: not-allowed;
     }
   }

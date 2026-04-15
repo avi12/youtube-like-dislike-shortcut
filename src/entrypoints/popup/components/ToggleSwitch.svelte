@@ -21,27 +21,27 @@
 
 <style>
   .toggle-switch {
+    position: relative;
     display: flex;
     align-items: center;
-    position: relative;
 
     & label {
-      cursor: pointer;
       display: flex;
-      align-items: center;
       gap: 16px;
-      font-size: 0.875rem;
+      align-items: center;
       color: var(--textbox-color-disabled);
+      font-size: 0.875rem;
+      cursor: pointer;
 
       &::before {
         content: "";
         width: 50px;
         height: 28px;
+        padding: 4px;
+        border-radius: 48px;
         background-color: var(--switch-disabled-track-bg);
         box-shadow: var(--switch-disabled-track-bg-shadow);
-        border-radius: 48px;
         transition: background-color 0.25s;
-        padding: 4px;
       }
 
       &::after {
@@ -51,13 +51,13 @@
         left: 4px;
         width: 24px;
         height: 24px;
-        translate: 0 -50%;
         border-radius: 50%;
         background-color: var(--switch-disabled-thumb-bg);
         box-shadow: var(--switch-disabled-thumb-shadow);
         transition:
           translate 0.25s,
           background-color 0.25s;
+        translate: 0 -50%;
       }
     }
 
@@ -71,9 +71,9 @@
         }
 
         &::after {
-          translate: 26px -50%;
           background-color: var(--switch-thumb-bg);
           box-shadow: var(--switch-thumb-shadow);
+          translate: 26px -50%;
         }
       }
 
