@@ -19,7 +19,11 @@ export default defineConfig({
       browser_specific_settings: {
         gecko: {
           id: "youtube-like-dislike-shortcut@avi12.com",
-          strict_min_version: "82.0"
+          strict_min_version: "82.0",
+          data_collection_permissions: {
+            required: ["websiteActivity", "websiteContent"],
+            optional: ["technicalAndInteraction"]
+          }
         }
       },
       developer: {
