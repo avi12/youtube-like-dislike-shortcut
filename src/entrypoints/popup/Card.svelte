@@ -1,40 +1,17 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { storage } from "#imports";
   import AutoLike from "@/entrypoints/popup/sections/AutoLike.svelte";
   import KeyboardShortcut from "@/entrypoints/popup/sections/KeyboardShortcut.svelte";
-  import { defaultShortcuts, keys, ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
+  import { keys, ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import { type ButtonTriggers } from "@/lib/types";
-  import { initial, isModifier, StorageKey } from "@/lib/utils-initials";
+  import { isModifier, StorageKey } from "@/lib/utils-initials";
 
-  const autoLikePromise = Promise.all([
-    storage.getItem<typeof initial.isAutoLike>(StorageKey.isAutoLike, { fallback: initial.isAutoLike }),
-    storage.getItem<typeof initial.autoLikeThreshold>(StorageKey.autoLikeThreshold, { fallback: initial.autoLikeThreshold }),
-    storage.getItem<typeof initial.isAutoLikeSubscribedChannels>(StorageKey.isAutoLikeSubscribedChannels, { fallback: initial.isAutoLikeSubscribedChannels })
-  ]);
-
-  function getShortcut(obj: typeof initial.buttonTriggers.like) {
-    return [...obj.modifiers, ...obj.primary];
+  interface Props {
+    isAutoLike: boolean;
+    autoLikeThreshold: number;
+    isAutoLikeSubscribedChannels: boolean;
   }
-
-  onMount(async () => {
-    const shortcuts = await storage.getItem<typeof defaultShortcuts>(StorageKey.keyboardShortcuts, { fallback: defaultShortcuts });
-    keys.combos = shortcuts;
-
-    const buttonTriggers = await storage.getItem<ButtonTriggers>(StorageKey.buttonTriggers, {
-      fallback: initial.buttonTriggers
-    });
-    keys.combos = {
-      like: buttonTriggers ? getShortcut(buttonTriggers.like) : getShortcut(initial.buttonTriggers.like),
-      dislike: buttonTriggers ? getShortcut(buttonTriggers.dislike) : getShortcut(initial.buttonTriggers.dislike),
-      unrate: buttonTriggers ? getShortcut(buttonTriggers.unrate) : getShortcut(initial.buttonTriggers.unrate)
-    };
-    keys.combosSecondary = {
-      like: buttonTriggers ? buttonTriggers.like.secondary : initial.buttonTriggers.like.secondary,
-      dislike: buttonTriggers ? buttonTriggers.dislike.secondary : initial.buttonTriggers.dislike.secondary,
-      unrate: buttonTriggers ? buttonTriggers.unrate.secondary : initial.buttonTriggers.unrate.secondary
-    };
-  });
+  const { isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels }: Props = $props();
 
   $effect(() => {
     storage.setItem<ButtonTriggers>(StorageKey.buttonTriggers, {
@@ -58,14 +35,10 @@
 </script>
 
 <main>
-  {#if keys.combos && keys.combosSecondary}
-    <KeyboardShortcut type={ShortcutType.like}>Like</KeyboardShortcut>
-    <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
-    <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
-  {/if}
-  {#await autoLikePromise then [isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels]}
-    <AutoLike {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
-  {/await}
+  <KeyboardShortcut type={ShortcutType.like}>Like</KeyboardShortcut>
+  <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
+  <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
+  <AutoLike {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
 </main>
 
 <style>
@@ -76,5 +49,4 @@
     padding: 24px;
     border-radius: 24px;
   }
-
 </style>

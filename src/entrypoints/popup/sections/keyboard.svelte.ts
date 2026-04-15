@@ -1,3 +1,5 @@
+import { type ButtonTriggers } from "@/lib/types";
+
 export const defaultAdditionalShortcuts: Record<string, string | undefined> = {
   "Shift + Equal": "NumpadAdd",
   "Shift + Minus": "NumpadSubtract",
@@ -32,3 +34,16 @@ export const keys = $state<{
   isRecording: false,
   currentlyRecording: null
 });
+
+export function initializeKeys(buttonTriggers: ButtonTriggers) {
+  keys.combos = {
+    like: [...buttonTriggers.like.modifiers, ...buttonTriggers.like.primary],
+    dislike: [...buttonTriggers.dislike.modifiers, ...buttonTriggers.dislike.primary],
+    unrate: [...buttonTriggers.unrate.modifiers, ...buttonTriggers.unrate.primary]
+  };
+  keys.combosSecondary = {
+    [ShortcutType.like]: buttonTriggers.like.secondary,
+    [ShortcutType.dislike]: buttonTriggers.dislike.secondary,
+    [ShortcutType.unrate]: buttonTriggers.unrate.secondary
+  };
+}

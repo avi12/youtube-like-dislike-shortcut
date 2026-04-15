@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { storage } from "#imports";
   import ThemeSwitch from "@/entrypoints/popup/Header/ThemeSwitch.svelte";
-  import { ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
-  import { StorageKey } from "@/lib/utils-initials";
+  import { type ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
 
-  const themePromise = storage.getItem<ThemeMode>(StorageKey.theme, { fallback: ThemeMode.auto });
+  interface Props {
+    selectedTheme: ThemeMode;
+  }
+  const { selectedTheme }: Props = $props();
 </script>
 
 <header>
   <h1>Like/Dislike Shortcut</h1>
-  {#await themePromise then selectedTheme}
-    <ThemeSwitch {selectedTheme} />
-  {/await}
+  <ThemeSwitch {selectedTheme} />
 </header>
 
 <style>
