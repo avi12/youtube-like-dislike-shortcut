@@ -132,8 +132,7 @@ html * {
     background-color 0.2s ease-in-out;
 }
 
-button,
-.checkbox-custom {
+button {
   cursor: pointer;
 
   &:focus-visible {

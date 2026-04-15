@@ -39,6 +39,7 @@
         height: 16px;
         border: 1px solid var(--checkbox-bg);
         border-radius: 2px;
+        cursor: pointer;
         transition: border-color var(--transition-time) ease-in-out;
 
         &::before {
