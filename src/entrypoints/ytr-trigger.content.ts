@@ -12,7 +12,7 @@ function getSecondaryKeyFromPrimary({
   primary: string[];
 }) {
   const formattedModifiers = modifiers.map(keyToModifier).join(" + ");
-  const formattedPrimary = formattedModifiers + " + " + primary.join(" + ");
+  const formattedPrimary = (formattedModifiers ? `${formattedModifiers} + ` : "") + primary.join(" + ");
   return defaultAdditionalShortcuts[formattedPrimary];
 }
 

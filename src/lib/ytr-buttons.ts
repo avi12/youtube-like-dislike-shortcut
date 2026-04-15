@@ -30,6 +30,10 @@ function showIndicator(isRated: boolean) {
   }
 
   const elBezelContainer = getBezelContainer();
+  if (!elBezelContainer) {
+    return;
+  }
+
   const elBezel = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezel);
   const elBezelIcon = elBezelContainer.querySelector<HTMLDivElement>(SELECTORS.bezelIcon);
   const elBezelTextWrapper = document.querySelector<HTMLElement>(SELECTORS.bezelTextWrapper);
@@ -44,11 +48,14 @@ function showIndicator(isRated: boolean) {
 }
 
 function getBezelContainer() {
-  return document.querySelector(SELECTORS.bezelTextWrapper)!.parentElement!;
+  return document.querySelector(SELECTORS.bezelTextWrapper)?.parentElement ?? null;
 }
 
 function clearAnimationOnEnd() {
   const elBezelContainer = getBezelContainer();
+  if (!elBezelContainer) {
+    return;
+  }
   const elBezelTextWrapper = document.querySelector<HTMLElement>(SELECTORS.bezelTextWrapper);
   elBezelContainer.addEventListener("animationend", () => {
     elBezelContainer.style.display = "none";

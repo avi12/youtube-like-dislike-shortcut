@@ -17,13 +17,17 @@ enum LIKE_STATUSES {
 }
 
 function getVideoId() {
-  const player = document.getElementById("movie_player");
-  if (player && "getVideoData" in player) {
-    const { getVideoData } = player;
-    if (typeof getVideoData === "function") {
-      const videoId = String(getVideoData.call(player)?.video_id);
-      if (videoId) {
-        return videoId;
+  const isWatchPage = location.pathname === "/watch";
+
+  if (isWatchPage) {
+    const player = document.getElementById("movie_player");
+    if (player && "getVideoData" in player) {
+      const { getVideoData } = player;
+      if (typeof getVideoData === "function") {
+        const videoId = getVideoData.call(player)?.video_id;
+        if (videoId) {
+          return String(videoId);
+        }
       }
     }
   }
@@ -31,7 +35,7 @@ function getVideoId() {
   const channelTrailer = document.querySelector("ytd-channel-video-player-renderer");
   if (channelTrailer && "data" in channelTrailer) {
     const { data } = channelTrailer;
-    if (data && typeof data === "object" && "videoId" in data) {
+    if (data && typeof data === "object" && "videoId" in data && data.videoId) {
       return String(data.videoId);
     }
   }
@@ -72,5 +76,6 @@ function init() {
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   world: "MAIN",
+  allFrames: true,
   main: () => init()
 });
