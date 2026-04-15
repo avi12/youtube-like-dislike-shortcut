@@ -39,20 +39,14 @@
     return Boolean(getVisibleElement(SELECTORS.liveBadge));
   }
 
-  async function addTemporaryBodyListener() {
+  function addTemporaryBodyListener() {
     if (lastTitle === document.title && lastUrl === location.href) {
       return;
     }
-
     lastTitle = document.title;
     lastUrl = location.href;
     isShorts = getIsShorts();
     isLiveOrPremiere = getIsLiveOrPremiere();
-    sharedState.percentageWatched = 0;
-    sharedState.lastTimeUpdate = 0;
-    sharedState.isRatingResolved = false;
-    sharedState.isUserInteracted = false;
-    window.ytrUserInteracted = false;
   }
 
   function addStorageListener() {
@@ -76,7 +70,9 @@
 
   :global(body) {
     padding-bottom: 5px;
-    font: bold 14px Roboto, sans-serif;
+    font-family: Roboto, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
     font-variant-numeric: tabular-nums;
   }
 </style>

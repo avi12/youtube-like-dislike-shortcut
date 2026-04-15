@@ -27,15 +27,26 @@ function watchForInitialRating() {
   navigateFinishController?.abort();
   navigateFinishController = null;
 
-  const ratedSelector = `:where(${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}) button[aria-pressed=true]`;
-  const anyButtonSelector = `:where(${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}) button[aria-pressed]`;
+  sharedState.isRatingResolved = false;
+  sharedState.isRatedInitially = false;
+  sharedState.isUserInteracted = false;
+  sharedState.percentageWatched = 0;
+  sharedState.lastTimeUpdate = 0;
+  window.ytrUserInteracted = false;
+
+  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
+  const anyButtonSelector = `:where(${containerSelector}) button[aria-pressed]`;
 
   function applyState() {
     const isRated = Boolean(getRatedButton());
-    sharedState.isRatedInitially = isRated;
-    sharedState.isUserInteracted = isRated;
+    if (!sharedState.isRatingResolved) {
+      sharedState.isRatedInitially = isRated;
+    }
     sharedState.isRatingResolved = true;
-    window.ytrUserInteracted = isRated;
+    if (isRated) {
+      sharedState.isUserInteracted = true;
+      window.ytrUserInteracted = true;
+    }
   }
 
   function stopWatching() {
@@ -45,34 +56,19 @@ function watchForInitialRating() {
     navigateFinishController = null;
   }
 
-  navigateFinishController = new AbortController();
-  document.addEventListener(
-    "yt-navigate-finish",
-    () => {
-      stopWatching();
-      applyState();
-    },
-    { once: true, signal: navigateFinishController.signal }
-  );
-
-  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
-
+  // Keep watching after initial resolution to catch YouTube's async aria-pressed updates
   ratingWatchObserver = new MutationObserver(mutations => {
-    const hasRatedButtonChange = mutations.some(
+    const isRelevant = mutations.some(
       mutation =>
-        mutation.type === "attributes" &&
-        mutation.attributeName === "aria-pressed" &&
-        mutation.target instanceof Element &&
-        Boolean(mutation.target.closest(containerSelector))
+        mutation.type === "childList" ||
+        (mutation.type === "attributes" &&
+          mutation.attributeName === "aria-pressed" &&
+          mutation.target instanceof Element &&
+          Boolean(mutation.target.closest(containerSelector)))
     );
-
-    if (!hasRatedButtonChange || !document.querySelector(anyButtonSelector)) {
+    if (!isRelevant || !document.querySelector(anyButtonSelector)) {
       return;
     }
-    if (!document.querySelector(ratedSelector)) {
-      return;
-    }
-    stopWatching();
     applyState();
   });
 
@@ -82,6 +78,16 @@ function watchForInitialRating() {
     attributes: true,
     attributeFilter: ["aria-pressed"]
   });
+
+  navigateFinishController = new AbortController();
+  document.addEventListener("yt-navigate-finish", () => {
+    stopWatching();
+    applyState();
+  }, { once: true, signal: navigateFinishController.signal }  );
+
+  if (document.querySelector(anyButtonSelector)) {
+    applyState();
+  }
 }
 
 export default defineContentScript({
@@ -147,17 +153,15 @@ export default defineContentScript({
     new MutationObserver(() => {
       void mountUiIfNeeded();
     }).observe(document, OBSERVER_OPTIONS);
+    document.addEventListener("yt-navigate-finish", () => {
+      watchForInitialRating();
+      void mountUiIfNeeded();
+    });
 
     document.addEventListener("timeupdate", async e => {
       const isNewPage = location.href !== lastHref;
       if (isNewPage) {
         lastHref = location.href;
-        sharedState.percentageWatched = 0;
-        sharedState.lastTimeUpdate = 0;
-        sharedState.isRatingResolved = false;
-        sharedState.isRatedInitially = false;
-        sharedState.isUserInteracted = false;
-        window.ytrUserInteracted = false;
         watchForInitialRating();
       }
 
@@ -227,11 +231,9 @@ export default defineContentScript({
         return;
       }
 
-      const elRatePressed = target
-        .closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
-        ?.querySelector("button[aria-pressed=true]");
-      if (elRatePressed) {
+      if (target.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)) {
         sharedState.isUserInteracted = true;
+        window.ytrUserInteracted = true;
       }
     });
   }
