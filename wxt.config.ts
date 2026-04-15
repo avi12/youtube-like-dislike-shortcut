@@ -1,5 +1,5 @@
 import { defineConfig } from "wxt";
-import packageJson from "./package.json" assert { type: "json" };
+import packageJson from "./package.json" with { type: "json" };
 
 const url = packageJson.repository;
 const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;

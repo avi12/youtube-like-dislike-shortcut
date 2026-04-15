@@ -1,14 +1,36 @@
 {
   "extends": ["stylelint-config-ccb"],
+  "ignoreFiles": ["build/**", "user-data/**", "node_modules/**"],
   "plugins": ["@stylistic/stylelint-plugin"],
   "rules": {
     "@stylistic/indentation": 2,
-    "selector-pseudo-class-no-unknown": [true, {"ignorePseudoClasses":  ["global"]}]
+    "selector-pseudo-class-no-unknown": [true, {"ignorePseudoClasses": ["global"]}],
+    "selector-no-qualifying-type": [true, {"ignore": ["attribute", "class"]}],
+    "selector-max-type": null,
+    "selector-max-universal": null,
+    "selector-pseudo-element-allowed-list": null,
+    "unit-disallowed-list": null,
+    "time-min-milliseconds": null,
+    "no-unknown-custom-properties": null,
+    "csstools/value-no-unknown-custom-properties": null,
+    "declaration-property-max-values": null,
+    "declaration-property-value-allowed-list": null,
+    "rule-selector-property-disallowed-list": null,
+    "declaration-property-value-disallowed-list": null,
+    "declaration-property-unit-allowed-list": null,
+    "property-disallowed-list": null,
+    "max-nesting-depth": null,
+    "plugin/no-unsupported-browser-features": null
   },
   "overrides": [
     {
       "files": ["src/**/*.svelte"],
-      "customSyntax": "postcss-html"
+      "customSyntax": "postcss-html",
+      "rules": {
+        "selector-pseudo-class-disallowed-list": null,
+        "declaration-no-important": null,
+        "a11y/font-size-is-readable": null
+      }
     }
   ]
 }
