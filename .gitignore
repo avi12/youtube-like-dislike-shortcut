@@ -30,3 +30,4 @@ opera.env
 *.sln
 *.sw?
 user-data/
+.claude/settings.local.json
