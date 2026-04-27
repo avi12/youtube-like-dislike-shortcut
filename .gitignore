@@ -16,7 +16,6 @@ stats-*.json
 # local env files
 chrome.env
 firefox.env
-edge.env
 opera.env
 
 # Editor directories and files
