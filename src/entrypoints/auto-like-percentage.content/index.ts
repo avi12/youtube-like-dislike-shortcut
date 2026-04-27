@@ -154,6 +154,7 @@ export default defineContentScript({
       void mountUiIfNeeded();
     }).observe(document, OBSERVER_OPTIONS);
     document.addEventListener("yt-navigate-finish", () => {
+      lastHref = "";
       watchForInitialRating();
       void mountUiIfNeeded();
     });
