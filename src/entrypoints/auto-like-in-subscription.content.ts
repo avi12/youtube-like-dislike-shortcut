@@ -1,5 +1,6 @@
 import {
   addNavigationListener,
+  DOM_ATTRIBUTE,
   getElementByMutationObserver,
   getStorage,
   initial,
@@ -12,18 +13,33 @@ import { getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/li
 let OBSERVER_SUBSCRIPTION: MutationObserver;
 let lastUrl: string | undefined;
 let lastTitle: string | undefined;
+let hasHandledNavigation = false;
 
 async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
-  const [elLike] = getRateButtons();
-  const isSubscribed = getIsSubscribed();
-  if (isSubscribed && elLike && !getRatedButton()) {
-    await rateVideo(true);
+  if (hasHandledNavigation) {
     observer?.disconnect();
     return true;
   }
 
+  const [elLike] = getRateButtons();
+  if (!elLike) {
+    return false;
+  }
+
+  if (getRatedButton()) {
+    hasHandledNavigation = true;
+    observer?.disconnect();
+    return true;
+  }
+
+  if (!getIsSubscribed()) {
+    return false;
+  }
+
+  hasHandledNavigation = true;
+  await rateVideo(true);
   observer?.disconnect();
-  return false;
+  return true;
 }
 
 async function addTemporaryBodyListener() {
@@ -33,6 +49,7 @@ async function addTemporaryBodyListener() {
 
   lastUrl = location.href;
   lastTitle = document.title;
+  hasHandledNavigation = false;
 
   if (!window.ytrAutoLikeSubscribedChannels) {
     return;
@@ -67,7 +84,10 @@ function addStorageListener() {
 
 async function addSubscribedEventListener() {
   const elSubscribed = await getElementByMutationObserver<HTMLButtonElement>(SELECTORS.buttonSubscribe);
-  OBSERVER_SUBSCRIPTION.observe(elSubscribed, { attributes: true, attributeFilter: ["subscribed"] });
+  OBSERVER_SUBSCRIPTION.observe(elSubscribed, {
+    attributes: true,
+    attributeFilter: [DOM_ATTRIBUTE.subscribed]
+  });
 }
 
 export default defineContentScript({
