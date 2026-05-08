@@ -68,15 +68,33 @@ export default [
     },
     rules: {
       "@stylistic/linebreak-style": ["error", "unix"],
+      "@stylistic/object-curly-newline": ["error", {
+        ObjectExpression: { multiline: true, consistent: true },
+        ObjectPattern: { multiline: true, consistent: true }
+      }],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-      "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports", fixStyle: "inline-type-imports" }],
+      "@typescript-eslint/consistent-type-imports": ["error", {
+        prefer: "type-imports",
+        fixStyle: "inline-type-imports" 
+      }],
       "@typescript-eslint/no-floating-promises": "error",
-      "id-length": ["error", { min: 3, exceptions: ["_", "e"], properties: "never" }],
-      "import-newlines/enforce": ["error", { items: 4, "max-len": 120, forceSingleLine: true }],
+      "id-length": ["error", {
+        min: 3,
+        exceptions: ["_", "e"],
+        properties: "never" 
+      }],
+      "import-newlines/enforce": ["error", {
+        items: 4,
+        "max-len": 120,
+        forceSingleLine: true 
+      }],
       "import/order": "off",
-      "perfectionist/sort-imports": ["error", { internalPattern: ["^@/"], newlinesBetween: 0 }]
+      "perfectionist/sort-imports": ["error", {
+        internalPattern: ["^@/"],
+        newlinesBetween: 0 
+      }]
     }
   }
 ];

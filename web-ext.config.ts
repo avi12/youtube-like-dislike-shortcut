@@ -58,7 +58,10 @@ function setupChromeProfile() {
   }
 
   console.log(`Copying Chrome profile from ${src} to ${dest}...`);
-  cpSync(src, dest, { recursive: true, filter: src => !LOCK_FILES.has(basename(src)) });
+  cpSync(src, dest, {
+    recursive: true,
+    filter: src => !LOCK_FILES.has(basename(src)) 
+  });
   console.log("Done.");
 }
 

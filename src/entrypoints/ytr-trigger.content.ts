@@ -34,12 +34,19 @@ function isComboPressed({
 function getActionPressed(event: KeyboardEvent) {
   for (const actionName of Object.values(ShortcutType)) {
     const { primary, modifiers, secondary } = window.ytrLastButtonTriggers[actionName];
-    if (isComboPressed({ modifiers, primary, event })) {
+    if (isComboPressed({
+      modifiers,
+      primary,
+      event 
+    })) {
       return actionName;
     }
 
     if (secondary) {
-      const secondaryKey = getSecondaryKeyFromPrimary({ primary, modifiers });
+      const secondaryKey = getSecondaryKeyFromPrimary({
+        primary,
+        modifiers 
+      });
       if (secondaryKey === event.code) {
         return actionName;
       }
