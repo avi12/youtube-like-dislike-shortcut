@@ -1,10 +1,12 @@
 import { mount, unmount } from "svelte";
 import {
+  DOM_ATTRIBUTE,
   getStorage,
   getVisibleElement,
   OBSERVER_OPTIONS,
   SELECTORS,
-  StorageKey
+  StorageKey,
+  YOUTUBE_EVENT
 } from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
@@ -35,18 +37,14 @@ function watchForInitialRating() {
   window.ytrUserInteracted = false;
 
   const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
-  const anyButtonSelector = `:where(${containerSelector}) button[aria-pressed]`;
+  const anyButtonSelector = `:where(${containerSelector}) button[${DOM_ATTRIBUTE.ariaPressed}]`;
 
   function applyState() {
     const isRated = Boolean(getRatedButton());
-    if (!sharedState.isRatingResolved) {
+    if (!sharedState.isUserInteracted) {
       sharedState.isRatedInitially = isRated;
     }
     sharedState.isRatingResolved = true;
-    if (isRated) {
-      sharedState.isUserInteracted = true;
-      window.ytrUserInteracted = true;
-    }
   }
 
   function stopWatching() {
@@ -62,7 +60,7 @@ function watchForInitialRating() {
       mutation =>
         mutation.type === "childList" ||
         (mutation.type === "attributes" &&
-          mutation.attributeName === "aria-pressed" &&
+          mutation.attributeName === DOM_ATTRIBUTE.ariaPressed &&
           mutation.target instanceof Element &&
           Boolean(mutation.target.closest(containerSelector)))
     );
@@ -76,14 +74,17 @@ function watchForInitialRating() {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ["aria-pressed"]
+    attributeFilter: [DOM_ATTRIBUTE.ariaPressed]
   });
 
   navigateFinishController = new AbortController();
-  document.addEventListener("yt-navigate-finish", () => {
+  document.addEventListener(YOUTUBE_EVENT.navigateFinish, () => {
     stopWatching();
     applyState();
-  }, { once: true, signal: navigateFinishController.signal }  );
+  }, {
+    once: true,
+    signal: navigateFinishController.signal 
+  }  );
 
   if (document.querySelector(anyButtonSelector)) {
     applyState();
@@ -153,7 +154,7 @@ export default defineContentScript({
     new MutationObserver(() => {
       void mountUiIfNeeded();
     }).observe(document, OBSERVER_OPTIONS);
-    document.addEventListener("yt-navigate-finish", () => {
+    document.addEventListener(YOUTUBE_EVENT.navigateFinish, () => {
       lastHref = "";
       watchForInitialRating();
       void mountUiIfNeeded();
@@ -226,16 +227,20 @@ export default defineContentScript({
     { capture: true }
     );
 
-    document.addEventListener("click", e => {
+    function markUserInteractedIfRateButton(e: Event) {
       const { target } = e;
       if (!(target instanceof HTMLElement)) {
         return;
       }
-
-      if (target.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)) {
-        sharedState.isUserInteracted = true;
-        window.ytrUserInteracted = true;
+      if (!target.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)) {
+        return;
       }
-    });
+      sharedState.isUserInteracted = true;
+      window.ytrUserInteracted = true;
+    }
+
+    document.addEventListener("pointerdown", markUserInteractedIfRateButton, { capture: true });
+    document.addEventListener("keydown", markUserInteractedIfRateButton, { capture: true });
+    document.addEventListener("click", markUserInteractedIfRateButton);
   }
 });
