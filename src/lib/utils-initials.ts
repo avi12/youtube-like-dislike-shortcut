@@ -53,16 +53,46 @@ export enum SELECTORS {
   toggleButtonsShortsVideo = "reel-action-bar-view-model",
   buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
   title = "title",
+  ytdApp = "ytd-app",
+  channelTrailerPlayer = "ytd-channel-video-player-renderer",
+  moviePlayer = "#movie_player",
   // Bezel classes
   bezel = "ytd-page-manager .ytp-bezel",
   bezelIcon = "ytd-page-manager .ytp-bezel-icon",
   bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper"
 }
 
+export enum DOM_ATTRIBUTE {
+  ariaPressed = "aria-pressed",
+  subscribed = "subscribed"
+}
+
+export enum YOUTUBE_EVENT {
+  navigateFinish = "yt-navigate-finish"
+}
+
+export enum YOUTUBE_PATHNAME {
+  watch = "/watch",
+  embed = "/embed/",
+  shorts = "/shorts/"
+}
+
 const buttonTriggers: ButtonTriggers = {
-  like: { primary: ["Equal"], modifiers: ["shiftKey"], secondary: true },
-  dislike: { primary: ["Minus"], modifiers: ["shiftKey"], secondary: true },
-  unrate: { primary: ["Digit0"], modifiers: ["shiftKey"], secondary: true }
+  like: {
+    primary: ["Equal"],
+    modifiers: ["shiftKey"],
+    secondary: true 
+  },
+  dislike: {
+    primary: ["Minus"],
+    modifiers: ["shiftKey"],
+    secondary: true 
+  },
+  unrate: {
+    primary: ["Digit0"],
+    modifiers: ["shiftKey"],
+    secondary: true 
+  }
 };
 
 export const initial = {
@@ -79,7 +109,10 @@ export function isModifier(key: string): key is typeof MODIFIER_KEYS[number] {
   return MODIFIER_KEYS.some(item => item === key);
 }
 
-export const OBSERVER_OPTIONS = Object.freeze<MutationObserverInit>({ childList: true, subtree: true });
+export const OBSERVER_OPTIONS = Object.freeze<MutationObserverInit>({
+  childList: true,
+  subtree: true 
+});
 
 function getIsElementVisible(element: HTMLElement) {
   return element?.offsetWidth > 0 && element?.offsetHeight > 0;
@@ -92,7 +125,7 @@ function getIsElementInViewport(element: HTMLElement) {
 
 export function getVisibleElement<T extends HTMLElement>(selector: string) {
   const elements = document.querySelectorAll<T>(selector);
-  const isShorts = location.pathname.startsWith("/shorts");
+  const isShorts = location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
   return elements.values().find(isShorts ? getIsElementInViewport : getIsElementVisible);
 }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { storage } from "#imports";
   import { sharedState } from "./states.svelte";
-  import { addNavigationListener, getVisibleElement, initial, SELECTORS } from "@/lib/utils-initials";
+  import { addNavigationListener, getVisibleElement, initial, SELECTORS, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
   import { StorageKey } from "@/lib/utils-initials";
 
   interface Props {
@@ -32,7 +32,7 @@
   );
 
   function getIsShorts() {
-    return location.pathname.startsWith("/shorts");
+    return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
   }
 
   function getIsLiveOrPremiere() {

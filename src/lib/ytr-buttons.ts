@@ -1,6 +1,6 @@
 import { svgs } from "@/lib/icons";
 import { Rating } from "@/lib/types";
-import { SELECTORS } from "@/lib/utils-initials";
+import { DOM_ATTRIBUTE, SELECTORS, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
 import { RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 
 let gLastRating = Rating.Like;
@@ -16,11 +16,11 @@ export function getRateButtons() {
   if (!elButtonsRate) {
     return [];
   }
-  return elButtonsRate.querySelectorAll<HTMLButtonElement>("button[aria-pressed]").values();
+  return elButtonsRate.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`).values();
 }
 
 function getIsShorts() {
-  return location.pathname.startsWith("/shorts/");
+  return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
 }
 
 
@@ -71,12 +71,12 @@ function clearAnimationOnEnd() {
 
 export function getRatedButton() {
   const { toggleButtonsShortsVideo, toggleButtonsNormalVideo } = SELECTORS;
-  return document.querySelector<HTMLButtonElement>(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[aria-pressed=true]`);
+  return document.querySelector<HTMLButtonElement>(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}) button[${DOM_ATTRIBUTE.ariaPressed}=true]`);
 }
 
 export function getIsSubscribed() {
   const elSubscribe = document.querySelector(SELECTORS.buttonSubscribe);
-  return elSubscribe?.getAttribute("subscribed") !== null;
+  return elSubscribe?.getAttribute(DOM_ATTRIBUTE.subscribed) !== null;
 }
 
 async function rateVideoViaApi(isLike: boolean | null) {
