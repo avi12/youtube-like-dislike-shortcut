@@ -17,6 +17,7 @@
     "dev:with-profile": "pnpx cross-env CHROME_WITH_PROFILE=1 wxt",
     "dev:rtl": "pnpx cross-env LANG=he wxt",
     "dev:opera": "pnpm dev -b opera",
+    "dev:opera:with-profile": "pnpx cross-env OPERA_WITH_PROFILE=1 wxt -b opera",
     "dev:firefox": "wxt -b firefox --mv3",
     "dev:firefox:with-profile": "pnpx cross-env FIREFOX_WITH_PROFILE=1 wxt -b firefox --mv3",
     "build": "wxt build --mode prod",

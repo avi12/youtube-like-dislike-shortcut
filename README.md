@@ -46,6 +46,7 @@ Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pn
 | Chrome                 | `pnpm dev`                      |
 | Chrome (with profile)  | `pnpm dev:with-profile`         |
 | Opera                  | `pnpm dev:opera`                |
+| Opera (with profile)   | `pnpm dev:opera:with-profile`   |
 | Firefox                | `pnpm dev:firefox`              |
 | Firefox (with profile) | `pnpm dev:firefox:with-profile` |
 

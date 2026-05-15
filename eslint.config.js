@@ -9,7 +9,7 @@ import svelteParser from "svelte-eslint-parser";
 import tsEslint from "typescript-eslint";
 
 export default [
-  globalIgnores([".wxt/**", "build/**", "user-data/**"]),
+  globalIgnores([".wxt/**", "build/**", "user-profiles/**"]),
   eslint.configs.recommended,
   ...tsEslint.configs.recommended,
   ...svelteEslint.configs["flat/recommended"],

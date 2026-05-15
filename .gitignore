@@ -28,5 +28,5 @@ opera.env
 *.njsproj
 *.sln
 *.sw?
-user-data/
+user-profiles/
 .claude/settings.local.json
