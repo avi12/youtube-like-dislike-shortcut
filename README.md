@@ -37,42 +37,42 @@ The repo includes `.mcp.json` with two MCP servers for browser automation:
 
 ## Requirements
 
-Install [Node.js](https://nodejs.org) and [Bun](https://bun.sh), then: `bun install`
+Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pnpm install`
 
 ## Dev
 
-| Browser                | Command                            |
-|------------------------|------------------------------------|
-| Chrome                 | `bun run dev`                      |
-| Chrome (with profile)  | `bun run dev:with-profile`         |
-| Opera                  | `bun run dev:opera`                |
-| Firefox                | `bun run dev:firefox`              |
-| Firefox (with profile) | `bun run dev:firefox:with-profile` |
+| Browser                | Command                         |
+|------------------------|---------------------------------|
+| Chrome                 | `pnpm dev`                      |
+| Chrome (with profile)  | `pnpm dev:with-profile`         |
+| Opera                  | `pnpm dev:opera`                |
+| Firefox                | `pnpm dev:firefox`              |
+| Firefox (with profile) | `pnpm dev:firefox:with-profile` |
 
 ## Build
 
-| Browser | Command                 |
-|---------|-------------------------|
-| Chrome  | `bun run build`         |
-| Opera   | `bun run build:opera`   |
-| Firefox | `bun run build:firefox` |
+| Browser | Command              |
+|---------|----------------------|
+| Chrome  | `pnpm build`         |
+| Opera   | `pnpm build:opera`   |
+| Firefox | `pnpm build:firefox` |
 
 ## Package
 
-| Browser | Command                   |
-|---------|---------------------------|
-| Chrome  | `bun run package`         |
-| Opera   | `bun run package:opera`   |
-| Firefox | `bun run package:firefox` |
+| Browser | Command                |
+|---------|------------------------|
+| Chrome  | `pnpm package`         |
+| Opera   | `pnpm package:opera`   |
+| Firefox | `pnpm package:firefox` |
 
 ## Build & Package
 
-| Browser | Command                         |
-|---------|---------------------------------|
-| Chrome  | `bun run build:package`         |
-| Opera   | `bun run build:package:opera`   |
-| Firefox | `bun run build:package:firefox` |
-| All     | `bun run build:package:all`     |
+| Browser | Command                      |
+|---------|------------------------------|
+| Chrome  | `pnpm build:package`         |
+| Opera   | `pnpm build:package:opera`   |
+| Firefox | `pnpm build:package:firefox` |
+| All     | `pnpm build:package:all`     |
 
 ## Contribution
 

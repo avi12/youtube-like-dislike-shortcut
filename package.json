@@ -7,35 +7,44 @@
   "license": "GPL-3.0-or-later",
   "author": "Avi <avi6106@gmail.com>",
   "homepage": "https://avi12.com/youtube-like-dislike-shortcut",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=22.13",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "dev": "wxt",
-    "dev:with-profile": "bunx cross-env CHROME_WITH_PROFILE=1 wxt",
-    "dev:rtl": "bunx cross-env LANG=he wxt",
-    "dev:opera": "bun dev -b opera",
+    "dev:with-profile": "pnpx cross-env CHROME_WITH_PROFILE=1 wxt",
+    "dev:rtl": "pnpx cross-env LANG=he wxt",
+    "dev:opera": "pnpm dev -b opera",
     "dev:firefox": "wxt -b firefox --mv3",
-    "dev:firefox:with-profile": "bunx cross-env FIREFOX_WITH_PROFILE=1 wxt -b firefox --mv3",
+    "dev:firefox:with-profile": "pnpx cross-env FIREFOX_WITH_PROFILE=1 wxt -b firefox --mv3",
     "build": "wxt build --mode prod",
-    "build:opera": "bun run build -b opera",
-    "build:firefox": "bun run build -b firefox --mv3",
+    "build:opera": "pnpm build -b opera",
+    "build:firefox": "pnpm build -b firefox --mv3",
     "package": "wxt zip --mode prod",
-    "package:opera": "bun run package -b opera",
-    "package:firefox": "bun run package -b firefox --mv3",
-    "build:package": "bun run build && bun run package",
-    "build:package:opera": "bun build:opera && bun package:opera",
-    "build:package:firefox": "bun build:firefox && bun package:firefox",
-    "build:package:all": "concurrently \"bun build:package\" \"bun build:package:opera\" \"bun build:package:firefox\" --names Chrome,Opera,Firefox",
-    "svelte:check": "bunx svelte-check",
+    "package:opera": "pnpm package -b opera",
+    "package:firefox": "pnpm package -b firefox --mv3",
+    "build:package": "pnpm build && pnpm package",
+    "build:package:opera": "pnpm build:opera && pnpm package:opera",
+    "build:package:firefox": "pnpm build:firefox && pnpm package:firefox",
+    "build:package:all": "concurrently \"pnpm build:package\" \"pnpm build:package:opera\" \"pnpm build:package:firefox\" --names Chrome,Opera,Firefox",
+    "svelte:check": "pnpx svelte-check",
     "lint:fix": "eslint --fix",
     "stylelint:fix": "stylelint \"src/**/*.{css,svelte}\" --fix",
     "postinstall": "wxt prepare"
   },
-  "overrides": {
-    "acorn": "8.16.0"
+  "pnpm": {
+    "overrides": {
+      "acorn": "8.16.0"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@stylistic/stylelint-plugin": "^5.1.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/chrome": "^0.1.40",
+    "@types/node": "^25.8.0",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
     "@wxt-dev/module-svelte": "2.0.5",
