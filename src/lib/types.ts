@@ -11,7 +11,7 @@ export const enum Rating {
   Dislike = "dislike"
 }
 
-export type ButtonTrigger = {
+type ButtonTrigger = {
   primary: string[];
   modifiers: Modifier[];
   secondary: boolean;

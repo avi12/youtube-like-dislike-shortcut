@@ -21,7 +21,7 @@ If there is a single use function in Svelte, inline it.
 Minimize indentations.  
 Don't automatically store stuff in the storage, instead, First, rely on fallback value and only rely on storage if the user has explicitly set it.  
 don't use em dash, use regular hyphen.  
-After each modification, lint the project with ESLint and Stylelint and svelte-check and knip.
+After each modification, lint the project with ESLint and Stylelint and svelte-check and fallow.
 Let TypeScript infer return types instead of annotating them explicitly.
 Extract @attach arrow functions in Svelte templates to named functions in the script block.
 Avoid adding `window.` prefixes, unless it will increase the readability, in which case it is allowed.  

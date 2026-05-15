@@ -1,3 +1,4 @@
 allowBuilds:
   esbuild: true
+  fallow: true
   spawn-sync: true
