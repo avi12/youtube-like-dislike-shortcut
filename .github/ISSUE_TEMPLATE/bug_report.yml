@@ -33,7 +33,6 @@ body:
       options:
       - Chrome
       - Firefox
-      - Chromium Edge
       - Opera
       - Vivaldi
       - Brave

@@ -7,12 +7,6 @@ const { LANG = "en" } = process.env;
 const osPlatform = process.platform;
 const home = homedir();
 
-const edgeByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: join(process.env.ProgramFiles!, "Microsoft/Edge/Application/msedge.exe"),
-  darwin: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
-  linux: "/usr/bin/microsoft-edge-stable"
-};
-
 const operaByPlatform: Partial<Record<NodeJS.Platform, string>> = {
   win32: join(process.env.LOCALAPPDATA!, "Programs/Opera/opera.exe"),
   darwin: "/Applications/Opera.app/Contents/MacOS/Opera",
@@ -71,7 +65,6 @@ if (process.env.CHROME_WITH_PROFILE === "1") {
 
 export default defineWebExtConfig({
   binaries: {
-    edge: edgeByPlatform[osPlatform] ?? "",
     opera: operaByPlatform[osPlatform] ?? ""
   },
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],

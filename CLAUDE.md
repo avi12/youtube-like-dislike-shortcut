@@ -8,7 +8,7 @@ use @ffmpeg/ffmpeg for the video and audio processing.
 use @webext-core/messageing for message passing.  
 use 100% type safety in typescript.  
 make the UI as accessible as possible.  
-support for chromium browsers (chrome, edge, opera) and firefox mv3 is mandatory.  
+support for chromium browsers (chrome, opera) and firefox mv3 is mandatory.  
 don't use abbreviations, use full words for variables and function names. Exception: event handler parameters use `e` instead of `event`.
 Use modern browser and CSS features.  
 

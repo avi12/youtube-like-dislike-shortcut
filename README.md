@@ -45,7 +45,6 @@ Install [Node.js](https://nodejs.org) and [Bun](https://bun.sh), then: `bun inst
 |------------------------|------------------------------------|
 | Chrome                 | `bun run dev`                      |
 | Chrome (with profile)  | `bun run dev:with-profile`         |
-| Edge                   | `bun run dev:edge`                 |
 | Opera                  | `bun run dev:opera`                |
 | Firefox                | `bun run dev:firefox`              |
 | Firefox (with profile) | `bun run dev:firefox:with-profile` |
@@ -55,7 +54,6 @@ Install [Node.js](https://nodejs.org) and [Bun](https://bun.sh), then: `bun inst
 | Browser | Command                 |
 |---------|-------------------------|
 | Chrome  | `bun run build`         |
-| Edge    | `bun run build:edge`    |
 | Opera   | `bun run build:opera`   |
 | Firefox | `bun run build:firefox` |
 
@@ -64,7 +62,6 @@ Install [Node.js](https://nodejs.org) and [Bun](https://bun.sh), then: `bun inst
 | Browser | Command                   |
 |---------|---------------------------|
 | Chrome  | `bun run package`         |
-| Edge    | `bun run package:edge`    |
 | Opera   | `bun run package:opera`   |
 | Firefox | `bun run package:firefox` |
 
@@ -73,7 +70,6 @@ Install [Node.js](https://nodejs.org) and [Bun](https://bun.sh), then: `bun inst
 | Browser | Command                         |
 |---------|---------------------------------|
 | Chrome  | `bun run build:package`         |
-| Edge    | `bun run build:package:edge`    |
 | Opera   | `bun run build:package:opera`   |
 | Firefox | `bun run build:package:firefox` |
 | All     | `bun run build:package:all`     |
