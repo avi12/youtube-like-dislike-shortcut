@@ -1,8 +1,5 @@
 {
   "permissions": {
-    "deny": [
-      "Bash(git push:*)"
-    ],
     "allow": [
       "mcp__chrome-devtools-mcp__*",
       "mcp__firefox-devtools-mcp__*"
