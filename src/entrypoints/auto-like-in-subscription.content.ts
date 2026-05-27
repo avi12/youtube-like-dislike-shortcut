@@ -21,6 +21,11 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return true;
   }
 
+  if (!window.ytrAutoLikeSubscribedChannels) {
+    observer?.disconnect();
+    return true;
+  }
+
   const [elLike] = getRateButtons();
   if (!elLike) {
     return false;
