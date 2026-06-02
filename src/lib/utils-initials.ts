@@ -1,4 +1,4 @@
-import { type ButtonTriggers } from "@/lib/types";
+import { type ButtonTriggers, type Modifier } from "@/lib/types";
 
 function isPlainObject(val: unknown): val is Record<string, unknown> {
   return typeof val === "object" && val !== null && !Array.isArray(val);
@@ -38,11 +38,16 @@ export async function getStorage<K extends keyof typeof window>({
   } catch {
     value = fallback;
   }
-  if (isPlainObject(value) && isPlainObject(fallback)) {
+  const isMergeableObject = isPlainObject(value) && isPlainObject(fallback);
+  if (isMergeableObject) {
     Object.assign(value, mergeWithFallback(fallback, value));
   }
   window[updateWindowKey] = value;
   return value;
+}
+
+export enum YOUTUBE_HOST {
+  music = "music.youtube.com"
 }
 
 export enum SELECTORS {
@@ -51,15 +56,13 @@ export enum SELECTORS {
   percentageContainer = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, reel-action-bar-view-model",
   toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "reel-action-bar-view-model",
+  toggleButtonsMusicVideo = "ytmusic-like-button-renderer",
   buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
+  buttonFollowMusic = "ytmusic-subscribe-button-renderer",
   title = "title",
   ytdApp = "ytd-app",
   channelTrailerPlayer = "ytd-channel-video-player-renderer",
-  moviePlayer = "#movie_player",
-  // Bezel classes
-  bezel = "ytd-page-manager .ytp-bezel",
-  bezelIcon = "ytd-page-manager .ytp-bezel-icon",
-  bezelTextWrapper = "ytd-page-manager .ytp-bezel-text-wrapper"
+  moviePlayer = "#movie_player"
 }
 
 export enum DOM_ATTRIBUTE {
@@ -133,7 +136,8 @@ export async function getElementByMutationObserver<T extends HTMLElement>(select
   return new Promise<T>(resolve => {
     new MutationObserver((_, observer) => {
       const element = document.documentElement.querySelector<T>(selector);
-      if (element) {
+      const isElementFound = element !== null;
+      if (isElementFound) {
         observer.disconnect();
         resolve(element);
       }
@@ -160,4 +164,66 @@ export function keyToModifier(key: string) {
 
 export function modifierToKey(modifier: string) {
   return Object.entries(MODIFIER_KEY_DISPLAY).find(([, display]) => display === modifier)?.[0] ?? modifier;
+}
+
+export const ShortcutType = {
+  like: "like",
+  dislike: "dislike",
+  unrate: "unrate"
+} as const;
+export type ShortcutType = (typeof ShortcutType)[keyof typeof ShortcutType];
+
+export const defaultAdditionalShortcuts: Record<string, string | undefined> = {
+  "Shift + Equal": "NumpadAdd",
+  "Shift + Minus": "NumpadSubtract",
+  "Shift + Digit8": "NumpadMultiply",
+  "Shift + Slash": "NumpadDivide",
+  "Shift + Period": "NumpadDecimal"
+};
+
+function isComboPressed({
+  modifiers,
+  primary,
+  event
+}: {
+  modifiers: Modifier[];
+  primary: string[];
+  event: KeyboardEvent;
+}) {
+  const isPrimaryPressed = primary.includes(event.code);
+  if (!isPrimaryPressed) {
+    return false;
+  }
+  return modifiers.every(modifier => event[modifier]);
+}
+
+function getSecondaryKeyFromPrimary({
+  modifiers,
+  primary
+}: {
+  modifiers: Modifier[];
+  primary: string[];
+}) {
+  const formattedModifiers = modifiers.map(keyToModifier).join(" + ");
+  const formattedPrimary = (formattedModifiers ? `${formattedModifiers} + ` : "") + primary.join(" + ");
+  return defaultAdditionalShortcuts[formattedPrimary];
+}
+
+export function getActionPressed(event: KeyboardEvent, buttonTriggers: ButtonTriggers) {
+  for (const actionName of Object.values(ShortcutType)) {
+    const { primary, modifiers, secondary } = buttonTriggers[actionName];
+    const isComboMatch = isComboPressed({ modifiers, primary, event });
+    if (isComboMatch) {
+      return actionName;
+    }
+    const isSecondaryEnabled = secondary;
+    if (isSecondaryEnabled) {
+      const secondaryKey = getSecondaryKeyFromPrimary({ primary, modifiers });
+      const isSecondaryMatch = secondaryKey === event.code;
+      if (isSecondaryMatch) {
+        return actionName;
+      }
+    }
+  }
+  return null;
 }

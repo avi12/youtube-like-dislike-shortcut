@@ -1,0 +1,39 @@
+.ytr-fallback-bezel {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  .ytp-bezel {
+    width: var(--ytr-bezel-circle-size, 58px);
+    height: var(--ytr-bezel-circle-size, 58px);
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ytr-fallback-bezel-fadeout 1s ease-out forwards;
+  }
+
+  .ytp-bezel-icon {
+    width: var(--ytr-bezel-icon-size, 40px);
+    height: var(--ytr-bezel-icon-size, 40px);
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+@keyframes ytr-fallback-bezel-fadeout {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
