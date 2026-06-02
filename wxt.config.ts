@@ -13,6 +13,24 @@ function parseGitignoreAsExcludes() {
 const url = packageJson.repository;
 const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
 
+const sharedPermissions: Browser.runtime.ManifestPermission[] = [
+  "storage",
+  "declarativeNetRequest",
+  "cookies"
+];
+
+function getMinimumVersionChromeOrOpera(browser: string) {
+  if (browser === "firefox") {
+    return {};
+  }
+
+  if (browser === "opera") {
+    return { minimum_opera_version: "106.0" };
+  }
+
+  return { minimum_chrome_version: "120.0" };
+}
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
@@ -21,14 +39,15 @@ export default defineConfig({
     name: "YouTube Like-Dislike Shortcut",
     description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
     homepage_url: url,
-    permissions: ["storage"],
+    permissions: browser === "firefox" ? sharedPermissions : [...sharedPermissions, "offscreen"],
+    host_permissions: ["https://www.youtube.com/*"],
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
     ...browser !== "firefox" && { offline_enabled: true },
     ...browser === "firefox" && {
       browser_specific_settings: {
         gecko: {
           id: "youtube-like-dislike-shortcut@avi12.com",
-          strict_min_version: "82.0",
+          strict_min_version: "117.0",
           data_collection_permissions: {
             required: ["websiteActivity", "websiteContent"],
             optional: ["technicalAndInteraction"]
@@ -40,7 +59,7 @@ export default defineConfig({
         url
       }
     },
-    minimum_chrome_version: "88.0"
+    ...getMinimumVersionChromeOrOpera(browser)
   }),
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
@@ -52,6 +71,11 @@ export default defineConfig({
   vite: ({ mode }) => ({
     build: {
       sourcemap: mode === "development" ? "inline" : false
+    },
+    server: {
+      fs: {
+        deny: ["user-profiles/**", ".env", ".env.*", "*.{crt,pem}", "**/.git/**"]
+      }
     }
   })
 });

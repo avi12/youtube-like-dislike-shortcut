@@ -2,3 +2,16 @@ allowBuilds:
   esbuild: true
   fallow: true
   spawn-sync: true
+minimumReleaseAgeExclude:
+  - concurrently@10.0.1
+  - '@typescript-eslint/eslint-plugin@8.60.1'
+  - '@typescript-eslint/parser@8.60.1'
+  - '@typescript-eslint/project-service@8.60.1'
+  - '@typescript-eslint/scope-manager@8.60.1'
+  - '@typescript-eslint/tsconfig-utils@8.60.1'
+  - '@typescript-eslint/type-utils@8.60.1'
+  - '@typescript-eslint/types@8.60.1'
+  - '@typescript-eslint/typescript-estree@8.60.1'
+  - '@typescript-eslint/utils@8.60.1'
+  - '@typescript-eslint/visitor-keys@8.60.1'
+  - typescript-eslint@8.60.1

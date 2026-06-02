@@ -4,20 +4,26 @@
     "wxt.config.ts",
     "web-ext.config.ts",
     "src/entrypoints/popup/main.ts",
+    "src/entrypoints/background.ts",
     "src/entrypoints/ytr-trigger.content.ts",
+    "src/entrypoints/ytr-embed.content.ts",
     "src/entrypoints/ytr-rate-api.content.ts",
     "src/entrypoints/auto-like-percentage.content/index.ts",
-    "src/entrypoints/auto-like-in-subscription.content.ts"
+    "src/entrypoints/auto-like-in-subscription.content.ts",
+    "src/entrypoints/auto-like-percentage-music.content/index.ts"
   ],
   "ignorePatterns": [
-    "tests/**"
+    "tests/**",
+    "scripts/**"
   ],
   "ignoreDependencies": [
     "#imports",
     "@stylistic/stylelint-plugin",
     "@sveltejs/vite-plugin-svelte",
     "@wxt-dev/module-svelte",
-    "postcss-html"
+    "chokidar",
+    "postcss-html",
+    "web-ext-run"
   ],
   "rules": {
     "unused-enum-members": "off",

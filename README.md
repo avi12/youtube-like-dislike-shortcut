@@ -1,17 +1,21 @@
 # YouTube Like-Dislike Shortcut
 
-Basically copies the like/dislike shortcut from YouTube Music, which means:
+Works on both **YouTube** and **YouTube Music**
 
-- <kbd>Shift</kbd>+<kbd>Plus</kbd> (on the number row) to like a video
+Keyboard shortcuts (configurable in the popup):
+
+- <kbd>Shift</kbd>+<kbd>Plus</kbd> (on the number row) to like
 - <kbd>Shift</kbd>+<kbd>Minus</kbd> (on the number row) to dislike
+- <kbd>Shift</kbd>+<kbd>0</kbd> (on the number row) to remove your like/dislike
 - <kbd>Numpad Plus</kbd> to like
 - <kbd>Numpad Minus</kbd> to dislike
+- Pressing the like/dislike shortcut while the corresponding button is already active will do nothing
 
 Additionally:
 
-- Auto-like videos based on a watch time threshold that you set OR based on whether you're subscribed to the channel
-- <kbd>Shift</kbd>+<kbd>0</kbd> (on the number row) to remove your like/dislike
-- Pressing the like/dislike shortcut while the corresponding button is active (i.e. pressed), will do nothing
+- Auto-like based on a watch time threshold that you set
+- Auto-like based on whether you're subscribed to the channel (YouTube) or the artist is in your library (YouTube Music)
+- The watched percentage is shown next to the like button while auto-like is active
 - <details>
     <summary>Pop-up page with options</summary>
     <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/4fd19d7c-cf26-433d-b34d-2104dabb881b" alt="Screenshot">
@@ -21,10 +25,10 @@ Additionally:
 
 Available for:
 
-- [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?color=white&label=users&style=flat-square)
+- [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) 120+ ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?color=white&label=users&style=flat-square)
 - [Mozilla Firefox](https://addons.mozilla.org/addon/youtube-like-dislike-shortcut)
-  109+ ![Mozilla Add-on](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=users&style=flat-square)
-- [Opera](https://addons.opera.com/en/extensions/details/youtube-like-dislike-shortcut)
+  117+ ![Mozilla Add-on](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=users&style=flat-square)
+- [Opera](https://addons.opera.com/en/extensions/details/youtube-like-dislike-shortcut) 106+
 
 Made by [Avi](https://avi12.com)
 

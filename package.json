@@ -1,6 +1,6 @@
 {
   "name": "youtube-like-dislike-shortcut",
-  "version": "2.5.7",
+  "version": "2.6.0",
   "description": "Like videos with Shift+Plus or Numpad Plus, dislike with Shift+Minus or Numpad Minus.",
   "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
   "type": "module",
@@ -13,13 +13,14 @@
     "pnpm": ">=11"
   },
   "scripts": {
-    "dev": "wxt",
-    "dev:with-profile": "pnpx cross-env CHROME_WITH_PROFILE=1 wxt",
-    "dev:rtl": "pnpx cross-env LANG=he wxt",
-    "dev:opera": "pnpm dev -b opera",
-    "dev:opera:with-profile": "pnpx cross-env OPERA_WITH_PROFILE=1 wxt -b opera",
-    "dev:firefox": "wxt -b firefox --mv3",
-    "dev:firefox:with-profile": "pnpx cross-env FIREFOX_WITH_PROFILE=1 wxt -b firefox --mv3",
+    "dev": "tsx scripts/dev-server.ts",
+    "dev:with-profile": "tsx scripts/dev-server.ts --browser chrome --with-profile",
+    "dev:rtl": "pnpx cross-env LANG=he tsx scripts/dev-server.ts",
+    "dev:edge": "tsx scripts/dev-server.ts --browser edge",
+    "dev:edge:with-profile": "tsx scripts/dev-server.ts --browser edge --with-profile",
+    "dev:firefox": "tsx scripts/dev-server.ts --browser firefox",
+    "dev:firefox:with-profile": "tsx scripts/dev-server.ts --browser firefox --with-profile",
+    "dev:wxt": "wxt",
     "build": "wxt build --mode prod",
     "build:opera": "pnpm build -b opera",
     "build:firefox": "pnpm build -b firefox --mv3",
@@ -41,30 +42,33 @@
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@types/chrome": "^0.1.42",
     "@types/node": "^25.9.1",
+    "chokidar": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.60.0",
     "@wxt-dev/module-svelte": "2.0.5",
-    "concurrently": "^9.2.1",
-    "eslint": "^10.4.0",
+    "concurrently": "^10.0.1",
+    "eslint": "^10.4.1",
     "eslint-config-avi12": "github:avi12/eslint-config-avi12",
     "eslint-plugin-import-newlines": "^2.0.0",
     "eslint-plugin-perfectionist": "^5.9.0",
-    "eslint-plugin-svelte": "^3.17.1",
-    "fallow": "^2.81.0",
+    "eslint-plugin-svelte": "^3.19.0",
+    "fallow": "^2.85.0",
     "globals": "^17.6.0",
     "postcss-html": "^1.8.1",
     "stylelint": "^17.12.0",
-    "stylelint-config-ccb": "^3.31.5",
-    "svelte": "5.55.9",
-    "svelte-eslint-parser": "^1.6.1",
+    "stylelint-config-ccb": "^3.32.0",
+    "svelte": "5.56.0",
+    "svelte-eslint-parser": "^1.7.0",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0",
+    "typescript-eslint": "^8.60.1",
+    "web-ext-run": "^0.2.4",
     "wxt": "0.20.26"
-  },
-  "dependencies": {
-    "@webext-core/messaging": "^3.0.1"
   },
   "overrides": {
     "acorn": "8.16.0"
+  },
+  "dependencies": {
+    "@webext-core/messaging": "^3.0.1"
   }
 }

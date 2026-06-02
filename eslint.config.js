@@ -9,7 +9,7 @@ import svelteParser from "svelte-eslint-parser";
 import tsEslint from "typescript-eslint";
 
 export default [
-  globalIgnores([".wxt/**", "build/**", "user-profiles/**"]),
+  globalIgnores([".wxt/**", "build/**", "user-profiles/**", "scripts/**"]),
   eslint.configs.recommended,
   ...tsEslint.configs.recommended,
   ...svelteEslint.configs["flat/recommended"],
@@ -91,6 +91,7 @@ export default [
         forceSingleLine: true 
       }],
       "import/order": "off",
+      "no-nested-ternary": "error",
       "perfectionist/sort-imports": ["error", {
         internalPattern: ["^@/"],
         newlinesBetween: 0 

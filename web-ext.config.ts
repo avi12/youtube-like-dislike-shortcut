@@ -10,13 +10,13 @@ const home = homedir();
 const enum Browser {
   Chrome = "chrome",
   Firefox = "firefox",
-  Opera = "opera"
+  Edge = "edge"
 }
 
-const operaBinaryByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: join(process.env.LOCALAPPDATA!, "Programs/Opera/opera.exe"),
-  darwin: "/Applications/Opera.app/Contents/MacOS/Opera",
-  linux: "/usr/bin/opera"
+const edgeBinaryByPlatform: Partial<Record<NodeJS.Platform, string>> = {
+  win32: join(process.env["ProgramFiles(x86)"]!, "Microsoft/Edge/Application/msedge.exe"),
+  darwin: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  linux: "/usr/bin/microsoft-edge"
 };
 
 const chromeProfileSourceByPlatform: Partial<Record<NodeJS.Platform, string>> = {
@@ -25,10 +25,10 @@ const chromeProfileSourceByPlatform: Partial<Record<NodeJS.Platform, string>> = 
   linux: join(home, ".config", "google-chrome")
 };
 
-const operaProfileSourceByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: join(process.env.APPDATA!, "Opera Software", "Opera Stable"),
-  darwin: join(home, "Library", "Application Support", "com.operasoftware.Opera"),
-  linux: join(home, ".config", "opera")
+const edgeProfileSourceByPlatform: Partial<Record<NodeJS.Platform, string>> = {
+  win32: join(process.env.LOCALAPPDATA!, "Microsoft", "Edge", "User Data"),
+  darwin: join(home, "Library", "Application Support", "Microsoft Edge"),
+  linux: join(home, ".config", "microsoft-edge")
 };
 
 const firefoxProfilesDirByPlatform: Partial<Record<NodeJS.Platform, string>> = {
@@ -73,7 +73,7 @@ function copyProfileIfMissing(browser: Browser, source: string | undefined) {
 
 const isChromeWithProfile = process.env.CHROME_WITH_PROFILE === "1";
 const isFirefoxWithProfile = process.env.FIREFOX_WITH_PROFILE === "1";
-const isOperaWithProfile = process.env.OPERA_WITH_PROFILE === "1";
+const isEdgeWithProfile = process.env.EDGE_WITH_PROFILE === "1";
 
 if (isChromeWithProfile) {
   copyProfileIfMissing(Browser.Chrome, chromeProfileSourceByPlatform[osPlatform]);
@@ -81,16 +81,16 @@ if (isChromeWithProfile) {
 if (isFirefoxWithProfile) {
   copyProfileIfMissing(Browser.Firefox, findDefaultFirefoxProfile());
 }
-if (isOperaWithProfile) {
-  copyProfileIfMissing(Browser.Opera, operaProfileSourceByPlatform[osPlatform]);
+if (isEdgeWithProfile) {
+  copyProfileIfMissing(Browser.Edge, edgeProfileSourceByPlatform[osPlatform]);
 }
 
-const isAnyChromiumWithProfile = isChromeWithProfile || isOperaWithProfile;
-const chromiumProfileBrowser = isOperaWithProfile ? Browser.Opera : Browser.Chrome;
+const isAnyChromiumWithProfile = isChromeWithProfile || isEdgeWithProfile;
+const chromiumProfileBrowser = isEdgeWithProfile ? Browser.Edge : Browser.Chrome;
 
 export default defineWebExtConfig({
   binaries: {
-    opera: operaBinaryByPlatform[osPlatform] ?? ""
+    edge: edgeBinaryByPlatform[osPlatform] ?? ""
   },
   startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
   ...isAnyChromiumWithProfile && {
