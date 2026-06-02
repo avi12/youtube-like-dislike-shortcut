@@ -43,6 +43,8 @@
     ).map(keyToModifier)
   );
   const isHasAnotherShortcut = $derived(defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]);
+  const isNotRecordingThisType = $derived(!keys.isRecording || keys.currentlyRecording !== type);
+  const isShowingAlternateShortcut = $derived(Boolean(isHasAnotherShortcut) && isNotRecordingThisType);
 
   const REGEX_MODIFIERS = new RegExp(`(${MODIFIER_KEYCODES.join("|")})`, "g");
 
@@ -73,7 +75,9 @@
 
   function getHasConflicts(newKeyCombo: string[]) {
     for (const currentType of Object.values(ShortcutType)) {
-      if (currentType !== type && getIsKeyCombosTheSame(keys.combos[currentType], newKeyCombo)) {
+      const isDifferentType = currentType !== type;
+      const isSameCombo = getIsKeyCombosTheSame(keys.combos[currentType], newKeyCombo);
+      if (isDifferentType && isSameCombo) {
         error = `Conflicts with ${currentType}'s shortcut`;
         return true;
       }
@@ -84,7 +88,8 @@
 
   $effect(() => {
     function handleKeydown(e: KeyboardEvent) {
-      if (!keys.isRecording || keys.currentlyRecording !== type) {
+      const isRecordingThisType = keys.isRecording && keys.currentlyRecording === type;
+      if (!isRecordingThisType) {
         return;
       }
       e.preventDefault();
@@ -106,25 +111,29 @@
     }
 
     function handleKeyup(e: KeyboardEvent) {
-      if (!keys.isRecording || keys.currentlyRecording !== type) {
+      const isRecordingThisType = keys.isRecording && keys.currentlyRecording === type;
+      if (!isRecordingThisType) {
         return;
       }
       const key = processKey(e);
 
       // If a non-modifier key's keydown was intercepted by the browser (e.g. Shift+Insert
       // treated as paste), recover using the modifiers tracked so far this session.
-      if (!isModifier(key) && !pressedKeys.has(key) && comboModifiers.length > 0) {
+      const isInterceptedNonModifier = !isModifier(key) && !pressedKeys.has(key) && comboModifiers.length > 0;
+      if (isInterceptedNonModifier) {
         keyComboTemp = [...comboModifiers, key];
         pressedKeys.clear();
       }
 
       pressedKeys.delete(key);
-      if (pressedKeys.size !== 0) {
+      const isAllKeysReleased = pressedKeys.size === 0;
+      if (!isAllKeysReleased) {
         return;
       }
 
       const isOnlyModifiers = keyComboTemp.every(isModifier);
-      if (isOnlyModifiers || getHasConflicts(keyComboTemp)) {
+      const isInvalidCombo = isOnlyModifiers || getHasConflicts(keyComboTemp);
+      if (isInvalidCombo) {
         return;
       }
 
@@ -167,7 +176,7 @@
     </ButtonShortcut>
     {#if error}
       <div class="error" in:fade>{error}</div>
-    {:else if isHasAnotherShortcut && (!keys.isRecording || keys.currentlyRecording !== type)}
+    {:else if isShowingAlternateShortcut}
       <Checkbox
         bind:checked={keys.combosSecondary[type]}
         disabled={keys.isRecording && keys.currentlyRecording !== type}>
@@ -179,7 +188,7 @@
     <h2>
       {@render children?.()}
     </h2>
-    {#if keys.isRecording && keys.currentlyRecording === type}
+    {#if active}
       <ButtonCancel
         onclick={() => {
           resetRecordingState();

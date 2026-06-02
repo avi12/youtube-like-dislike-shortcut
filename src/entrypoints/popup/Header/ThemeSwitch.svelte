@@ -18,7 +18,8 @@
   const getIsDark = () => instanceDarkTheme.matches;
 
   function setTheme(themeMode = ThemeMode.auto) {
-    if (themeMode === ThemeMode.auto) {
+    const isAutoMode = themeMode === ThemeMode.auto;
+    if (isAutoMode) {
       theme.current = getIsDark() ? ThemeMode.dark : ThemeMode.light;
       return;
     }
@@ -36,7 +37,8 @@
     storage.setItem(StorageKey.theme, theme.selected);
     document.documentElement.dataset.theme = theme.current;
 
-    if (theme.selected === ThemeMode.auto) {
+    const isAutoTheme = theme.selected === ThemeMode.auto;
+    if (isAutoTheme) {
       instanceDarkTheme.addEventListener("change", () => {
         const elQuickTransitions = document.querySelectorAll(`.${CSS_CLASS_QUICK_TRANSITION}`);
         for (const elQuickTransition of elQuickTransitions) {

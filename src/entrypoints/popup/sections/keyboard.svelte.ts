@@ -1,23 +1,13 @@
 import { type ButtonTriggers } from "@/lib/types";
+import { defaultAdditionalShortcuts, ShortcutType } from "@/lib/utils-initials";
 
-export const defaultAdditionalShortcuts: Record<string, string | undefined> = {
-  "Shift + Equal": "NumpadAdd",
-  "Shift + Minus": "NumpadSubtract",
-  "Shift + Digit8": "NumpadMultiply",
-  "Shift + Slash": "NumpadDivide",
-  "Shift + Period": "NumpadDecimal"
-};
+export { defaultAdditionalShortcuts, ShortcutType };
+
 export const defaultShortcuts = {
   like: ["shiftKey", "Equal"],
   dislike: ["shiftKey", "Minus"],
   unrate: ["shiftKey", "Digit0"]
 };
-export const ShortcutType = {
-  like: "like",
-  dislike: "dislike",
-  unrate: "unrate"
-} as const;
-export type ShortcutType = (typeof ShortcutType)[keyof typeof ShortcutType];
 
 export const keys = $state<{
   combos: typeof defaultShortcuts;

@@ -8,9 +8,11 @@
   let { isAutoLike, value = $bindable(60), disabled }: Props = $props();
 
   $effect(() => {
-    if (value < 1) {
+    const isBelowMin = value < 1;
+    const isAboveMax = value > 99;
+    if (isBelowMin) {
       value = 1;
-    } else if (value > 99) {
+    } else if (isAboveMax) {
       value = 99;
     }
   });
@@ -25,7 +27,9 @@
         const number = value;
         const isIncrement = e.key === "ArrowUp";
         const isDecrement = e.key === "ArrowDown";
-        if ((isIncrement && number >= 99) || (isDecrement && number <= 1)) {
+        const isAtUpperBound = isIncrement && number >= 99;
+        const isAtLowerBound = isDecrement && number <= 1;
+        if (isAtUpperBound || isAtLowerBound) {
           e.preventDefault();
         }
       }}
