@@ -4,7 +4,6 @@
     "wxt.config.ts",
     "web-ext.config.ts",
     "src/entrypoints/popup/main.ts",
-    "src/entrypoints/background.ts",
     "src/entrypoints/ytr-trigger.content.ts",
     "src/entrypoints/ytr-embed.content.ts",
     "src/entrypoints/ytr-rate-api.content.ts",

@@ -32,7 +32,9 @@ export type ButtonTriggers = {
 export enum YTCFG_KEY {
   innertubeContext = "INNERTUBE_CONTEXT",
   clientName = "INNERTUBE_CONTEXT_CLIENT_NAME",
-  clientVersion = "INNERTUBE_CONTEXT_CLIENT_VERSION"
+  clientVersion = "INNERTUBE_CONTEXT_CLIENT_VERSION",
+  delegatedSessionId = "DELEGATED_SESSION_ID",
+  sessionIndex = "SESSION_INDEX"
 }
 
 /**
@@ -61,6 +63,8 @@ interface YtcfgGetter {
   (key: YTCFG_KEY.innertubeContext): InnertubeContext | undefined;
   (key: YTCFG_KEY.clientName): number | undefined;
   (key: YTCFG_KEY.clientVersion): string | undefined;
+  (key: YTCFG_KEY.delegatedSessionId): string | undefined;
+  (key: YTCFG_KEY.sessionIndex): string | undefined;
 }
 
 declare global {

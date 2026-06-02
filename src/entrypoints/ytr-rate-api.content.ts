@@ -1,31 +1,19 @@
-import { type InnertubeContext, YTCFG_KEY } from "@/lib/types";
+import { YTCFG_KEY } from "@/lib/types";
 import { SELECTORS, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
-import { type RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import { RateAction, type RateContext, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import { executeRateRequest, fetchRateParamsFromNext } from "@/lib/ytr-rate-fetch";
 import { buildSapisidAuthorization } from "@/lib/ytr-sapisid";
 
-enum LIKE_API_URLS {
-  like = "/youtubei/v1/like/like",
-  dislike = "/youtubei/v1/like/dislike",
-  removelike = "/youtubei/v1/like/removelike"
-}
+const WEB_CLIENT_NAME_NUMBER = 1;
 
-enum LIKE_STATUSES {
-  like = "LIKE",
-  dislike = "DISLIKE",
-  removelike = "INDIFFERENT"
-}
-
-interface YtdAppElement extends HTMLElement {
-  resolveCommand: (cmd: unknown, ctx: unknown) => void;
-}
+const paramFieldForAction: Record<RateAction, "likeParams" | "dislikeParams" | "removeLikeParams"> = {
+  [RateAction.like]: "likeParams",
+  [RateAction.dislike]: "dislikeParams",
+  [RateAction.removelike]: "removeLikeParams"
+};
 
 interface MoviePlayerElement extends HTMLElement {
   getVideoData?: () => { video_id?: string } | undefined;
-}
-
-interface RateRequestBody {
-  context: InnertubeContext;
-  target: { videoId: string };
 }
 
 function getVideoIdFromPlayer() {
@@ -40,121 +28,157 @@ function getVideoIdFromEmbedUrl() {
 
 function getVideoIdFromChannelTrailer() {
   const trailer = document.querySelector(SELECTORS.channelTrailerPlayer);
-  if (!trailer || !("data" in trailer)) {
+  const isTrailerWithData = trailer && "data" in trailer;
+  if (!isTrailerWithData) {
     return "";
   }
   const { data } = trailer;
-  if (!data || typeof data !== "object" || !("videoId" in data) || !data.videoId) {
+  const isValidVideoData = data && typeof data === "object" && "videoId" in data && data.videoId;
+  if (!isValidVideoData) {
     return "";
   }
   return String(data.videoId);
 }
 
 function getVideoId() {
-  if (location.pathname === YOUTUBE_PATHNAME.watch) {
+  const isWatchPage = location.pathname === YOUTUBE_PATHNAME.watch;
+  if (isWatchPage) {
     return getVideoIdFromPlayer();
   }
-  if (location.pathname.startsWith(YOUTUBE_PATHNAME.embed)) {
+  const isEmbedPage = location.pathname.startsWith(YOUTUBE_PATHNAME.embed);
+  if (isEmbedPage) {
     return getVideoIdFromPlayer() || getVideoIdFromEmbedUrl();
   }
   return getVideoIdFromChannelTrailer();
 }
 
-function rateViaResolveCommand(action: RateAction, videoId: string) {
-  const ytdApp = document.querySelector<YtdAppElement>(SELECTORS.ytdApp);
-  if (!ytdApp) {
-    return false;
+function getRateContext(): RateContext | null {
+  const ytcfg = window.ytcfg;
+  if (!ytcfg) {
+    return null;
   }
-  try {
-    ytdApp.resolveCommand(
-      {
-        commandMetadata: {
-          webCommandMetadata: {
-            sendPost: true,
-            apiUrl: LIKE_API_URLS[action]
-          }
-        },
-        likeEndpoint: {
-          status: LIKE_STATUSES[action],
-          target: { videoId }
-        }
-      },
-      {}
-    );
-    return true;
-  } catch {
-    return false;
+  const videoId = getVideoId();
+  const clientNameNumber = ytcfg.get(YTCFG_KEY.clientName);
+  const clientVersion = ytcfg.get(YTCFG_KEY.clientVersion);
+  const innertubeContext = ytcfg.get(YTCFG_KEY.innertubeContext);
+  const delegatedSessionId = ytcfg.get(YTCFG_KEY.delegatedSessionId) ?? "";
+  const sessionIndex = ytcfg.get(YTCFG_KEY.sessionIndex) ?? "";
+  const isContextComplete = videoId && clientNameNumber !== undefined && clientVersion !== undefined && innertubeContext !== undefined;
+  if (!isContextComplete) {
+    return null;
   }
+  return { videoId, clientNameNumber, clientVersion, innertubeContext, delegatedSessionId, sessionIndex };
 }
 
-async function rateViaFetch(action: RateAction, videoId: string) {
-  const { ytcfg } = window;
+function getEmbedRateContext(): RateContext | null {
+  const ytcfg = window.ytcfg;
   if (!ytcfg) {
-    return false;
+    return null;
   }
-  const Authorization = await buildSapisidAuthorization();
-  if (!Authorization) {
-    return false;
-  }
-  const clientName = ytcfg.get(YTCFG_KEY.clientName);
+  const videoId = getVideoId();
   const clientVersion = ytcfg.get(YTCFG_KEY.clientVersion);
-  const context = ytcfg.get(YTCFG_KEY.innertubeContext);
-  if (clientName === undefined || clientVersion === undefined || context === undefined) {
-    return false;
+  if (!videoId || !clientVersion) {
+    return null;
   }
-  try {
-    const response = await fetch(`${LIKE_API_URLS[action]}?prettyPrint=false`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Authorization,
-        "Content-Type": "application/json",
-        "X-YouTube-Client-Name": String(clientName),
-        "X-YouTube-Client-Version": clientVersion
-      },
-      body: JSON.stringify({
-        context,
-        target: { videoId }
-      } satisfies RateRequestBody)
-    });
-    return response.ok;
-  } catch {
-    return false;
+  const existingContext = ytcfg.get(YTCFG_KEY.innertubeContext);
+  const minimalClient = {
+    clientName: "WEB",
+    clientVersion,
+    ...existingContext?.client.hl && { hl: existingContext.client.hl },
+    ...existingContext?.client.gl && { gl: existingContext.client.gl }
+  };
+  return {
+    videoId,
+    clientNameNumber: WEB_CLIENT_NAME_NUMBER,
+    clientVersion,
+    innertubeContext: { client: minimalClient },
+    delegatedSessionId: ytcfg.get(YTCFG_KEY.delegatedSessionId) ?? "",
+    sessionIndex: ytcfg.get(YTCFG_KEY.sessionIndex) ?? ""
+  };
+}
+
+function extractRateParam(action: RateAction) {
+  const data = Object.getOwnPropertyDescriptor(window, "ytInitialData")?.value;
+  if (!data) {
+    return undefined;
   }
+  const targetField = paramFieldForAction[action];
+  const stack: unknown[] = [data];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!node || typeof node !== "object") {
+      continue;
+    }
+    if (targetField in node) {
+      const value = Object.getOwnPropertyDescriptor(node, targetField)?.value;
+      if (typeof value === "string" && value) {
+        return value;
+      }
+    }
+    for (const value of Object.values(node)) {
+      if (value && typeof value === "object") {
+        stack.push(value);
+      }
+    }
+  }
+  return undefined;
 }
 
 async function rateVideoOnPage(action: RateAction) {
-  const videoId = getVideoId();
-  if (!videoId) {
-    return {
-      success: false,
-      error: "No video ID found"
-    };
+  const context = getRateContext();
+  if (!context) {
+    return { success: false, error: "No video context" };
   }
-  if (rateViaResolveCommand(action, videoId)) {
-    return {
-      success: true,
-      videoId
-    };
+  const params = extractRateParam(action);
+  if (!params) {
+    return { success: false, error: "No rate params in ytInitialData" };
   }
-  if (await rateViaFetch(action, videoId)) {
-    return {
-      success: true,
-      videoId
-    };
+  const Authorization = await buildSapisidAuthorization();
+  if (!Authorization) {
+    return { success: false, error: "No SAPISID cookie" };
   }
-  return {
-    success: false,
-    error: "Failed to rate video"
-  };
+  try {
+    const isOk = await executeRateRequest({ action, context, Authorization, params });
+    if (!isOk) {
+      return { success: false, error: "Rate request failed" };
+    }
+    return { success: true, videoId: context.videoId };
+  } catch {
+    return { success: false, error: "Rate request threw" };
+  }
+}
+
+async function rateInEmbed(action: RateAction) {
+  const context = getEmbedRateContext();
+  if (!context) {
+    return { success: false, error: "No embed context" };
+  }
+  const Authorization = await buildSapisidAuthorization();
+  if (!Authorization) {
+    return { success: false, error: "No SAPISID cookie" };
+  }
+  try {
+    const params = await fetchRateParamsFromNext({ action, context, Authorization });
+    if (!params) {
+      return { success: false, error: "No rate params from /next" };
+    }
+    const isOk = await executeRateRequest({ action, context, Authorization, params });
+    if (!isOk) {
+      return { success: false, error: "Rate request failed" };
+    }
+    return { success: true, videoId: context.videoId };
+  } catch {
+    return { success: false, error: "Rate request threw" };
+  }
 }
 
 function init() {
   ytrMessenger.onMessage(YtrMessage.rateVideo, ({ data }) => rateVideoOnPage(data));
+  ytrMessenger.onMessage(YtrMessage.rateInEmbed, ({ data }) => rateInEmbed(data));
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/*"],
+  matches: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/*"],
   world: "MAIN",
   allFrames: true,
   main: () => init()

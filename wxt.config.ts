@@ -14,9 +14,7 @@ const url = packageJson.repository;
 const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
 
 const sharedPermissions: Browser.runtime.ManifestPermission[] = [
-  "storage",
-  "declarativeNetRequest",
-  "cookies"
+  "storage"
 ];
 
 function getMinimumVersionChromeOrOpera(browser: string) {
@@ -39,7 +37,7 @@ export default defineConfig({
     name: "YouTube Like-Dislike Shortcut",
     description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
     homepage_url: url,
-    permissions: browser === "firefox" ? sharedPermissions : [...sharedPermissions, "offscreen"],
+    permissions: sharedPermissions,
     host_permissions: ["https://www.youtube.com/*"],
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
     ...browser !== "firefox" && { offline_enabled: true },
