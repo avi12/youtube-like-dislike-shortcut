@@ -1,6 +1,7 @@
 import { type InnertubeContext, YTCFG_KEY } from "@/lib/types";
 import { SELECTORS, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
 import { type RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import { buildSapisidAuthorization } from "@/lib/ytr-sapisid";
 
 enum LIKE_API_URLS {
   like = "/youtubei/v1/like/like",
@@ -13,9 +14,6 @@ enum LIKE_STATUSES {
   dislike = "DISLIKE",
   removelike = "INDIFFERENT"
 }
-
-const HEX_PAD_LENGTH = 2;
-const MILLISECONDS_PER_SECOND = 1000;
 
 interface YtdAppElement extends HTMLElement {
   resolveCommand: (cmd: unknown, ctx: unknown) => void;
@@ -89,35 +87,12 @@ function rateViaResolveCommand(action: RateAction, videoId: string) {
   }
 }
 
-function getSapisidCookie() {
-  const prefix = "SAPISID=";
-  const cookieEntry = document.cookie
-    .split(";")
-    .map(part => part.trim())
-    .find(part => part.startsWith(prefix));
-  return cookieEntry?.slice(prefix.length) ?? "";
-}
-
-async function getAuthorization() {
-  const sapisid = getSapisidCookie();
-  if (!sapisid) {
-    return "";
-  }
-  const timestampSeconds = Math.floor(Date.now() / MILLISECONDS_PER_SECOND);
-  const text = `${timestampSeconds} ${sapisid} ${location.origin}`;
-  const buffer = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(text));
-  const hash = Array.from(new Uint8Array(buffer))
-    .map(byte => byte.toString(16).padStart(HEX_PAD_LENGTH, "0"))
-    .join("");
-  return `SAPISIDHASH ${timestampSeconds}_${hash}`;
-}
-
 async function rateViaFetch(action: RateAction, videoId: string) {
   const { ytcfg } = window;
   if (!ytcfg) {
     return false;
   }
-  const Authorization = await getAuthorization();
+  const Authorization = await buildSapisidAuthorization();
   if (!Authorization) {
     return false;
   }
