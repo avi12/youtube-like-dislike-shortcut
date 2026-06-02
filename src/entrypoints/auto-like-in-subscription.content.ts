@@ -6,14 +6,26 @@ import {
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
-  StorageKey
+  StorageKey,
+  YOUTUBE_HOST
 } from "@/lib/utils-initials";
-import { getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+import {
+  getIsInLibrary,
+  getIsSubscribed,
+  getRateButtons,
+  getRatedButton,
+  rateVideo
+} from "@/lib/ytr-buttons";
+
+function getIsFollowing() {
+  return location.hostname === YOUTUBE_HOST.music ? getIsInLibrary() : getIsSubscribed();
+}
 
 let OBSERVER_SUBSCRIPTION: MutationObserver;
 let lastUrl: string | undefined;
 let lastTitle: string | undefined;
 let hasHandledNavigation = false;
+let hasNavigated = false;
 
 async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
   if (hasHandledNavigation) {
@@ -21,7 +33,12 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return true;
   }
 
-  if (!window.ytrAutoLikeSubscribedChannels) {
+  if (!hasNavigated) {
+    return false;
+  }
+
+  const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
+  if (!isAutoLikeSubscribedChannels) {
     observer?.disconnect();
     return true;
   }
@@ -31,13 +48,15 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return false;
   }
 
-  if (getRatedButton()) {
+  const isAlreadyRated = getRatedButton();
+  if (isAlreadyRated) {
     hasHandledNavigation = true;
     observer?.disconnect();
     return true;
   }
 
-  if (!getIsSubscribed()) {
+  const isFollowing = getIsFollowing();
+  if (!isFollowing) {
     return false;
   }
 
@@ -48,30 +67,36 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
 }
 
 async function addTemporaryBodyListener() {
-  if (lastUrl === location.href || lastTitle === document.title) {
+  const isSameUrlOrTitle = lastUrl === location.href || lastTitle === document.title;
+  if (isSameUrlOrTitle) {
     return;
   }
 
   lastUrl = location.href;
   lastTitle = document.title;
   hasHandledNavigation = false;
+  hasNavigated = true;
 
-  if (!window.ytrAutoLikeSubscribedChannels) {
+  const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
+  if (!isAutoLikeSubscribedChannels) {
     return;
   }
 
-  if (await autoLikeIfSubscribed()) {
+  const isLikedNow = await autoLikeIfSubscribed();
+  if (isLikedNow) {
     OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
     return;
   }
 
   const navigationUrl = location.href;
   new MutationObserver(async (_, observer) => {
-    if (location.href !== navigationUrl) {
+    const isUrlChanged = location.href !== navigationUrl;
+    if (isUrlChanged) {
       observer.disconnect();
       return;
     }
-    if (await autoLikeIfSubscribed()) {
+    const isLikedAfterMutation = await autoLikeIfSubscribed();
+    if (isLikedAfterMutation) {
       OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
       observer.disconnect();
     }
@@ -80,29 +105,32 @@ async function addTemporaryBodyListener() {
 
 function addStorageListener() {
   storage.watch<boolean>(StorageKey.isAutoLikeSubscribedChannels, async isAutoLike => {
-    window.ytrAutoLikeSubscribedChannels = isAutoLike !== null ? isAutoLike : initial.isAutoLikeSubscribedChannels;
+    const isAutoLikeSet = isAutoLike !== null;
+    window.ytrAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
     if (isAutoLike) {
       await autoLikeIfSubscribed();
     }
   });
 }
 
-async function addSubscribedEventListener() {
-  const elSubscribed = await getElementByMutationObserver<HTMLButtonElement>(SELECTORS.buttonSubscribe);
-  OBSERVER_SUBSCRIPTION.observe(elSubscribed, {
+async function addFollowEventListener() {
+  const selector = location.hostname === YOUTUBE_HOST.music ? SELECTORS.buttonFollowMusic : SELECTORS.buttonSubscribe;
+  const elFollowButton = await getElementByMutationObserver<HTMLButtonElement>(selector);
+  OBSERVER_SUBSCRIPTION.observe(elFollowButton, {
     attributes: true,
     attributeFilter: [DOM_ATTRIBUTE.subscribed]
   });
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/*"],
+  matches: ["https://www.youtube.com/*", "https://music.youtube.com/*"],
   async main () {
     lastUrl = location.href;
     lastTitle = document.title;
 
     OBSERVER_SUBSCRIPTION = new MutationObserver(async () => {
-      if (getIsSubscribed()) {
+      const isFollowing = getIsFollowing();
+      if (isFollowing) {
         await autoLikeIfSubscribed();
         OBSERVER_SUBSCRIPTION.disconnect();
       }
@@ -116,9 +144,10 @@ export default defineContentScript({
 
     addStorageListener();
     await addNavigationListener(addTemporaryBodyListener);
-    await addSubscribedEventListener();
+    await addFollowEventListener();
 
-    if (!window.ytrAutoLikeSubscribedChannels) {
+    const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
+    if (!isAutoLikeSubscribedChannels) {
       return;
     }
 
