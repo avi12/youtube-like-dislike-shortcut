@@ -1,8 +1,8 @@
+import { storage } from "#imports";
 import {
   addNavigationListener,
   DOM_ATTRIBUTE,
   getElementByMutationObserver,
-  getStorage,
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
@@ -35,16 +35,16 @@ function getFollowSelector() {
 
 let lastUrl: string | undefined;
 let lastTitle: string | undefined;
-let hasHandledNavigation = false;
+let isNavigationHandled = false;
 let isUserSubscribeClickPending = false;
+let isAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels;
 
 async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
-  if (hasHandledNavigation) {
+  if (isNavigationHandled) {
     observer?.disconnect();
     return true;
   }
 
-  const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
   if (!isAutoLikeSubscribedChannels) {
     announceSubscriptionDecision(SubscriptionDecision.released);
     observer?.disconnect();
@@ -59,7 +59,7 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
   const elAlreadyRated = getRatedButton();
   if (elAlreadyRated) {
     announceSubscriptionDecision(SubscriptionDecision.released);
-    hasHandledNavigation = true;
+    isNavigationHandled = true;
     observer?.disconnect();
     return true;
   }
@@ -71,7 +71,7 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
   }
 
   announceSubscriptionDecision(SubscriptionDecision.claimed);
-  hasHandledNavigation = true;
+  isNavigationHandled = true;
   await rateVideo(true);
   observer?.disconnect();
   return true;
@@ -87,24 +87,24 @@ async function handleUserSubscribed() {
     return;
   }
   isUserSubscribeClickPending = false;
-  if (hasHandledNavigation) {
+  if (isNavigationHandled) {
     return;
   }
   const elAlreadyRated = getRatedButton();
   if (elAlreadyRated) {
-    hasHandledNavigation = true;
+    isNavigationHandled = true;
     return;
   }
-  hasHandledNavigation = true;
+  isNavigationHandled = true;
   await rateVideo(true);
 }
 
 function markUserSubscribeClick(e: Event) {
-  const { target } = e;
-  if (!(target instanceof Element)) {
+  const { target: elTarget } = e;
+  if (!(elTarget instanceof Element)) {
     return;
   }
-  const isInsideFollowButton = Boolean(target.closest(getFollowSelector()));
+  const isInsideFollowButton = Boolean(elTarget.closest(getFollowSelector()));
   if (!isInsideFollowButton) {
     return;
   }
@@ -121,11 +121,10 @@ async function addTemporaryBodyListener() {
 
   lastUrl = href;
   lastTitle = title;
-  hasHandledNavigation = false;
+  isNavigationHandled = false;
   isUserSubscribeClickPending = false;
   resetSubscriptionDecision();
 
-  const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
   if (!isAutoLikeSubscribedChannels) {
     announceSubscriptionDecision(SubscriptionDecision.released);
     return;
@@ -153,8 +152,8 @@ async function addTemporaryBodyListener() {
 function addStorageListener() {
   storage.watch<boolean>(StorageKey.isAutoLikeSubscribedChannels, async isAutoLike => {
     const isAutoLikeSet = isAutoLike !== null;
-    window.ytrAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
-    if (!window.ytrAutoLikeSubscribedChannels) {
+    isAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
+    if (!isAutoLikeSubscribedChannels) {
       announceSubscriptionDecision(SubscriptionDecision.released);
       return;
     }
@@ -179,13 +178,11 @@ export default defineContentScript({
     document.addEventListener("click", markUserSubscribeClick, { capture: true });
     document.addEventListener("keydown", markUserSubscribeClick, { capture: true });
 
-    window.ytrAutoLikeSubscribedChannels = await getStorage({
-      storageKey: StorageKey.isAutoLikeSubscribedChannels,
-      fallback: initial.isAutoLikeSubscribedChannels,
-      updateWindowKey: "ytrAutoLikeSubscribedChannels"
+    isAutoLikeSubscribedChannels = await storage.getItem<boolean>(StorageKey.isAutoLikeSubscribedChannels, {
+      fallback: initial.isAutoLikeSubscribedChannels
     });
 
-    if (!window.ytrAutoLikeSubscribedChannels) {
+    if (!isAutoLikeSubscribedChannels) {
       announceSubscriptionDecision(SubscriptionDecision.released);
     }
 
@@ -193,7 +190,6 @@ export default defineContentScript({
     await addNavigationListener(addTemporaryBodyListener);
     await addFollowButtonObserver();
 
-    const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
     if (!isAutoLikeSubscribedChannels) {
       return;
     }

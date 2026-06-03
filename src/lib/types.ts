@@ -164,7 +164,6 @@ declare global {
     ytrUserInteracted: boolean;
     ytrAutoLikeEnabled: typeof initial.isAutoLike;
     ytrAutoLikeThreshold: typeof initial.autoLikeThreshold;
-    ytrAutoLikeSubscribedChannels: typeof initial.isAutoLikeSubscribedChannels;
     ytrLastButtonTriggers: typeof initial.buttonTriggers;
     ytcfg?: { get: YtcfgGetter };
     ytInitialData?: YtInitialData;
