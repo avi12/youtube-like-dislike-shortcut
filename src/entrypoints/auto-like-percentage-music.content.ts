@@ -10,8 +10,9 @@ import {
   YOUTUBE_EVENT
 } from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./auto-like-percentage.content/CsuiAutoLikePercent.svelte";
-import { sharedState, watchDisplayPercentage } from "./auto-like-percentage.content/states.svelte";
+import { sharedState, watchMountState } from "./auto-like-percentage.content/states.svelte";
 
 let ratingWatchObserver: MutationObserver | null = null;
 
@@ -24,6 +25,7 @@ function watchForInitialRating() {
   sharedState.isUserInteracted = false;
   sharedState.isRatingResolved = false;
   sharedState.isRatedInitially = false;
+  sharedState.isCurrentlyRated = false;
   window.ytrUserInteracted = false;
 
   const anyButtonSelector = `${SELECTORS.toggleButtonsMusicVideo} button[${DOM_ATTRIBUTE.ariaPressed}]`;
@@ -34,8 +36,8 @@ function watchForInitialRating() {
       sharedState.isUserInteracted = true;
     }
     const isRated = Boolean(getRatedButton());
-    const isSharedUserInteracted = sharedState.isUserInteracted;
-    if (!isSharedUserInteracted) {
+    sharedState.isCurrentlyRated = isRated;
+    if (!sharedState.isUserInteracted) {
       sharedState.isRatedInitially = isRated;
     }
     sharedState.isRatingResolved = true;
@@ -74,6 +76,11 @@ export default defineContentScript({
   matches: ["https://music.youtube.com/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
+    onSubscriptionDecision(decision => {
+      sharedState.subscriptionDecision = decision;
+    });
+    sharedState.subscriptionDecision = getSubscriptionDecision();
+
     await Promise.all([
       getStorage({
         storageKey: StorageKey.isAutoLike,
@@ -89,7 +96,6 @@ export default defineContentScript({
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
 
     let lastHref = location.href;
-    let lastNavigationHref = location.href;
     let isMounting = false;
     let activeShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
     const elementNameToInject = "ytr-percentage-music";
@@ -113,8 +119,8 @@ export default defineContentScript({
         position: "inline",
         append: "after",
         anchor: SELECTORS.toggleButtonsMusicVideo,
-        onMount(container) {
-          return mount(CsuiAutoLikePercent, { target: container });
+        onMount(elContainer) {
+          return mount(CsuiAutoLikePercent, { target: elContainer });
         },
         onRemove(app) {
           if (app) {
@@ -131,17 +137,24 @@ export default defineContentScript({
       activeShadowUi = null;
     }
 
-    let isDisplayPercentage = false;
+    let isFreshMountAllowed = false;
+    let isUnmountRequired = true;
+    let hasMountedForCurrentNav = false;
+
     function syncUi() {
-      if (isDisplayPercentage) {
-        void mountUi();
-      } else {
+      if (isUnmountRequired) {
         unmountUi();
+        return;
+      }
+      if (hasMountedForCurrentNav || isFreshMountAllowed) {
+        hasMountedForCurrentNav = true;
+        void mountUi();
       }
     }
 
-    watchDisplayPercentage(isDisplay => {
-      isDisplayPercentage = isDisplay;
+    watchMountState(({ isFreshMountAllowed: nextFreshMountAllowed, isUnmountRequired: nextUnmountRequired }) => {
+      isFreshMountAllowed = nextFreshMountAllowed;
+      isUnmountRequired = nextUnmountRequired;
       syncUi();
     });
 
@@ -153,12 +166,9 @@ export default defineContentScript({
     });
 
     document.addEventListener(YOUTUBE_EVENT.navigateFinish, () => {
-      const isNewNavigation = location.href !== lastNavigationHref;
-      if (isNewNavigation) {
-        lastNavigationHref = location.href;
-        sharedState.hasNavigated = true;
-      }
       lastHref = "";
+      sharedState.subscriptionDecision = undefined;
+      hasMountedForCurrentNav = false;
       watchForInitialRating();
     });
 
@@ -197,13 +207,13 @@ export default defineContentScript({
       const isValidDelta = delta > 0 && delta < 1 && Boolean(duration) && duration !== Infinity;
       if (isValidDelta) {
         sharedState.percentageWatched += (delta / duration) * 100;
-        const shouldAutoLike =
+        const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
-          sharedState.hasNavigated &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
           !sharedState.isUserInteracted &&
-          !sharedState.isRatedInitially;
-        if (shouldAutoLike) {
+          !sharedState.isRatedInitially &&
+          !sharedState.isCurrentlyRated;
+        if (isAutoLikeTriggered) {
           await rateVideo(true);
         }
       }
