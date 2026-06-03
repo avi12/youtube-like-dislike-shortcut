@@ -34,7 +34,8 @@ The dev server script (scripts/dev-server.ts) is configured such that on every f
 Avoid comments unless absolutely necessary, prefer using descriptive variables and functions.  
 
 Variable naming rules:
-1. If a variable represents an element, it should be prefixed with "el"
-2. If a variable represents an index, it should be prefixed with "i", unless it's iterating over an array in a for loop/higher-order function, in which case use "I" as-is
-3. If a variable represents a boolean, it should be prefixed with "is"
-4. An event callback's first parameter must always be "e"
+1. Boolean variables must be prefixed with "is" and be phrased positively (use `isEnabled`/`!isEnabled`, never `isDisabled` or `isNotX`)
+2. Element variables must be prefixed with "el"
+3. Index variables, unless they come from the YouTube API, must be prefixed with "i". Exception: inside a for loop or higher-order function where it is obvious what the index represents, keep just "i". Otherwise use the full word prefixed with "i" (e.g. `iButton`, `iShortcut`)
+4. Don't use abbreviations, use full words (exception: event handler parameters use `e` instead of `event`)
+5. Prefer variables not to live on the `window` object. Only attach to `window` when the value genuinely must be shared between scripts
