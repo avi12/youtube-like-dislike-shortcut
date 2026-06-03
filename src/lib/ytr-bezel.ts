@@ -32,19 +32,20 @@ export function showRateBezel(rating: Rating, isRated: boolean) {
   }
   const elHost = getBezelHost();
   elHost.querySelector(`.${FALLBACK_BEZEL_CLASS}`)?.remove();
-  const playerRect = elPlayer.getBoundingClientRect();
+  const { top, left, width, height } = elPlayer.getBoundingClientRect();
   const iconSize = getPlayButtonIconSize();
   const circleSize = Math.round(iconSize * BEZEL_CIRCLE_TO_ICON_RATIO);
   const iconName: keyof typeof svgs = isRated ? rating : `un${rating}`;
   const elContainer = document.createElement("div");
   elContainer.className = FALLBACK_BEZEL_CLASS;
-  elContainer.style.setProperty("--ytr-bezel-icon-size", `${iconSize}px`);
-  elContainer.style.setProperty("--ytr-bezel-circle-size", `${circleSize}px`);
-  elContainer.style.top = `${playerRect.top}px`;
-  elContainer.style.left = `${playerRect.left}px`;
-  elContainer.style.width = `${playerRect.width}px`;
-  elContainer.style.height = `${playerRect.height}px`;
-  elContainer.style.zIndex = String(MAX_Z_INDEX);
+  const { style } = elContainer;
+  style.setProperty("--ytr-bezel-icon-size", `${iconSize}px`);
+  style.setProperty("--ytr-bezel-circle-size", `${circleSize}px`);
+  style.top = `${top}px`;
+  style.left = `${left}px`;
+  style.width = `${width}px`;
+  style.height = `${height}px`;
+  style.zIndex = String(MAX_Z_INDEX);
   const elBezel = document.createElement("div");
   elBezel.className = "ytp-bezel";
   elBezel.setAttribute("role", "status");
