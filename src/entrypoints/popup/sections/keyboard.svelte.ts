@@ -25,15 +25,15 @@ export const keys = $state<{
   currentlyRecording: null
 });
 
-export function initializeKeys(buttonTriggers: ButtonTriggers) {
+export function initializeKeys({ like, dislike, unrate }: ButtonTriggers) {
   keys.combos = {
-    like: [...buttonTriggers.like.modifiers, ...buttonTriggers.like.primary],
-    dislike: [...buttonTriggers.dislike.modifiers, ...buttonTriggers.dislike.primary],
-    unrate: [...buttonTriggers.unrate.modifiers, ...buttonTriggers.unrate.primary]
+    like: [...like.modifiers, ...like.primary],
+    dislike: [...dislike.modifiers, ...dislike.primary],
+    unrate: [...unrate.modifiers, ...unrate.primary]
   };
   keys.combosSecondary = {
-    [ShortcutType.like]: buttonTriggers.like.secondary,
-    [ShortcutType.dislike]: buttonTriggers.dislike.secondary,
-    [ShortcutType.unrate]: buttonTriggers.unrate.secondary
+    [ShortcutType.like]: like.secondary,
+    [ShortcutType.dislike]: dislike.secondary,
+    [ShortcutType.unrate]: unrate.secondary
   };
 }

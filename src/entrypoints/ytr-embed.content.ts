@@ -51,7 +51,8 @@ async function init() {
   });
 
   document.addEventListener("keydown", e => {
-    const isFocusedOnInput = document.activeElement?.matches("input, [contenteditable='true']") ?? false;
+    const { activeElement } = document;
+    const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
     if (isFocusedOnInput) {
       return;
     }

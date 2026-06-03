@@ -58,15 +58,15 @@
     comboModifiers = [];
   }
 
-  function processKey(event: KeyboardEvent) {
-    if (event.key.startsWith("Control")) {
+  function processKey({ key, code }: KeyboardEvent) {
+    if (key.startsWith("Control")) {
       return "ctrlKey";
     }
-    const modifierCode = event.key.replace(REGEX_MODIFIERS, modifierToKey);
+    const modifierCode = key.replace(REGEX_MODIFIERS, modifierToKey);
     if (isModifier(modifierCode)) {
       return modifierCode;
     }
-    return event.code;
+    return code;
   }
 
   function getIsKeyCombosTheSame(keyCombo1: string[], keyCombo2: string[]) {

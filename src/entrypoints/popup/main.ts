@@ -7,22 +7,24 @@ import { type ButtonTriggers } from "@/lib/types";
 import { initial, StorageKey } from "@/lib/utils-initials";
 import Popup from "./Popup.svelte";
 
+const { buttonTriggers: defaultButtonTriggers, isAutoLike: defaultIsAutoLike, autoLikeThreshold: defaultAutoLikeThreshold, isAutoLikeSubscribedChannels: defaultIsAutoLikeSubscribedChannels } = initial;
+
 const [buttonTriggers, selectedTheme, isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels] = await Promise.all([
-  storage.getItem<ButtonTriggers>(StorageKey.buttonTriggers, { fallback: initial.buttonTriggers }),
+  storage.getItem<ButtonTriggers>(StorageKey.buttonTriggers, { fallback: defaultButtonTriggers }),
   storage.getItem<ThemeMode>(StorageKey.theme, { fallback: ThemeMode.auto }),
-  storage.getItem<typeof initial.isAutoLike>(StorageKey.isAutoLike, { fallback: initial.isAutoLike }),
-  storage.getItem<typeof initial.autoLikeThreshold>(StorageKey.autoLikeThreshold, { fallback: initial.autoLikeThreshold }),
-  storage.getItem<typeof initial.isAutoLikeSubscribedChannels>(StorageKey.isAutoLikeSubscribedChannels, { fallback: initial.isAutoLikeSubscribedChannels })
+  storage.getItem<typeof defaultIsAutoLike>(StorageKey.isAutoLike, { fallback: defaultIsAutoLike }),
+  storage.getItem<typeof defaultAutoLikeThreshold>(StorageKey.autoLikeThreshold, { fallback: defaultAutoLikeThreshold }),
+  storage.getItem<typeof defaultIsAutoLikeSubscribedChannels>(StorageKey.isAutoLikeSubscribedChannels, { fallback: defaultIsAutoLikeSubscribedChannels })
 ]);
 
-initializeKeys(buttonTriggers ?? initial.buttonTriggers);
+initializeKeys(buttonTriggers ?? defaultButtonTriggers);
 
 mount(Popup, {
   target: document.getElementById("app") ?? document.body,
   props: {
     selectedTheme: selectedTheme ?? ThemeMode.auto,
-    isAutoLike: isAutoLike ?? initial.isAutoLike,
-    autoLikeThreshold: autoLikeThreshold ?? initial.autoLikeThreshold,
-    isAutoLikeSubscribedChannels: isAutoLikeSubscribedChannels ?? initial.isAutoLikeSubscribedChannels
+    isAutoLike: isAutoLike ?? defaultIsAutoLike,
+    autoLikeThreshold: autoLikeThreshold ?? defaultAutoLikeThreshold,
+    isAutoLikeSubscribedChannels: isAutoLikeSubscribedChannels ?? defaultIsAutoLikeSubscribedChannels
   }
 });

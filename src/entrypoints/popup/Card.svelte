@@ -14,20 +14,21 @@
   const { isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels }: Props = $props();
 
   $effect(() => {
+    const { like, dislike, unrate } = keys.combos;
     storage.setItem<ButtonTriggers>(StorageKey.buttonTriggers, {
       like: {
-        primary: keys.combos.like.filter(key => !isModifier(key)),
-        modifiers: keys.combos.like.filter(isModifier),
+        primary: like.filter(key => !isModifier(key)),
+        modifiers: like.filter(isModifier),
         secondary: keys.combosSecondary.like
       },
       dislike: {
-        primary: keys.combos.dislike.filter(key => !isModifier(key)),
-        modifiers: keys.combos.dislike.filter(isModifier),
+        primary: dislike.filter(key => !isModifier(key)),
+        modifiers: dislike.filter(isModifier),
         secondary: keys.combosSecondary.dislike
       },
       unrate: {
-        primary: keys.combos.unrate.filter(key => !isModifier(key)),
-        modifiers: keys.combos.unrate.filter(isModifier),
+        primary: unrate.filter(key => !isModifier(key)),
+        modifiers: unrate.filter(isModifier),
         secondary: keys.combosSecondary.unrate
       }
     });

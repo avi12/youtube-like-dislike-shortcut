@@ -1,8 +1,6 @@
 const HEX_PAD_LENGTH = 2;
 const MILLISECONDS_PER_SECOND = 1000;
 const SAPISID_COOKIE_NAMES = ["SAPISID", "__Secure-3PAPISID", "__Secure-1PAPISID"];
-const YOUTUBE_ORIGIN = "https://www.youtube.com";
-
 function readCookie(name: string) {
   const prefix = `${name}=`;
   const cookieEntry = document.cookie
@@ -28,7 +26,7 @@ export async function buildSapisidAuthorization() {
     return "";
   }
   const timestampSeconds = Math.floor(Date.now() / MILLISECONDS_PER_SECOND);
-  const text = `${timestampSeconds} ${sapisid} ${YOUTUBE_ORIGIN}`;
+  const text = `${timestampSeconds} ${sapisid} https://www.youtube.com`;
   const buffer = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(text));
   const hash = Array.from(new Uint8Array(buffer))
     .map(byte => byte.toString(16).padStart(HEX_PAD_LENGTH, "0"))

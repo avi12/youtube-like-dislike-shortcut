@@ -30,19 +30,19 @@ export const svgs = {
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
-export function createIconElement(definition: IconDefinition) {
+export function createIconElement({ viewBox, pathData, fill, stroke }: IconDefinition) {
   const elSvg = document.createElementNS(SVG_NAMESPACE, "svg");
   elSvg.setAttribute("xmlns", SVG_NAMESPACE);
-  elSvg.setAttribute("viewBox", definition.viewBox);
+  elSvg.setAttribute("viewBox", viewBox);
   elSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
   elSvg.setAttribute("focusable", "false");
   const elPath = document.createElementNS(SVG_NAMESPACE, "path");
-  elPath.setAttribute("d", definition.pathData);
-  if (definition.fill) {
-    elPath.setAttribute("fill", definition.fill);
+  elPath.setAttribute("d", pathData);
+  if (fill) {
+    elPath.setAttribute("fill", fill);
   }
-  if (definition.stroke) {
-    elPath.setAttribute("stroke", definition.stroke);
+  if (stroke) {
+    elPath.setAttribute("stroke", stroke);
   }
   elSvg.append(elPath);
   return elSvg;
