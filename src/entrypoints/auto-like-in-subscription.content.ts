@@ -16,16 +16,27 @@ import {
   getRatedButton,
   rateVideo
 } from "@/lib/ytr-buttons";
+import {
+  announceSubscriptionDecision,
+  resetSubscriptionDecision,
+  SubscriptionDecision
+} from "@/lib/ytr-subscription-signal";
 
 function getIsFollowing() {
-  return location.hostname === YOUTUBE_HOST.music ? getIsInLibrary() : getIsSubscribed();
+  const { hostname } = location;
+  return hostname === YOUTUBE_HOST.music ? getIsInLibrary() : getIsSubscribed();
 }
 
-let OBSERVER_SUBSCRIPTION: MutationObserver;
+function getFollowSelector() {
+  const { hostname } = location;
+  const { buttonFollowMusic, buttonSubscribe } = SELECTORS;
+  return hostname === YOUTUBE_HOST.music ? buttonFollowMusic : buttonSubscribe;
+}
+
 let lastUrl: string | undefined;
 let lastTitle: string | undefined;
 let hasHandledNavigation = false;
-let hasNavigated = false;
+let isUserSubscribeClickPending = false;
 
 async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
   if (hasHandledNavigation) {
@@ -33,12 +44,9 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return true;
   }
 
-  if (!hasNavigated) {
-    return false;
-  }
-
   const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
   if (!isAutoLikeSubscribedChannels) {
+    announceSubscriptionDecision(SubscriptionDecision.released);
     observer?.disconnect();
     return true;
   }
@@ -48,8 +56,9 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return false;
   }
 
-  const isAlreadyRated = getRatedButton();
-  if (isAlreadyRated) {
+  const elAlreadyRated = getRatedButton();
+  if (elAlreadyRated) {
+    announceSubscriptionDecision(SubscriptionDecision.released);
     hasHandledNavigation = true;
     observer?.disconnect();
     return true;
@@ -57,38 +66,77 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
 
   const isFollowing = getIsFollowing();
   if (!isFollowing) {
+    announceSubscriptionDecision(SubscriptionDecision.released);
     return false;
   }
 
+  announceSubscriptionDecision(SubscriptionDecision.claimed);
   hasHandledNavigation = true;
   await rateVideo(true);
   observer?.disconnect();
   return true;
 }
 
+async function handleUserSubscribed() {
+  if (!isUserSubscribeClickPending) {
+    return;
+  }
+  const isFollowing = getIsFollowing();
+  if (!isFollowing) {
+    isUserSubscribeClickPending = false;
+    return;
+  }
+  isUserSubscribeClickPending = false;
+  if (hasHandledNavigation) {
+    return;
+  }
+  const elAlreadyRated = getRatedButton();
+  if (elAlreadyRated) {
+    hasHandledNavigation = true;
+    return;
+  }
+  hasHandledNavigation = true;
+  await rateVideo(true);
+}
+
+function markUserSubscribeClick(e: Event) {
+  const { target } = e;
+  if (!(target instanceof Element)) {
+    return;
+  }
+  const isInsideFollowButton = Boolean(target.closest(getFollowSelector()));
+  if (!isInsideFollowButton) {
+    return;
+  }
+  isUserSubscribeClickPending = true;
+}
+
 async function addTemporaryBodyListener() {
-  const isSameUrlOrTitle = lastUrl === location.href || lastTitle === document.title;
+  const { href } = location;
+  const { title } = document;
+  const isSameUrlOrTitle = lastUrl === href || lastTitle === title;
   if (isSameUrlOrTitle) {
     return;
   }
 
-  lastUrl = location.href;
-  lastTitle = document.title;
+  lastUrl = href;
+  lastTitle = title;
   hasHandledNavigation = false;
-  hasNavigated = true;
+  isUserSubscribeClickPending = false;
+  resetSubscriptionDecision();
 
   const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
   if (!isAutoLikeSubscribedChannels) {
+    announceSubscriptionDecision(SubscriptionDecision.released);
     return;
   }
 
   const isLikedNow = await autoLikeIfSubscribed();
   if (isLikedNow) {
-    OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
     return;
   }
 
-  const navigationUrl = location.href;
+  const navigationUrl = href;
   new MutationObserver(async (_, observer) => {
     const isUrlChanged = location.href !== navigationUrl;
     if (isUrlChanged) {
@@ -97,7 +145,6 @@ async function addTemporaryBodyListener() {
     }
     const isLikedAfterMutation = await autoLikeIfSubscribed();
     if (isLikedAfterMutation) {
-      OBSERVER_SUBSCRIPTION.observe(document, OBSERVER_OPTIONS);
       observer.disconnect();
     }
   }).observe(document, OBSERVER_OPTIONS);
@@ -107,16 +154,17 @@ function addStorageListener() {
   storage.watch<boolean>(StorageKey.isAutoLikeSubscribedChannels, async isAutoLike => {
     const isAutoLikeSet = isAutoLike !== null;
     window.ytrAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
-    if (isAutoLike) {
-      await autoLikeIfSubscribed();
+    if (!window.ytrAutoLikeSubscribedChannels) {
+      announceSubscriptionDecision(SubscriptionDecision.released);
+      return;
     }
+    await autoLikeIfSubscribed();
   });
 }
 
-async function addFollowEventListener() {
-  const selector = location.hostname === YOUTUBE_HOST.music ? SELECTORS.buttonFollowMusic : SELECTORS.buttonSubscribe;
-  const elFollowButton = await getElementByMutationObserver<HTMLButtonElement>(selector);
-  OBSERVER_SUBSCRIPTION.observe(elFollowButton, {
+async function addFollowButtonObserver() {
+  const elFollowButton = await getElementByMutationObserver<HTMLButtonElement>(getFollowSelector());
+  new MutationObserver(handleUserSubscribed).observe(elFollowButton, {
     attributes: true,
     attributeFilter: [DOM_ATTRIBUTE.subscribed]
   });
@@ -124,17 +172,12 @@ async function addFollowEventListener() {
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://music.youtube.com/*"],
-  async main () {
+  async main() {
     lastUrl = location.href;
     lastTitle = document.title;
 
-    OBSERVER_SUBSCRIPTION = new MutationObserver(async () => {
-      const isFollowing = getIsFollowing();
-      if (isFollowing) {
-        await autoLikeIfSubscribed();
-        OBSERVER_SUBSCRIPTION.disconnect();
-      }
-    });
+    document.addEventListener("click", markUserSubscribeClick, { capture: true });
+    document.addEventListener("keydown", markUserSubscribeClick, { capture: true });
 
     window.ytrAutoLikeSubscribedChannels = await getStorage({
       storageKey: StorageKey.isAutoLikeSubscribedChannels,
@@ -142,9 +185,13 @@ export default defineContentScript({
       updateWindowKey: "ytrAutoLikeSubscribedChannels"
     });
 
+    if (!window.ytrAutoLikeSubscribedChannels) {
+      announceSubscriptionDecision(SubscriptionDecision.released);
+    }
+
     addStorageListener();
     await addNavigationListener(addTemporaryBodyListener);
-    await addFollowEventListener();
+    await addFollowButtonObserver();
 
     const isAutoLikeSubscribedChannels = window.ytrAutoLikeSubscribedChannels;
     if (!isAutoLikeSubscribedChannels) {
