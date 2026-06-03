@@ -12,7 +12,12 @@ import {
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./auto-like-percentage.content/CsuiAutoLikePercent.svelte";
-import { sharedState, watchMountState } from "./auto-like-percentage.content/states.svelte";
+import {
+  getIsFreshMountAllowed,
+  getIsUnmountRequired,
+  sharedState,
+  watchMountState
+} from "./auto-like-percentage.content/states.svelte";
 
 let ratingWatchObserver: MutationObserver | null = null;
 
@@ -94,8 +99,8 @@ export default defineContentScript({
       })
     ]);
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
+    sharedState.lastHref = location.href;
 
-    let lastHref = location.href;
     let isMounting = false;
     let activeShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
     const elementNameToInject = "ytr-percentage-music";
@@ -137,26 +142,18 @@ export default defineContentScript({
       activeShadowUi = null;
     }
 
-    let isFreshMountAllowed = false;
-    let isUnmountRequired = true;
-    let hasMountedForCurrentNav = false;
-
     function syncUi() {
-      if (isUnmountRequired) {
+      if (getIsUnmountRequired()) {
         unmountUi();
         return;
       }
-      if (hasMountedForCurrentNav || isFreshMountAllowed) {
-        hasMountedForCurrentNav = true;
+      if (sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed()) {
+        sharedState.hasMountedForCurrentNav = true;
         void mountUi();
       }
     }
 
-    watchMountState(({ isFreshMountAllowed: nextFreshMountAllowed, isUnmountRequired: nextUnmountRequired }) => {
-      isFreshMountAllowed = nextFreshMountAllowed;
-      isUnmountRequired = nextUnmountRequired;
-      syncUi();
-    });
+    watchMountState(syncUi);
 
     new MutationObserver(syncUi).observe(document, OBSERVER_OPTIONS);
 
@@ -165,19 +162,21 @@ export default defineContentScript({
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
 
-    document.addEventListener(YOUTUBE_EVENT.navigateFinish, () => {
-      lastHref = "";
+    function handleIfNavigated() {
+      if (location.href === sharedState.lastHref) {
+        return;
+      }
+      sharedState.lastHref = location.href;
+      sharedState.hasMountedForCurrentNav = false;
       sharedState.subscriptionDecision = undefined;
-      hasMountedForCurrentNav = false;
+      unmountUi();
       watchForInitialRating();
-    });
+    }
+
+    document.addEventListener(YOUTUBE_EVENT.navigateFinish, handleIfNavigated);
 
     document.addEventListener("timeupdate", async e => {
-      const isNewPage = location.href !== lastHref;
-      if (isNewPage) {
-        lastHref = location.href;
-        watchForInitialRating();
-      }
+      handleIfNavigated();
 
       const isUserInteractedGlobal = window.ytrUserInteracted;
       if (isUserInteractedGlobal) {
@@ -191,13 +190,13 @@ export default defineContentScript({
         return;
       }
 
-      const { target } = e;
-      const isTargetVideo = target instanceof HTMLVideoElement;
+      const { target: elTarget } = e;
+      const isTargetVideo = elTarget instanceof HTMLVideoElement;
       if (!isTargetVideo) {
         return;
       }
 
-      const { duration, currentTime } = target;
+      const { duration, currentTime } = elTarget;
       const isLastTimeUpdateSet = Boolean(sharedState.lastTimeUpdate);
       if (!isLastTimeUpdateSet) {
         sharedState.lastTimeUpdate = currentTime;
@@ -221,12 +220,12 @@ export default defineContentScript({
     }, { capture: true });
 
     function markUserInteractedIfRateButton(e: Event) {
-      const { target } = e;
-      const isTargetElement = target instanceof HTMLElement;
+      const { target: elTarget } = e;
+      const isTargetElement = elTarget instanceof HTMLElement;
       if (!isTargetElement) {
         return;
       }
-      const isInsideRateButtons = Boolean(target.closest(SELECTORS.toggleButtonsMusicVideo));
+      const isInsideRateButtons = Boolean(elTarget.closest(SELECTORS.toggleButtonsMusicVideo));
       if (!isInsideRateButtons) {
         return;
       }

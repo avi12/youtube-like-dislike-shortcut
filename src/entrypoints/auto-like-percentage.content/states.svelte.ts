@@ -13,6 +13,8 @@ interface SharedState {
   isShorts: boolean;
   isAutoLikeEnabled: boolean;
   subscriptionDecision: SubscriptionDecision | undefined;
+  hasMountedForCurrentNav: boolean;
+  lastHref: string;
 }
 
 export const sharedState: SharedState = $state({
@@ -27,10 +29,12 @@ export const sharedState: SharedState = $state({
   isLiveOrPremiere: false,
   isShorts: false,
   isAutoLikeEnabled: false,
-  subscriptionDecision: undefined
+  subscriptionDecision: undefined,
+  hasMountedForCurrentNav: false,
+  lastHref: ""
 });
 
-function getIsUnmountRequired() {
+export function getIsUnmountRequired() {
   if (!sharedState.isAutoLikeEnabled) {
     return true;
   }
@@ -46,7 +50,7 @@ function getIsUnmountRequired() {
   return sharedState.isAdInitiallyPlaying && sharedState.isAdPlaying;
 }
 
-function getIsFreshMountAllowed() {
+export function getIsFreshMountAllowed() {
   if (getIsUnmountRequired()) {
     return false;
   }
@@ -59,10 +63,8 @@ function getIsFreshMountAllowed() {
   return !sharedState.isUserInteracted;
 }
 
-export function watchMountState(onChange: (state: { isFreshMountAllowed: boolean; isUnmountRequired: boolean }) => void) {
+export function watchMountState(syncUi: () => void) {
   return $effect.root(() => {
-    $effect(() => {
-      onChange({ isFreshMountAllowed: getIsFreshMountAllowed(), isUnmountRequired: getIsUnmountRequired() });
-    });
+    $effect(syncUi);
   });
 }

@@ -14,7 +14,37 @@ import {
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
-import { sharedState, watchMountState } from "./states.svelte";
+import { getIsFreshMountAllowed, getIsUnmountRequired, sharedState, watchMountState } from "./states.svelte";
+
+enum CsuiElementName {
+  percentage = "ytr-percentage",
+  percentageFullscreen = "ytr-percentage-fullscreen"
+}
+
+interface UiManager {
+  name: CsuiElementName;
+  selector: string;
+  append: "first" | "before" | "after";
+  shadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null;
+  isMounting: boolean;
+}
+
+const uiManagers: UiManager[] = [
+  {
+    name: CsuiElementName.percentage,
+    selector: SELECTORS.percentageContainer,
+    append: "first",
+    shadowUi: null,
+    isMounting: false
+  },
+  {
+    name: CsuiElementName.percentageFullscreen,
+    selector: SELECTORS.percentageContainerFullscreen,
+    append: "before",
+    shadowUi: null,
+    isMounting: false
+  }
+];
 
 function getIsShorts() {
   return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
@@ -50,8 +80,7 @@ function watchForInitialRating() {
   const anyButtonSelector = `:where(${containerSelector}) button[${DOM_ATTRIBUTE.ariaPressed}]`;
 
   function applyState() {
-    const isUserInteractedGlobal = window.ytrUserInteracted;
-    if (isUserInteractedGlobal) {
+    if (window.ytrUserInteracted) {
       sharedState.isUserInteracted = true;
     }
     const isRated = Boolean(getRatedButton());
@@ -62,7 +91,6 @@ function watchForInitialRating() {
     sharedState.isRatingResolved = true;
   }
 
-  // Keep watching after initial resolution to catch YouTube's async aria-pressed updates
   ratingWatchObserver = new MutationObserver(mutations => {
     const isRelevant = mutations.some(
       mutation =>
@@ -103,15 +131,11 @@ export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
-    let isMounting = false;
-    let lastHref = location.href;
-    const elementNameToInject = "ytr-percentage";
-
-    watchForInitialRating();
+    sharedState.isShorts = getIsShorts();
     sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.isAdPlaying = getIsAdPlaying();
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
-    sharedState.isShorts = getIsShorts();
+    sharedState.lastHref = location.href;
 
     onSubscriptionDecision(decision => {
       sharedState.subscriptionDecision = decision;
@@ -132,116 +156,73 @@ export default defineContentScript({
     ]);
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
 
-    let activeShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
-    let activeFullscreenShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
-    let isMountingFullscreen = false;
-    let lastNavigationHref = location.href;
-    let hasMountedForCurrentNav = false;
-    const elementNameToInjectFullscreen = "ytr-percentage-fullscreen";
+    watchForInitialRating();
 
-    function handleIfNavigated() {
-      const isSameUrl = location.href === lastNavigationHref;
-      if (isSameUrl) {
+    async function mountManager(manager: UiManager) {
+      const isAlreadyMounted = Boolean(document.querySelector(manager.name));
+      const isSkipped = manager.isMounting || isAlreadyMounted;
+      if (isSkipped) {
         return;
       }
-      lastNavigationHref = location.href;
-      lastHref = "";
+      const elAnchor = document.querySelector(manager.selector);
+      if (!elAnchor) {
+        return;
+      }
+      manager.isMounting = true;
+      manager.shadowUi = await createShadowRootUi(ctx, {
+        name: manager.name,
+        position: "inline",
+        append: manager.append,
+        anchor: manager.selector,
+        onMount(elShadowContainer) {
+          return mount(CsuiAutoLikePercent, { target: elShadowContainer });
+        },
+        onRemove(app) {
+          if (app) {
+            void unmount(app);
+          }
+        }
+      });
+      manager.shadowUi.mount();
+      manager.isMounting = false;
+    }
+
+    async function mountUi() {
+      await Promise.all(uiManagers.map(mountManager));
+    }
+
+    function unmountUi() {
+      for (const manager of uiManagers) {
+        manager.shadowUi?.remove();
+        manager.shadowUi = null;
+      }
+    }
+
+    function handleIfNavigated() {
+      if (location.href === sharedState.lastHref) {
+        return;
+      }
+      sharedState.lastHref = location.href;
+      sharedState.hasMountedForCurrentNav = false;
       sharedState.isShorts = getIsShorts();
       sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
       sharedState.subscriptionDecision = undefined;
-      hasMountedForCurrentNav = false;
       unmountUi();
       watchForInitialRating();
     }
 
-    async function mountUi() {
-      await Promise.all([mountNormalUi(), mountFullscreenUi()]);
-    }
-
-    async function mountNormalUi() {
-      const isAlreadyMounted = Boolean(document.querySelector(elementNameToInject));
-      const isMountSkipped = isMounting || isAlreadyMounted;
-      if (isMountSkipped) {
-        return;
-      }
-      const elContainer = document.querySelector(SELECTORS.percentageContainer);
-      if (!elContainer) {
-        return;
-      }
-      isMounting = true;
-      activeShadowUi = await createShadowRootUi(ctx, {
-        name: elementNameToInject,
-        position: "inline",
-        append: "first",
-        anchor: SELECTORS.percentageContainer,
-        onMount(elShadowContainer) {
-          return mount(CsuiAutoLikePercent, { target: elShadowContainer });
-        },
-        onRemove(app) {
-          if (app) {
-            void unmount(app);
-          }
-        }
-      });
-      activeShadowUi.mount();
-      isMounting = false;
-    }
-
-    async function mountFullscreenUi() {
-      const isAlreadyMounted = Boolean(document.querySelector(elementNameToInjectFullscreen));
-      const isMountSkipped = isMountingFullscreen || isAlreadyMounted;
-      if (isMountSkipped) {
-        return;
-      }
-      const elFullscreenAnchor = document.querySelector(SELECTORS.percentageContainerFullscreen);
-      if (!elFullscreenAnchor) {
-        return;
-      }
-      isMountingFullscreen = true;
-      activeFullscreenShadowUi = await createShadowRootUi(ctx, {
-        name: elementNameToInjectFullscreen,
-        position: "inline",
-        append: "before",
-        anchor: SELECTORS.percentageContainerFullscreen,
-        onMount(elShadowContainer) {
-          return mount(CsuiAutoLikePercent, { target: elShadowContainer });
-        },
-        onRemove(app) {
-          if (app) {
-            void unmount(app);
-          }
-        }
-      });
-      activeFullscreenShadowUi.mount();
-      isMountingFullscreen = false;
-    }
-
-    function unmountUi() {
-      activeShadowUi?.remove();
-      activeShadowUi = null;
-      activeFullscreenShadowUi?.remove();
-      activeFullscreenShadowUi = null;
-    }
-
-    let isFreshMountAllowed = false;
-    let isUnmountRequired = true;
-
     function syncUi() {
-      if (isUnmountRequired) {
+      if (getIsUnmountRequired()) {
         unmountUi();
         return;
       }
-      if (hasMountedForCurrentNav || isFreshMountAllowed) {
-        hasMountedForCurrentNav = true;
+      if (sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed()) {
+        sharedState.hasMountedForCurrentNav = true;
         void mountUi();
       }
     }
 
-    watchMountState(({ isFreshMountAllowed: nextFreshMountAllowed, isUnmountRequired: nextUnmountRequired }) => {
-      isFreshMountAllowed = nextFreshMountAllowed;
-      isUnmountRequired = nextUnmountRequired;
-      syncUi();
-    });
+    watchMountState(syncUi);
 
     new MutationObserver(() => {
       handleIfNavigated();
@@ -254,14 +235,9 @@ export default defineContentScript({
     });
 
     document.addEventListener("timeupdate", async e => {
-      const isNewPage = location.href !== lastHref;
-      if (isNewPage) {
-        lastHref = location.href;
-        watchForInitialRating();
-      }
+      handleIfNavigated();
 
-      const isUserInteractedGlobal = window.ytrUserInteracted;
-      if (isUserInteractedGlobal) {
+      if (window.ytrUserInteracted) {
         sharedState.isUserInteracted = true;
         return;
       }
@@ -285,19 +261,17 @@ export default defineContentScript({
         sharedState.percentageWatched = 0;
       }
 
-      const { target } = e;
-      const isTargetVideo = target instanceof HTMLVideoElement;
+      const { target: elTarget } = e;
+      const isTargetVideo = elTarget instanceof HTMLVideoElement;
       if (!isTargetVideo) {
         return;
       }
-      const { duration, currentTime } = target;
+      const { duration, currentTime } = elTarget;
       if (isAdPlaying) {
         sharedState.lastTimeUpdate = currentTime;
         return;
       }
-
-      const isLiveOrPremiere = sharedState.isLiveOrPremiere;
-      if (isLiveOrPremiere) {
+      if (sharedState.isLiveOrPremiere) {
         sharedState.lastTimeUpdate = currentTime;
         return;
       }
@@ -329,12 +303,12 @@ export default defineContentScript({
     );
 
     function markUserInteractedIfRateButton(e: Event) {
-      const { target } = e;
-      const isTargetElement = target instanceof HTMLElement;
+      const { target: elTarget } = e;
+      const isTargetElement = elTarget instanceof HTMLElement;
       if (!isTargetElement) {
         return;
       }
-      const isInsideRateButtons = Boolean(target.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`));
+      const isInsideRateButtons = Boolean(elTarget.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`));
       if (!isInsideRateButtons) {
         return;
       }
