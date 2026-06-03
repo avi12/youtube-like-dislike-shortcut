@@ -34,8 +34,8 @@ const STABILITY_THRESHOLD_MS = 150;
 const POLL_INTERVAL_MS = 50;
 
 function parseBrowserArg(): SupportedBrowser {
-  const browserIndex = process.argv.findIndex(arg => arg === "--browser" || arg === "-b");
-  const candidate = browserIndex >= 0 ? process.argv[browserIndex + 1] : undefined;
+  const iBrowser = process.argv.findIndex(arg => arg === "--browser" || arg === "-b");
+  const candidate = iBrowser >= 0 ? process.argv[iBrowser + 1] : undefined;
   const allowed: SupportedBrowser[] = ["chrome", "edge", "firefox", "opera"];
   if (candidate && allowed.includes(candidate as SupportedBrowser)) {
     return candidate as SupportedBrowser;

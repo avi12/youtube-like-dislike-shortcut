@@ -6,8 +6,8 @@ interface StoredObject {
   [key: string]: StoredValue;
 }
 
-function isPlainObject(val: StoredValue): val is StoredObject {
-  return typeof val === "object" && val !== null && !Array.isArray(val);
+function isPlainObject(value: StoredValue): value is StoredObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function mergeWithFallback(fallback: StoredObject, stored: StoredObject) {
@@ -126,13 +126,13 @@ export const OBSERVER_OPTIONS = Object.freeze<MutationObserverInit>({
   subtree: true 
 });
 
-function getIsElementVisible(element: HTMLElement) {
-  const { offsetWidth, offsetHeight } = element;
+function getIsElementVisible(elElement: HTMLElement) {
+  const { offsetWidth, offsetHeight } = elElement;
   return offsetWidth > 0 && offsetHeight > 0;
 }
 
-function getIsElementInViewport(element: HTMLElement) {
-  const { top, left, bottom, right } = element.getBoundingClientRect();
+function getIsElementInViewport(elElement: HTMLElement) {
+  const { top, left, bottom, right } = elElement.getBoundingClientRect();
   return top > 0 && left > 0 && bottom < innerHeight && right < innerWidth;
 }
 

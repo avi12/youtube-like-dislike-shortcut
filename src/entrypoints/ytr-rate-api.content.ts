@@ -22,8 +22,8 @@ interface MoviePlayerElement extends HTMLElement {
 }
 
 function getVideoIdFromPlayer() {
-  const player = document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer);
-  return player?.getVideoData?.()?.video_id ?? "";
+  const elPlayer = document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer);
+  return elPlayer?.getVideoData?.()?.video_id ?? "";
 }
 
 function getVideoIdFromEmbedUrl() {
@@ -32,12 +32,12 @@ function getVideoIdFromEmbedUrl() {
 }
 
 function getVideoIdFromChannelTrailer() {
-  const trailer = document.querySelector(SELECTORS.channelTrailerPlayer);
-  const isTrailerWithData = trailer && "data" in trailer;
+  const elTrailer = document.querySelector(SELECTORS.channelTrailerPlayer);
+  const isTrailerWithData = elTrailer && "data" in elTrailer;
   if (!isTrailerWithData) {
     return "";
   }
-  const { data } = trailer;
+  const { data } = elTrailer;
   const isValidVideoData = data && typeof data === "object" && "videoId" in data && data.videoId;
   if (!isValidVideoData) {
     return "";

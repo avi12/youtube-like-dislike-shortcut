@@ -42,9 +42,9 @@
       ]
     ).map(keyToModifier)
   );
-  const isHasAnotherShortcut = $derived(defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]);
-  const isNotRecordingThisType = $derived(!keys.isRecording || keys.currentlyRecording !== type);
-  const isShowingAlternateShortcut = $derived(Boolean(isHasAnotherShortcut) && isNotRecordingThisType);
+  const alternateShortcutName = $derived(defaultAdditionalShortcuts[displayedKeyComboList.join(" + ")]);
+  const isRecordingThisType = $derived(keys.isRecording && keys.currentlyRecording === type);
+  const isShowingAlternateShortcut = $derived(Boolean(alternateShortcutName) && !isRecordingThisType);
 
   const REGEX_MODIFIERS = new RegExp(`(${MODIFIER_KEYCODES.join("|")})`, "g");
 
@@ -73,7 +73,7 @@
     return keyCombo1.join(" + ") === keyCombo2.join(" + ");
   }
 
-  function getHasConflicts(newKeyCombo: string[]) {
+  function getIsConflicting(newKeyCombo: string[]) {
     for (const currentType of Object.values(ShortcutType)) {
       const isDifferentType = currentType !== type;
       const isSameCombo = getIsKeyCombosTheSame(keys.combos[currentType], newKeyCombo);
@@ -88,7 +88,6 @@
 
   $effect(() => {
     function handleKeydown(e: KeyboardEvent) {
-      const isRecordingThisType = keys.isRecording && keys.currentlyRecording === type;
       if (!isRecordingThisType) {
         return;
       }
@@ -111,7 +110,6 @@
     }
 
     function handleKeyup(e: KeyboardEvent) {
-      const isRecordingThisType = keys.isRecording && keys.currentlyRecording === type;
       if (!isRecordingThisType) {
         return;
       }
@@ -132,8 +130,8 @@
       }
 
       const isOnlyModifiers = keyComboTemp.every(isModifier);
-      const isInvalidCombo = isOnlyModifiers || getHasConflicts(keyComboTemp);
-      if (isInvalidCombo) {
+      const isComboValid = !isOnlyModifiers && !getIsConflicting(keyComboTemp);
+      if (!isComboValid) {
         return;
       }
 
@@ -180,7 +178,7 @@
       <Checkbox
         bind:checked={keys.combosSecondary[type]}
         disabled={keys.isRecording && keys.currentlyRecording !== type}>
-        Also use {isHasAnotherShortcut}
+        Also use {alternateShortcutName}
       </Checkbox>
     {/if}
   </div>
