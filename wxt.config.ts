@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { defineConfig } from "wxt";
 import packageJson from "./package.json" with { type: "json" };
+import { MusicCommand } from "./src/lib/ytmusic-command";
 
 function parseGitignoreAsExcludes() {
   return readFileSync(".gitignore", "utf-8")
@@ -39,6 +40,17 @@ export default defineConfig({
     homepage_url: url,
     permissions: sharedPermissions,
     host_permissions: ["https://www.youtube.com/*"],
+    commands: {
+      [MusicCommand.like]: {
+        description: "Like the YouTube Music song that's playing"
+      },
+      [MusicCommand.dislike]: {
+        description: "Dislike the YouTube Music song that's playing"
+      },
+      [MusicCommand.unrate]: {
+        description: "Unrate the YouTube Music song that's playing"
+      }
+    },
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
     ...browser !== "firefox" && { offline_enabled: true },
     ...browser === "firefox" && {
