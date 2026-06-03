@@ -11,6 +11,11 @@ Keyboard shortcuts (configurable in the popup):
 - <kbd>Numpad Minus</kbd> to dislike
 - Pressing the like/dislike shortcut while the corresponding button is already active will do nothing
 
+Global keyboard shortcuts for YouTube Music (configurable in `chrome://extensions/shortcuts`, no defaults):
+
+- Like, dislike, or unrate the playing YouTube Music song from any tab or window
+- Only fires when there's a single YouTube Music tab and it isn't focused; when it is focused, the popup shortcuts above are used instead
+
 Additionally:
 
 - Auto-like based on a watch time threshold that you set
