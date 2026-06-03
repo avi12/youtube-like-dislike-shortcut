@@ -1,12 +1,17 @@
 import { YTCFG_KEY } from "@/lib/types";
 import { SELECTORS, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
-import { RateAction, type RateContext, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
-import { executeRateRequest, fetchRateParamsFromNext } from "@/lib/ytr-rate-fetch";
+import { RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import {
+  executeRateRequest,
+  fetchRateParamsFromNext,
+  findRateParamInInnertube,
+  type RateParamField
+} from "@/lib/ytr-rate-fetch";
 import { buildSapisidAuthorization } from "@/lib/ytr-sapisid";
 
 const WEB_CLIENT_NAME_NUMBER = 1;
 
-const paramFieldForAction: Record<RateAction, "likeParams" | "dislikeParams" | "removeLikeParams"> = {
+const paramFieldForAction: Record<RateAction, RateParamField> = {
   [RateAction.like]: "likeParams",
   [RateAction.dislike]: "dislikeParams",
   [RateAction.removelike]: "removeLikeParams"
@@ -22,8 +27,8 @@ function getVideoIdFromPlayer() {
 }
 
 function getVideoIdFromEmbedUrl() {
-  const match = location.pathname.match(/^\/embed\/([^/?]+)/);
-  return match ? match[1] : "";
+  const [, videoId] = location.pathname.match(/^\/embed\/([^/?]+)/) ?? [];
+  return videoId ?? "";
 }
 
 function getVideoIdFromChannelTrailer() {
@@ -41,19 +46,20 @@ function getVideoIdFromChannelTrailer() {
 }
 
 function getVideoId() {
-  const isWatchPage = location.pathname === YOUTUBE_PATHNAME.watch;
+  const { pathname } = location;
+  const isWatchPage = pathname === YOUTUBE_PATHNAME.watch;
   if (isWatchPage) {
     return getVideoIdFromPlayer();
   }
-  const isEmbedPage = location.pathname.startsWith(YOUTUBE_PATHNAME.embed);
+  const isEmbedPage = pathname.startsWith(YOUTUBE_PATHNAME.embed);
   if (isEmbedPage) {
     return getVideoIdFromPlayer() || getVideoIdFromEmbedUrl();
   }
   return getVideoIdFromChannelTrailer();
 }
 
-function getRateContext(): RateContext | null {
-  const ytcfg = window.ytcfg;
+function getRateContext() {
+  const { ytcfg } = window;
   if (!ytcfg) {
     return null;
   }
@@ -70,8 +76,8 @@ function getRateContext(): RateContext | null {
   return { videoId, clientNameNumber, clientVersion, innertubeContext, delegatedSessionId, sessionIndex };
 }
 
-function getEmbedRateContext(): RateContext | null {
-  const ytcfg = window.ytcfg;
+function getEmbedRateContext() {
+  const { ytcfg } = window;
   if (!ytcfg) {
     return null;
   }
@@ -80,12 +86,13 @@ function getEmbedRateContext(): RateContext | null {
   if (!videoId || !clientVersion) {
     return null;
   }
-  const existingContext = ytcfg.get(YTCFG_KEY.innertubeContext);
+  const existingClient = ytcfg.get(YTCFG_KEY.innertubeContext)?.client;
+  const { hl, gl } = existingClient ?? {};
   const minimalClient = {
     clientName: "WEB",
     clientVersion,
-    ...existingContext?.client.hl && { hl: existingContext.client.hl },
-    ...existingContext?.client.gl && { gl: existingContext.client.gl }
+    ...hl && { hl },
+    ...gl && { gl }
   };
   return {
     videoId,
@@ -98,30 +105,7 @@ function getEmbedRateContext(): RateContext | null {
 }
 
 function extractRateParam(action: RateAction) {
-  const data = Object.getOwnPropertyDescriptor(window, "ytInitialData")?.value;
-  if (!data) {
-    return undefined;
-  }
-  const targetField = paramFieldForAction[action];
-  const stack: unknown[] = [data];
-  while (stack.length > 0) {
-    const node = stack.pop();
-    if (!node || typeof node !== "object") {
-      continue;
-    }
-    if (targetField in node) {
-      const value = Object.getOwnPropertyDescriptor(node, targetField)?.value;
-      if (typeof value === "string" && value) {
-        return value;
-      }
-    }
-    for (const value of Object.values(node)) {
-      if (value && typeof value === "object") {
-        stack.push(value);
-      }
-    }
-  }
-  return undefined;
+  return findRateParamInInnertube(window.ytInitialData, paramFieldForAction[action]);
 }
 
 async function rateVideoOnPage(action: RateAction) {

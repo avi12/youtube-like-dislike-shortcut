@@ -1,4 +1,10 @@
-import { type InnertubeContext } from "@/lib/types";
+import {
+  type ButtonViewModelContainer,
+  type InnertubeContext,
+  type InnertubeNextResponse,
+  type ToggleButtonViewModelContainer,
+  type YtInitialData
+} from "@/lib/types";
 import { RateAction, type RateContext } from "@/lib/ytr-messaging";
 
 const LIKE_API_URLS: Record<RateAction, string> = {
@@ -9,7 +15,9 @@ const LIKE_API_URLS: Record<RateAction, string> = {
 
 const NEXT_API_URL = "/youtubei/v1/next";
 
-const RATE_PARAM_FIELD: Record<RateAction, string> = {
+export type RateParamField = "likeParams" | "dislikeParams" | "removeLikeParams";
+
+const RATE_PARAM_FIELD: Record<RateAction, RateParamField> = {
   [RateAction.like]: "likeParams",
   [RateAction.dislike]: "dislikeParams",
   [RateAction.removelike]: "removeLikeParams"
@@ -33,31 +41,70 @@ function buildHeaders({
   Authorization: string;
   context: RateContext;
 }) {
+  const { clientNameNumber, clientVersion, sessionIndex, delegatedSessionId } = context;
   return {
     Authorization,
     "Content-Type": "application/json",
-    "X-YouTube-Client-Name": String(context.clientNameNumber),
-    "X-YouTube-Client-Version": context.clientVersion,
+    "X-YouTube-Client-Name": String(clientNameNumber),
+    "X-YouTube-Client-Version": clientVersion,
     "X-Origin": "https://www.youtube.com",
-    ...context.sessionIndex && { "X-Goog-AuthUser": context.sessionIndex },
-    ...context.delegatedSessionId && { "X-Goog-PageId": context.delegatedSessionId }
+    ...sessionIndex && { "X-Goog-AuthUser": sessionIndex },
+    ...delegatedSessionId && { "X-Goog-PageId": delegatedSessionId }
   };
 }
 
-function findParamInResponse(parsed: unknown, fieldName: string) {
-  const stack: unknown[] = [parsed];
-  while (stack.length > 0) {
-    const node = stack.pop();
-    if (!node || typeof node !== "object") {
-      continue;
+function pickParamFromButtonContainer(container: ButtonViewModelContainer | undefined, field: RateParamField) {
+  const { commands = [] } = container?.buttonViewModel?.onTap?.serialCommand ?? {};
+  for (const command of commands) {
+    const { innertubeCommand } = command;
+    const direct = innertubeCommand?.likeEndpoint?.[field];
+    if (direct) {
+      return direct;
     }
-    for (const [key, value] of Object.entries(node)) {
-      if (key === fieldName && typeof value === "string" && value) {
-        return value;
+    const nested = innertubeCommand?.modalEndpoint?.modal?.modalWithTitleAndButtonRenderer?.button?.buttonRenderer?.navigationEndpoint?.signInEndpoint?.nextEndpoint?.likeEndpoint?.[field];
+    if (nested) {
+      return nested;
+    }
+  }
+  return undefined;
+}
+
+function pickParamFromToggle(container: ToggleButtonViewModelContainer | undefined, field: RateParamField) {
+  const inner = container?.toggleButtonViewModel?.toggleButtonViewModel;
+  return pickParamFromButtonContainer(inner?.defaultButtonViewModel, field)
+    ?? pickParamFromButtonContainer(inner?.toggledButtonViewModel, field);
+}
+
+export function findRateParamInInnertube(root: YtInitialData | InnertubeNextResponse | undefined, field: RateParamField) {
+  if (!root) {
+    return undefined;
+  }
+  const { contents: rootContents, playerOverlays } = root;
+  const { contents = [] } = rootContents?.twoColumnWatchNextResults?.results?.results ?? {};
+  for (const content of contents) {
+    const { topLevelButtons = [] } = content.videoPrimaryInfoRenderer?.videoActions?.menuRenderer ?? {};
+    for (const button of topLevelButtons) {
+      const { likeButtonViewModel, dislikeButtonViewModel } = button.segmentedLikeDislikeButtonViewModel ?? {};
+      const fromLike = pickParamFromToggle(likeButtonViewModel?.likeButtonViewModel, field);
+      if (fromLike) {
+        return fromLike;
       }
-      if (value && typeof value === "object") {
-        stack.push(value);
+      const fromDislike = pickParamFromToggle(dislikeButtonViewModel?.dislikeButtonViewModel, field);
+      if (fromDislike) {
+        return fromDislike;
       }
+    }
+  }
+  const { quickActionButtons = [] } = playerOverlays?.playerOverlayRenderer?.fullscreenQuickActionsBar?.quickActionsViewModel ?? {};
+  for (const quickButton of quickActionButtons) {
+    const { likeButtonViewModel, dislikeButtonViewModel } = quickButton;
+    const fromLike = pickParamFromToggle(likeButtonViewModel, field);
+    if (fromLike) {
+      return fromLike;
+    }
+    const fromDislike = pickParamFromToggle(dislikeButtonViewModel, field);
+    if (fromDislike) {
+      return fromDislike;
     }
   }
   return undefined;
@@ -66,29 +113,27 @@ function findParamInResponse(parsed: unknown, fieldName: string) {
 export async function fetchRateParamsFromNext({
   action,
   context,
-  Authorization,
-  urlBase = ""
+  Authorization
 }: {
   action: RateAction;
   context: RateContext;
   Authorization: string;
-  urlBase?: string;
 }) {
-  const response = await fetch(`${urlBase}${NEXT_API_URL}?prettyPrint=false`, {
+  const { innertubeContext, videoId } = context;
+  const response = await fetch(`${NEXT_API_URL}?prettyPrint=false`, {
     method: "POST",
-    credentials: "include",
     headers: buildHeaders({ Authorization, context }),
     body: JSON.stringify({
-      context: context.innertubeContext,
-      videoId: context.videoId
+      context: innertubeContext,
+      videoId
     } satisfies NextRequestBody)
   });
   if (!response.ok) {
     console.debug("[ytr-fetch] /next failed", response.status);
     return undefined;
   }
-  const parsed = await response.json().catch(() => null);
-  const param = findParamInResponse(parsed, RATE_PARAM_FIELD[action]);
+  const parsed: InnertubeNextResponse | null = await response.json().catch(() => null);
+  const param = findRateParamInInnertube(parsed ?? undefined, RATE_PARAM_FIELD[action]);
   console.debug("[ytr-fetch] /next", { action, hasParam: Boolean(param) });
   return param;
 }
@@ -97,41 +142,22 @@ export async function executeRateRequest({
   action,
   context,
   Authorization,
-  params,
-  urlBase = ""
+  params
 }: {
   action: RateAction;
   context: RateContext;
   Authorization: string;
   params?: string;
-  urlBase?: string;
 }) {
-  const response = await fetch(`${urlBase}${LIKE_API_URLS[action]}?prettyPrint=false`, {
+  const { innertubeContext, videoId } = context;
+  const response = await fetch(`${LIKE_API_URLS[action]}?prettyPrint=false`, {
     method: "POST",
-    credentials: "include",
     headers: buildHeaders({ Authorization, context }),
     body: JSON.stringify({
-      context: context.innertubeContext,
-      target: { videoId: context.videoId },
+      context: innertubeContext,
+      target: { videoId },
       ...params && { params }
     } satisfies RateRequestBody)
   });
-  const isOk = response.ok;
-  const status = response.status;
-  void response.text().then(text => {
-    let parsed = null;
-    try {
-      parsed = JSON.parse(text);
-    } catch { /* ignore */ }
-    const summary = parsed ? {
-      hasFrameworkUpdates: Boolean(parsed.frameworkUpdates),
-      mutationCount: parsed.frameworkUpdates?.entityBatchUpdate?.mutations?.length ?? 0,
-      mutationKinds: parsed.frameworkUpdates?.entityBatchUpdate?.mutations?.map((mutation: { payload?: Record<string, unknown> }) => Object.keys(mutation.payload ?? {})) ?? [],
-      hasActions: Boolean(parsed.actions),
-      responseId: parsed.responseContext?.responseId,
-      bodyLength: text.length
-    } : { rawBodySample: text.slice(0, 400) };
-    console.debug("[ytr-fetch] response", isOk, status, JSON.stringify(summary));
-  }).catch(() => undefined);
-  return isOk;
+  return response.ok;
 }

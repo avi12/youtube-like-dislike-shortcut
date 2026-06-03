@@ -38,11 +38,10 @@ export enum YTCFG_KEY {
 }
 
 /**
- * The `context` field expected by YouTube's internal Innertube API. We model the
- * fields we depend on (`client.clientName`/`clientVersion`) and use index signatures
- * for forward-compat with the additional fields YouTube ships (request, user,
- * clickTracking, etc.). Reverse-engineered from observation — YouTube publishes no
- * official documentation for Innertube.
+ * Minimal subset of the Innertube request context we build. YouTube ships many
+ * more fields on the real `INNERTUBE_CONTEXT` (request, user, clickTracking,
+ * adSignalsInfo, etc.) but we only depend on `client`. The full payload is
+ * passed through verbatim via JSON.stringify when forwarding.
  */
 export interface InnertubeContext {
   client: {
@@ -50,10 +49,103 @@ export interface InnertubeContext {
     clientVersion: string;
     hl?: string;
     gl?: string;
-    [key: string]: unknown;
   };
-  [key: string]: unknown;
 }
+
+/**
+ * Rate-endpoint payload (innertubeCommand.likeEndpoint). Field names confirmed
+ * against real `ytInitialData` and `/youtubei/v1/next` responses via DevTools.
+ */
+interface LikeEndpoint {
+  likeParams?: string;
+  dislikeParams?: string;
+  removeLikeParams?: string;
+}
+
+interface InnertubeCommand {
+  likeEndpoint?: LikeEndpoint;
+  modalEndpoint?: {
+    modal?: {
+      modalWithTitleAndButtonRenderer?: {
+        button?: {
+          buttonRenderer?: {
+            navigationEndpoint?: {
+              signInEndpoint?: {
+                nextEndpoint?: InnertubeCommand;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+}
+
+export interface ButtonViewModelContainer {
+  buttonViewModel?: {
+    onTap?: {
+      serialCommand?: {
+        commands?: { innertubeCommand?: InnertubeCommand }[];
+      };
+    };
+  };
+}
+
+export interface ToggleButtonViewModelContainer {
+  toggleButtonViewModel?: {
+    toggleButtonViewModel?: {
+      defaultButtonViewModel?: ButtonViewModelContainer;
+      toggledButtonViewModel?: ButtonViewModelContainer;
+    };
+  };
+}
+
+interface SegmentedLikeDislikeButton {
+  likeButtonViewModel?: { likeButtonViewModel?: ToggleButtonViewModelContainer };
+  dislikeButtonViewModel?: { dislikeButtonViewModel?: ToggleButtonViewModelContainer };
+}
+
+interface QuickActionButton {
+  likeButtonViewModel?: ToggleButtonViewModelContainer;
+  dislikeButtonViewModel?: ToggleButtonViewModelContainer;
+}
+
+export interface YtInitialData {
+  contents?: {
+    twoColumnWatchNextResults?: {
+      results?: {
+        results?: {
+          contents?: {
+            videoPrimaryInfoRenderer?: {
+              videoActions?: {
+                menuRenderer?: {
+                  topLevelButtons?: {
+                    segmentedLikeDislikeButtonViewModel?: SegmentedLikeDislikeButton;
+                  }[];
+                };
+              };
+            };
+          }[];
+        };
+      };
+    };
+  };
+  playerOverlays?: {
+    playerOverlayRenderer?: {
+      fullscreenQuickActionsBar?: {
+        quickActionsViewModel?: {
+          quickActionButtons?: QuickActionButton[];
+        };
+      };
+    };
+  };
+}
+
+/**
+ * Shape of `/youtubei/v1/next` responses (same top-level structure as
+ * `ytInitialData` on the watch page).
+ */
+export type InnertubeNextResponse = YtInitialData;
 
 /**
  * Overload signatures for `ytcfg.get(...)` so each known key returns its precise value type.
@@ -74,8 +166,7 @@ declare global {
     ytrAutoLikeThreshold: typeof initial.autoLikeThreshold;
     ytrAutoLikeSubscribedChannels: typeof initial.isAutoLikeSubscribedChannels;
     ytrLastButtonTriggers: typeof initial.buttonTriggers;
-    ytrLastUrl: string;
-    ytrLastTitle: string;
     ytcfg?: { get: YtcfgGetter };
+    ytInitialData?: YtInitialData;
   }
 }
