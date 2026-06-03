@@ -12,8 +12,9 @@ import {
   YOUTUBE_PATHNAME
 } from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
-import { sharedState, watchDisplayPercentage } from "./states.svelte";
+import { sharedState, watchMountState } from "./states.svelte";
 
 function getIsShorts() {
   return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
@@ -39,6 +40,7 @@ function watchForInitialRating() {
 
   sharedState.isRatingResolved = false;
   sharedState.isRatedInitially = false;
+  sharedState.isCurrentlyRated = false;
   sharedState.isUserInteracted = false;
   sharedState.percentageWatched = 0;
   sharedState.lastTimeUpdate = 0;
@@ -53,18 +55,11 @@ function watchForInitialRating() {
       sharedState.isUserInteracted = true;
     }
     const isRated = Boolean(getRatedButton());
-    const isSharedUserInteracted = sharedState.isUserInteracted;
-    if (!isSharedUserInteracted) {
+    sharedState.isCurrentlyRated = isRated;
+    if (!sharedState.isUserInteracted) {
       sharedState.isRatedInitially = isRated;
     }
     sharedState.isRatingResolved = true;
-  }
-
-  function stopWatching() {
-    ratingWatchObserver?.disconnect();
-    ratingWatchObserver = null;
-    navigateFinishController?.abort();
-    navigateFinishController = null;
   }
 
   // Keep watching after initial resolution to catch YouTube's async aria-pressed updates
@@ -92,13 +87,10 @@ function watchForInitialRating() {
   });
 
   navigateFinishController = new AbortController();
-  document.addEventListener(YOUTUBE_EVENT.navigateFinish, () => {
-    stopWatching();
-    applyState();
-  }, {
+  document.addEventListener(YOUTUBE_EVENT.navigateFinish, applyState, {
     once: true,
-    signal: navigateFinishController.signal 
-  }  );
+    signal: navigateFinishController.signal
+  });
 
   const isButtonPresentInitially = Boolean(document.querySelector(anyButtonSelector));
   if (isInitialRatingCheckPending && isButtonPresentInitially) {
@@ -121,6 +113,11 @@ export default defineContentScript({
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
     sharedState.isShorts = getIsShorts();
 
+    onSubscriptionDecision(decision => {
+      sharedState.subscriptionDecision = decision;
+    });
+    sharedState.subscriptionDecision = getSubscriptionDecision();
+
     await Promise.all([
       getStorage({
         storageKey: StorageKey.isAutoLike,
@@ -136,7 +133,11 @@ export default defineContentScript({
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
 
     let activeShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
+    let activeFullscreenShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
+    let isMountingFullscreen = false;
     let lastNavigationHref = location.href;
+    let hasMountedForCurrentNav = false;
+    const elementNameToInjectFullscreen = "ytr-percentage-fullscreen";
 
     function handleIfNavigated() {
       const isSameUrl = location.href === lastNavigationHref;
@@ -145,33 +146,36 @@ export default defineContentScript({
       }
       lastNavigationHref = location.href;
       lastHref = "";
-      sharedState.hasNavigated = true;
       sharedState.isShorts = getIsShorts();
       sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
+      sharedState.subscriptionDecision = undefined;
+      hasMountedForCurrentNav = false;
       unmountUi();
       watchForInitialRating();
     }
 
     async function mountUi() {
+      await Promise.all([mountNormalUi(), mountFullscreenUi()]);
+    }
+
+    async function mountNormalUi() {
       const isAlreadyMounted = Boolean(document.querySelector(elementNameToInject));
       const isMountSkipped = isMounting || isAlreadyMounted;
       if (isMountSkipped) {
         return;
       }
       const elContainer = document.querySelector(SELECTORS.percentageContainer);
-      const isContainerPresent = Boolean(elContainer);
-      if (!isContainerPresent) {
+      if (!elContainer) {
         return;
       }
-
       isMounting = true;
       activeShadowUi = await createShadowRootUi(ctx, {
         name: elementNameToInject,
         position: "inline",
         append: "first",
         anchor: SELECTORS.percentageContainer,
-        onMount(container) {
-          return mount(CsuiAutoLikePercent, { target: container });
+        onMount(elShadowContainer) {
+          return mount(CsuiAutoLikePercent, { target: elShadowContainer });
         },
         onRemove(app) {
           if (app) {
@@ -183,22 +187,59 @@ export default defineContentScript({
       isMounting = false;
     }
 
+    async function mountFullscreenUi() {
+      const isAlreadyMounted = Boolean(document.querySelector(elementNameToInjectFullscreen));
+      const isMountSkipped = isMountingFullscreen || isAlreadyMounted;
+      if (isMountSkipped) {
+        return;
+      }
+      const elFullscreenAnchor = document.querySelector(SELECTORS.percentageContainerFullscreen);
+      if (!elFullscreenAnchor) {
+        return;
+      }
+      isMountingFullscreen = true;
+      activeFullscreenShadowUi = await createShadowRootUi(ctx, {
+        name: elementNameToInjectFullscreen,
+        position: "inline",
+        append: "before",
+        anchor: SELECTORS.percentageContainerFullscreen,
+        onMount(elShadowContainer) {
+          return mount(CsuiAutoLikePercent, { target: elShadowContainer });
+        },
+        onRemove(app) {
+          if (app) {
+            void unmount(app);
+          }
+        }
+      });
+      activeFullscreenShadowUi.mount();
+      isMountingFullscreen = false;
+    }
+
     function unmountUi() {
       activeShadowUi?.remove();
       activeShadowUi = null;
+      activeFullscreenShadowUi?.remove();
+      activeFullscreenShadowUi = null;
     }
 
-    let isDisplayPercentage = false;
+    let isFreshMountAllowed = false;
+    let isUnmountRequired = true;
+
     function syncUi() {
-      if (isDisplayPercentage) {
-        void mountUi();
-      } else {
+      if (isUnmountRequired) {
         unmountUi();
+        return;
+      }
+      if (hasMountedForCurrentNav || isFreshMountAllowed) {
+        hasMountedForCurrentNav = true;
+        void mountUi();
       }
     }
 
-    watchDisplayPercentage(isDisplay => {
-      isDisplayPercentage = isDisplay;
+    watchMountState(({ isFreshMountAllowed: nextFreshMountAllowed, isUnmountRequired: nextUnmountRequired }) => {
+      isFreshMountAllowed = nextFreshMountAllowed;
+      isUnmountRequired = nextUnmountRequired;
       syncUi();
     });
 
@@ -271,14 +312,14 @@ export default defineContentScript({
       const isDurationUsable = Boolean(duration) && duration !== Infinity;
       if (isDeltaInRange && isDurationUsable) {
         sharedState.percentageWatched += (delta / duration) * 100;
-        const shouldAutoLike =
+        const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
-          sharedState.hasNavigated &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
           !sharedState.isLiveOrPremiere &&
           !sharedState.isUserInteracted &&
-          !sharedState.isRatedInitially;
-        if (shouldAutoLike) {
+          !sharedState.isRatedInitially &&
+          !sharedState.isCurrentlyRated;
+        if (isAutoLikeTriggered) {
           await rateVideo(true);
         }
       }

@@ -1,15 +1,23 @@
 import { type ButtonTriggers, type Modifier } from "@/lib/types";
 
-function isPlainObject(val: unknown): val is Record<string, unknown> {
+type StoredPrimitive = string | number | boolean | null;
+type StoredValue = StoredPrimitive | StoredValue[] | StoredObject;
+interface StoredObject {
+  [key: string]: StoredValue;
+}
+
+function isPlainObject(val: StoredValue): val is StoredObject {
   return typeof val === "object" && val !== null && !Array.isArray(val);
 }
 
-function mergeWithFallback(fallback: Record<string, unknown>, stored: Record<string, unknown>) {
-  const result = { ...fallback };
+function mergeWithFallback(fallback: StoredObject, stored: StoredObject) {
+  const result: StoredObject = { ...fallback };
   for (const key in stored) {
-    result[key] = isPlainObject(fallback[key]) && isPlainObject(stored[key])
-      ? mergeWithFallback(fallback[key], stored[key])
-      : stored[key];
+    const fallbackEntry = fallback[key];
+    const storedEntry = stored[key];
+    result[key] = isPlainObject(fallbackEntry) && isPlainObject(storedEntry)
+      ? mergeWithFallback(fallbackEntry, storedEntry)
+      : storedEntry;
   }
   return result;
 }
@@ -54,6 +62,7 @@ export enum SELECTORS {
   adOverlay = "ytd-player .ytp-ad-player-overlay-layout",
   liveBadge = "ytd-player .ytp-live-badge, ytd-player .ytp-offline-slate-bar",
   percentageContainer = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, reel-action-bar-view-model",
+  percentageContainerFullscreen = ".ytp-fullscreen-quick-actions like-button-view-model",
   toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "reel-action-bar-view-model",
   toggleButtonsMusicVideo = "ytmusic-like-button-renderer",
@@ -118,7 +127,8 @@ export const OBSERVER_OPTIONS = Object.freeze<MutationObserverInit>({
 });
 
 function getIsElementVisible(element: HTMLElement) {
-  return element?.offsetWidth > 0 && element?.offsetHeight > 0;
+  const { offsetWidth, offsetHeight } = element;
+  return offsetWidth > 0 && offsetHeight > 0;
 }
 
 function getIsElementInViewport(element: HTMLElement) {

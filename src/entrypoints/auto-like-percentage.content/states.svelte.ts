@@ -1,40 +1,68 @@
-export const sharedState = $state({
+import { SubscriptionDecision } from "@/lib/ytr-subscription-signal";
+
+interface SharedState {
+  percentageWatched: number;
+  lastTimeUpdate: number;
+  isUserInteracted: boolean;
+  isRatingResolved: boolean;
+  isRatedInitially: boolean;
+  isCurrentlyRated: boolean;
+  isAdPlaying: boolean;
+  isAdInitiallyPlaying: boolean;
+  isLiveOrPremiere: boolean;
+  isShorts: boolean;
+  isAutoLikeEnabled: boolean;
+  subscriptionDecision: SubscriptionDecision | undefined;
+}
+
+export const sharedState: SharedState = $state({
   percentageWatched: 0,
   lastTimeUpdate: 0,
   isUserInteracted: false,
   isRatingResolved: false,
   isRatedInitially: false,
+  isCurrentlyRated: false,
   isAdPlaying: false,
   isAdInitiallyPlaying: false,
   isLiveOrPremiere: false,
   isShorts: false,
   isAutoLikeEnabled: false,
-  hasNavigated: false
+  subscriptionDecision: undefined
 });
 
-function getIsDisplayPercentage() {
-  const isAutoLikeEnabled = sharedState.isAutoLikeEnabled;
-  if (!isAutoLikeEnabled) {
-    return false;
+function getIsUnmountRequired() {
+  if (!sharedState.isAutoLikeEnabled) {
+    return true;
   }
-  if (!sharedState.hasNavigated) {
-    return false;
+  if (sharedState.isShorts || sharedState.isLiveOrPremiere) {
+    return true;
   }
-  const isShortsOrLive = sharedState.isShorts || sharedState.isLiveOrPremiere;
-  if (isShortsOrLive) {
-    return false;
+  if (sharedState.subscriptionDecision === SubscriptionDecision.claimed) {
+    return true;
   }
-  const isRatingPendingAndUnrated = sharedState.isRatingResolved && !sharedState.isRatedInitially;
-  if (!isRatingPendingAndUnrated) {
-    return false;
+  if (sharedState.isCurrentlyRated && !sharedState.isUserInteracted) {
+    return true;
   }
-  return !sharedState.isAdInitiallyPlaying || !sharedState.isAdPlaying;
+  return sharedState.isAdInitiallyPlaying && sharedState.isAdPlaying;
 }
 
-export function watchDisplayPercentage(onChange: (isDisplay: boolean) => void) {
+function getIsFreshMountAllowed() {
+  if (getIsUnmountRequired()) {
+    return false;
+  }
+  if (!sharedState.isRatingResolved) {
+    return false;
+  }
+  if (sharedState.isRatedInitially || sharedState.isCurrentlyRated) {
+    return false;
+  }
+  return !sharedState.isUserInteracted;
+}
+
+export function watchMountState(onChange: (state: { isFreshMountAllowed: boolean; isUnmountRequired: boolean }) => void) {
   return $effect.root(() => {
     $effect(() => {
-      onChange(getIsDisplayPercentage());
+      onChange({ isFreshMountAllowed: getIsFreshMountAllowed(), isUnmountRequired: getIsUnmountRequired() });
     });
   });
 }
