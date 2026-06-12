@@ -24,12 +24,7 @@ export function getRateButtons() {
   if (!isButtonsRatePresent) {
     return [];
   }
-  const buttons = [...elButtonsRate.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`)];
-  const isYouTubeMusic = getIsYouTubeMusic();
-  if (isYouTubeMusic) {
-    buttons.reverse();
-  }
-  return buttons;
+  return [...elButtonsRate.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`)];
 }
 
 function showIndicator(isRated: boolean) {
