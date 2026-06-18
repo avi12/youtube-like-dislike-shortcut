@@ -18,13 +18,15 @@ function getIsShorts() {
 }
 
 export function getRateButtons() {
-  const selector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}, ${SELECTORS.toggleButtonsMusicVideo}`;
-  const elButtonsRate = document.querySelector<HTMLElement>(selector);
-  const isButtonsRatePresent = elButtonsRate !== null;
-  if (!isButtonsRatePresent) {
-    return [];
+  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}, ${SELECTORS.toggleButtonsMusicVideo}`;
+  const elButtonsRate = document.querySelector<HTMLElement>(containerSelector);
+  if (elButtonsRate === null) {
+    return {};
   }
-  return [...elButtonsRate.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`)];
+  return {
+    elLike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.likeButton) ?? undefined,
+    elDislike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.dislikeButton) ?? undefined
+  };
 }
 
 function showIndicator(isRated: boolean) {
@@ -80,9 +82,9 @@ async function rateVideoViaApi(isLike: boolean | null) {
  * (channel trailers, embedded videos)
  */
 export async function rateVideo(isLike: boolean | null) {
-  const [elLike, elDislike] = getRateButtons();
+  const { elLike, elDislike } = getRateButtons();
 
-  const isLikeButtonPresent = elLike !== undefined;
+  const isLikeButtonPresent = elLike !== undefined && elDislike !== undefined;
   if (!isLikeButtonPresent) {
     await rateVideoViaApi(isLike);
     return;

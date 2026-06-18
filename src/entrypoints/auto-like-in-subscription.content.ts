@@ -51,7 +51,7 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return true;
   }
 
-  const [elLike] = getRateButtons();
+  const { elLike } = getRateButtons();
   if (!elLike) {
     return false;
   }
