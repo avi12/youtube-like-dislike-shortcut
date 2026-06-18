@@ -13,9 +13,10 @@
 
 <style>
   :host {
-    color: inherit !important;
-    display: inline-flex !important;
+    display: flex !important;
+    justify-content: center !important;
     align-items: center !important;
+    color: unset !important;
   }
 
   :host(ytr-percentage-music) {
@@ -23,18 +24,18 @@
   }
 
   :host(ytr-percentage) {
+    display: block !important;
+    align-self: flex-start !important;
     margin-right: 6px !important;
+    line-height: 40px !important;
   }
 
   :global(body) {
+    margin: 0;
     font-family: Roboto, sans-serif;
     font-weight: 700;
     font-size: 14px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-  }
-
-  :host(ytr-percentage-music) :global(body) {
-    font-size: 12px;
   }
 </style>
