@@ -13,7 +13,6 @@
  *   pnpm dev --browser opera       - Opera
  *
  * Pass --with-profile to copy the user's real browser profile on first run
- * (matches the existing dev:*:with-profile scripts via web-ext.config.ts).
  */
 
 import chokidar from "chokidar";
@@ -52,7 +51,9 @@ const START_URL = "https://www.youtube.com/watch?v=aiSla-5xq3w";
 
 const OUTPUT_DIR_NAME = `${BROWSER}-mv3-${IS_FIREFOX ? "prod" : "prod"}`;
 const OUTPUT_DIR = resolve(PROJECT_ROOT, "build", OUTPUT_DIR_NAME);
-const PROFILE_DIR = resolve(PROJECT_ROOT, "user-profiles", BROWSER);
+// Profiles live OUTSIDE the project root: WXT's build-time Vite watcher watches the root and, on
+// Windows, crashes with EBUSY trying to watch the running browser's locked files (Network/Cookies).
+const PROFILE_DIR = resolve(PROJECT_ROOT, "..", "youtube-like-dislike-shortcut-profiles", BROWSER);
 
 const edgeBinaryByPlatform: Partial<Record<NodeJS.Platform, string>> = {
   win32: join(process.env["ProgramFiles(x86)"] ?? "", "Microsoft/Edge/Application/msedge.exe"),
