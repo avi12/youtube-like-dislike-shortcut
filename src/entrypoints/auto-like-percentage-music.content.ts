@@ -162,21 +162,38 @@ export default defineContentScript({
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
 
-    function handleIfNavigated() {
-      if (location.href === sharedState.lastHref) {
-        return;
-      }
-      sharedState.lastHref = location.href;
+    function resetForNewTrack() {
       sharedState.hasMountedForCurrentNav = false;
       sharedState.subscriptionDecision = undefined;
       unmountUi();
       watchForInitialRating();
     }
 
+    function handleIfNavigated() {
+      if (location.href === sharedState.lastHref) {
+        return;
+      }
+      sharedState.lastHref = location.href;
+      resetForNewTrack();
+    }
+
+    let lastTrackSource = "";
+    function handleIfTrackChanged() {
+      const elVideo = document.querySelector("video");
+      const trackSource = elVideo?.currentSrc;
+      if (!trackSource || trackSource === lastTrackSource) {
+        return;
+      }
+      lastTrackSource = trackSource;
+      resetForNewTrack();
+    }
+
     document.addEventListener(YOUTUBE_EVENT.navigateFinish, handleIfNavigated);
+    document.addEventListener("loadstart", handleIfTrackChanged, { capture: true });
 
     document.addEventListener("timeupdate", async e => {
       handleIfNavigated();
+      handleIfTrackChanged();
 
       const isUserInteractedGlobal = window.ytrUserInteracted;
       if (isUserInteractedGlobal) {
