@@ -40,35 +40,35 @@
     "@eslint/js": "^10.0.1",
     "@stylistic/stylelint-plugin": "^5.2.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
-    "@types/chrome": "^0.1.42",
-    "@types/node": "^25.9.1",
-    "chokidar": "^5.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.60.0",
-    "@typescript-eslint/parser": "^8.60.0",
+    "@types/chrome": "^0.2.2",
+    "@types/node": "^26.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.62.1",
+    "@typescript-eslint/parser": "^8.62.1",
     "@wxt-dev/module-svelte": "2.0.5",
-    "concurrently": "^10.0.1",
-    "eslint": "^10.4.1",
+    "chokidar": "^5.0.0",
+    "concurrently": "^10.0.3",
+    "eslint": "^10.6.0",
     "eslint-config-avi12": "github:avi12/eslint-config-avi12",
     "eslint-plugin-import-newlines": "^2.0.0",
-    "eslint-plugin-perfectionist": "^5.9.0",
-    "eslint-plugin-svelte": "^3.19.0",
-    "fallow": "^2.85.0",
-    "globals": "^17.6.0",
+    "eslint-plugin-perfectionist": "^5.9.1",
+    "eslint-plugin-svelte": "^3.20.0",
+    "fallow": "^2.104.0",
+    "globals": "^17.7.0",
     "postcss-html": "^1.8.1",
-    "stylelint": "^17.12.0",
+    "stylelint": "^17.14.0",
     "stylelint-config-ccb": "^3.32.0",
-    "svelte": "5.56.0",
-    "svelte-eslint-parser": "^1.7.0",
-    "tsx": "^4.22.3",
+    "svelte": "5.56.4",
+    "svelte-eslint-parser": "^1.8.0",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.1",
+    "typescript-eslint": "^8.62.1",
     "web-ext-run": "^0.2.4",
-    "wxt": "0.20.26"
+    "wxt": "0.20.27"
   },
   "overrides": {
     "acorn": "8.16.0"
   },
   "dependencies": {
-    "@webext-core/messaging": "^3.0.1"
+    "@webext-core/messaging": "^3.0.2"
   }
 }
