@@ -6,8 +6,7 @@ import {
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
-  StorageKey,
-  YOUTUBE_EVENT
+  StorageKey
 } from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
@@ -20,10 +19,14 @@ import {
 } from "./auto-like-percentage.content/states.svelte";
 
 let ratingWatchObserver: MutationObserver | null = null;
+let trackSettleController: AbortController | null = null;
+let isInitialRatingCheckPending = true;
 
 function watchForInitialRating() {
   ratingWatchObserver?.disconnect();
   ratingWatchObserver = null;
+  trackSettleController?.abort();
+  trackSettleController = null;
 
   sharedState.percentageWatched = 0;
   sharedState.lastTimeUpdate = 0;
@@ -71,10 +74,21 @@ function watchForInitialRating() {
     attributeFilter: [DOM_ATTRIBUTE.ariaPressed]
   });
 
+  // The player bar rate buttons persist across tracks and keep the previous
+  // track's rating until the new track's metadata loads, so wait for that to
+  // settle before resolving instead of reading the stale buttons right away
+  trackSettleController = new AbortController();
+  document.addEventListener("loadedmetadata", e => {
+    if (e.target instanceof HTMLVideoElement) {
+      applyState();
+    }
+  }, { capture: true, signal: trackSettleController.signal });
+
   const isButtonPresentInitially = Boolean(document.querySelector(anyButtonSelector));
-  if (isButtonPresentInitially) {
+  if (isInitialRatingCheckPending && isButtonPresentInitially) {
     applyState();
   }
+  isInitialRatingCheckPending = false;
 }
 
 export default defineContentScript({
@@ -99,7 +113,6 @@ export default defineContentScript({
       })
     ]);
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
-    sharedState.lastHref = location.href;
 
     let isMounting = false;
     let activeShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;
@@ -169,15 +182,7 @@ export default defineContentScript({
       watchForInitialRating();
     }
 
-    function handleIfNavigated() {
-      if (location.href === sharedState.lastHref) {
-        return;
-      }
-      sharedState.lastHref = location.href;
-      resetForNewTrack();
-    }
-
-    let lastTrackSource = "";
+    let lastTrackSource = document.querySelector("video")?.currentSrc ?? "";
     function handleIfTrackChanged() {
       const elVideo = document.querySelector("video");
       const trackSource = elVideo?.currentSrc;
@@ -188,11 +193,9 @@ export default defineContentScript({
       resetForNewTrack();
     }
 
-    document.addEventListener(YOUTUBE_EVENT.navigateFinish, handleIfNavigated);
     document.addEventListener("loadstart", handleIfTrackChanged, { capture: true });
 
     document.addEventListener("timeupdate", async e => {
-      handleIfNavigated();
       handleIfTrackChanged();
 
       const isUserInteractedGlobal = window.ytrUserInteracted;
