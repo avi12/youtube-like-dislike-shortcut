@@ -65,7 +65,7 @@ export enum SELECTORS {
   percentageContainerFullscreen = ".ytp-fullscreen-quick-actions like-button-view-model",
   toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "reel-action-bar-view-model",
-  toggleButtonsMusicVideo = "ytmusic-like-button-renderer",
+  toggleButtonsMusicVideo = "ytmusic-player-bar ytmusic-like-button-renderer",
   likeButton = "like-button-view-model button, yt-button-shape.like button",
   dislikeButton = "dislike-button-view-model button, yt-button-shape.dislike button",
   buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
