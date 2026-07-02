@@ -1,26 +1,26 @@
 .ytr-fallback-bezel {
   position: fixed;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   pointer-events: none;
 
-  .ytp-bezel {
+  & .ytp-bezel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: var(--ytr-bezel-circle-size, 58px);
     height: var(--ytr-bezel-circle-size, 58px);
-    background: rgba(0, 0, 0, 0.5);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgb(0 0 0 / 50%);
     animation: ytr-fallback-bezel-fadeout 1s ease-out forwards;
   }
 
-  .ytp-bezel-icon {
+  & .ytp-bezel-icon {
     width: var(--ytr-bezel-icon-size, 40px);
     height: var(--ytr-bezel-icon-size, 40px);
 
-    svg {
+    & svg {
       width: 100%;
       height: 100%;
     }
@@ -29,11 +29,12 @@
 
 @keyframes ytr-fallback-bezel-fadeout {
   0% {
-    opacity: 1;
+    opacity: 100%;
     scale: 1;
   }
+
   100% {
-    opacity: 0;
+    opacity: 0%;
     scale: 1.5;
   }
 }
