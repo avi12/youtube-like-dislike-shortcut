@@ -6,7 +6,7 @@ Keyboard shortcuts (configurable in the popup):
 
 - <kbd>Shift</kbd>+<kbd>Plus</kbd> (on the number row) to like
 - <kbd>Shift</kbd>+<kbd>Minus</kbd> (on the number row) to dislike
-- <kbd>Shift</kbd>+<kbd>0</kbd> (on the number row) to remove your like/dislike
+- <kbd>Shift</kbd>+<kbd>0</kbd> (on the number row) to remove your like
 - <kbd>Numpad Plus</kbd> to like
 - <kbd>Numpad Minus</kbd> to dislike
 - Pressing the like/dislike shortcut while the corresponding button is already active will do nothing

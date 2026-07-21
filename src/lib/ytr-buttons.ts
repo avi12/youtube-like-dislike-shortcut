@@ -17,8 +17,28 @@ function getIsShorts() {
   return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
 }
 
+function getShortsRateButtons() {
+  const elActionBar = document.querySelector<HTMLElement>(SELECTORS.toggleButtonsShortsVideo);
+  if (elActionBar === null) {
+    return {};
+  }
+
+  const rateButtonsSelector = `${SELECTORS.likeButton}, ${SELECTORS.dislikeButton}`;
+  const elKnownRateButtons = elActionBar.querySelectorAll<HTMLButtonElement>(rateButtonsSelector);
+  const elToggleButtons = elKnownRateButtons.length > 0
+    ? elKnownRateButtons
+    : elActionBar.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`);
+  return {
+    elLike: elToggleButtons.item(0) ?? undefined,
+    elDislike: elToggleButtons.item(1) ?? undefined
+  };
+}
+
 export function getRateButtons() {
-  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}, ${SELECTORS.toggleButtonsMusicVideo}`;
+  if (getIsShorts()) {
+    return getShortsRateButtons();
+  }
+  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsMusicVideo}`;
   const elButtonsRate = document.querySelector<HTMLElement>(containerSelector);
   if (elButtonsRate === null) {
     return {};
@@ -38,8 +58,14 @@ function showIndicator(isRated: boolean) {
 }
 
 export function getRatedButton() {
-  const { toggleButtonsShortsVideo, toggleButtonsNormalVideo, toggleButtonsMusicVideo } = SELECTORS;
-  return document.querySelector<HTMLButtonElement>(`:where(${toggleButtonsNormalVideo}, ${toggleButtonsShortsVideo}, ${toggleButtonsMusicVideo}) button[${DOM_ATTRIBUTE.ariaPressed}=true]`);
+  const { elLike, elDislike } = getRateButtons();
+  if (elLike && getIsActive(elLike)) {
+    return elLike;
+  }
+  if (elDislike && getIsActive(elDislike)) {
+    return elDislike;
+  }
+  return null;
 }
 
 export function getIsSubscribed() {
@@ -78,26 +104,21 @@ async function rateVideoViaApi(isLike: boolean | null) {
 
 /**
  * Rates/un-rates a video on YouTube.com
- * Falls back to YouTube's innertube API when DOM buttons aren't available
- * (channel trailers, embedded videos)
+ * Falls back to YouTube's innertube API when the requested DOM control isn't available
  */
 export async function rateVideo(isLike: boolean | null) {
   const { elLike, elDislike } = getRateButtons();
 
-  const isLikeButtonPresent = elLike !== undefined && elDislike !== undefined;
-  if (!isLikeButtonPresent) {
-    await rateVideoViaApi(isLike);
-    return;
-  }
-
-  window.ytrUserInteracted = true;
   const isLikeRequested = isLike === true;
   if (isLikeRequested) {
+    if (!elLike) {
+      await rateVideoViaApi(true);
+      return;
+    }
+    window.ytrUserInteracted = true;
     gLastRating = Rating.Like;
     showIndicator(true);
-
-    const isLikeActive = getIsActive(elLike);
-    if (!isLikeActive) {
+    if (!getIsActive(elLike)) {
       elLike.click();
       elLike.blur();
     }
@@ -106,31 +127,32 @@ export async function rateVideo(isLike: boolean | null) {
 
   const isDislikeRequested = isLike === false;
   if (isDislikeRequested) {
+    if (!elDislike) {
+      await rateVideoViaApi(false);
+      return;
+    }
+    window.ytrUserInteracted = true;
     gLastRating = Rating.Dislike;
     showIndicator(true);
-
-    const isDislikeActive = getIsActive(elDislike);
-    if (!isDislikeActive) {
+    if (!getIsActive(elDislike)) {
       elDislike.click();
       elDislike.blur();
     }
     return;
   }
 
-  const elBtnActive = getRatedButton();
-
-  const isActiveButtonPresent = elBtnActive !== null;
-  if (!isActiveButtonPresent) {
+  if (!elLike) {
     await rateVideoViaApi(null);
     return;
   }
 
-  const isLastRatingSet = Boolean(gLastRating);
-  if (!isLastRatingSet) {
-    gLastRating = elBtnActive === elDislike ? Rating.Dislike : Rating.Like;
+  if (!getIsActive(elLike)) {
+    return;
   }
-  showIndicator(false);
 
-  elBtnActive.click();
-  elBtnActive.blur();
+  window.ytrUserInteracted = true;
+  gLastRating = Rating.Like;
+  showIndicator(false);
+  elLike.click();
+  elLike.blur();
 }
