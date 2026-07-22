@@ -8,7 +8,7 @@ import {
   StorageKey
 } from "@/lib/utils-initials";
 import { showRateBezel } from "@/lib/ytr-bezel";
-import { RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import { RateAction, sendRateRequest } from "@/lib/ytr-messaging";
 
 const ratingForAction: Record<RateAction, Rating | null> = {
   [RateAction.like]: Rating.Like,
@@ -32,7 +32,7 @@ async function rateIfNeeded(e: KeyboardEvent) {
   e.stopPropagation();
   e.preventDefault();
   const action = rateActionMap[shortcutType];
-  const result = await ytrMessenger.sendMessage(YtrMessage.rateInEmbed, action).catch(() => null);
+  const result = await sendRateRequest(action).catch(() => null);
   if (!result?.success) {
     return;
   }

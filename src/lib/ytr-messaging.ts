@@ -8,14 +8,18 @@ export enum RateAction {
 }
 
 export enum YtrMessage {
-  rateVideo = "ytr-rate:rateVideo",
-  rateInEmbed = "ytr-rate:rateInEmbed"
+  getRateContext = "ytr-rate:getRateContext"
 }
 
-interface RateResult {
+export interface RateResult {
   success: boolean;
   videoId?: string;
   error?: string;
+}
+
+export interface RateContextResult {
+  context: RateContext;
+  params?: string;
 }
 
 export interface RateContext {
@@ -28,8 +32,20 @@ export interface RateContext {
 }
 
 type YtrProtocol = {
-  [YtrMessage.rateVideo]: (action: RateAction) => RateResult;
-  [YtrMessage.rateInEmbed]: (action: RateAction) => RateResult;
+  [YtrMessage.getRateContext]: (action: RateAction) => RateContextResult | null;
 };
 
 export const ytrMessenger = defineCustomEventMessaging<YtrProtocol>({ namespace: "ytr" });
+
+export interface RateRequest {
+  action: RateAction;
+}
+
+export function isRateRequest(message: unknown): message is RateRequest {
+  return typeof message === "object" && message !== null && "action" in message
+    && (message.action === RateAction.like || message.action === RateAction.dislike || message.action === RateAction.removelike);
+}
+
+export function sendRateRequest(action: RateAction) {
+  return browser.runtime.sendMessage<RateRequest, RateResult>({ action });
+}

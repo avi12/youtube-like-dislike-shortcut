@@ -1,7 +1,7 @@
-import { Rating } from "@/lib/types";
-import { DOM_ATTRIBUTE, SELECTORS, YOUTUBE_HOST, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
-import { showRateBezel } from "@/lib/ytr-bezel";
-import { RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import {Rating} from "@/lib/types";
+import {DOM_ATTRIBUTE, SELECTORS, YOUTUBE_HOST, YOUTUBE_PATHNAME} from "@/lib/utils-initials";
+import {showRateBezel} from "@/lib/ytr-bezel";
+import {RateAction, sendRateRequest} from "@/lib/ytr-messaging";
 
 let gLastRating = Rating.Like;
 
@@ -90,9 +90,8 @@ function getRateActionForFlag(isLike: boolean | null) {
 
 async function rateVideoViaApi(isLike: boolean | null) {
   const action = getRateActionForFlag(isLike);
-  const { success } = await ytrMessenger.sendMessage(YtrMessage.rateVideo, action);
-  const isSuccessful = success;
-  if (!isSuccessful) {
+  const { success } = await sendRateRequest(action);
+  if (!success) {
     return;
   }
   const isRatingSet = isLike !== null;

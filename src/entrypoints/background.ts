@@ -5,6 +5,7 @@ import {
   PortName,
   rateForMusicCommand
 } from "@/lib/ytmusic-command";
+import { isRateRequest } from "@/lib/ytr-messaging";
 
 export default defineBackground(() => {
   const musicPortFocus = new Map<Browser.runtime.Port, boolean>();
@@ -37,6 +38,13 @@ export default defineBackground(() => {
     port.onDisconnect.addListener(() => {
       musicPortFocus.delete(port);
     });
+  });
+
+  browser.runtime.onMessage.addListener((message: unknown, sender) => {
+    if (!isRateRequest(message) || sender.tab?.id === undefined || sender.frameId === undefined) {
+      return;
+    }
+    return browser.tabs.sendMessage(sender.tab.id, message, { frameId: sender.frameId });
   });
 
   browser.commands.onCommand.addListener(command => {

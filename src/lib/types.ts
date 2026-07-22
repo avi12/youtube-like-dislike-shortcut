@@ -40,8 +40,7 @@ export enum YTCFG_KEY {
 /**
  * Minimal subset of the Innertube request context we build. YouTube ships many
  * more fields on the real `INNERTUBE_CONTEXT` (request, user, clickTracking,
- * adSignalsInfo, etc.) but we only depend on `client`. The full payload is
- * passed through verbatim via JSON.stringify when forwarding.
+ * adSignalsInfo, etc.) but rate requests use only this allow-listed `client`.
  */
 export interface InnertubeContext {
   client: {
