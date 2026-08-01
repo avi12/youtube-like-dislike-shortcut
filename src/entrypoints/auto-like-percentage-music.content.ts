@@ -22,6 +22,10 @@ let ratingWatchObserver: MutationObserver | null = null;
 let trackSettleController: AbortController | null = null;
 let isInitialRatingCheckPending = true;
 
+function getIsAdPlaying() {
+  return Boolean(document.querySelector(SELECTORS.adShowingMusic));
+}
+
 function watchForInitialRating() {
   ratingWatchObserver?.disconnect();
   ratingWatchObserver = null;
@@ -184,8 +188,7 @@ export default defineContentScript({
 
     let lastTrackSource = document.querySelector("video")?.currentSrc ?? "";
     function handleIfTrackChanged() {
-      const elVideo = document.querySelector("video");
-      const trackSource = elVideo?.currentSrc;
+      const trackSource = document.querySelector("video")?.currentSrc;
       if (!trackSource || trackSource === lastTrackSource) {
         return;
       }
@@ -217,6 +220,12 @@ export default defineContentScript({
       }
 
       const { duration, currentTime } = elTarget;
+
+      if (getIsAdPlaying()) {
+        sharedState.lastTimeUpdate = currentTime;
+        return;
+      }
+
       const isLastTimeUpdateSet = Boolean(sharedState.lastTimeUpdate);
       if (!isLastTimeUpdateSet) {
         sharedState.lastTimeUpdate = currentTime;
