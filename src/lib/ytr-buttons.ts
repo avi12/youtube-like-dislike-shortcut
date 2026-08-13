@@ -1,7 +1,7 @@
-import {Rating} from "@/lib/types";
-import {DOM_ATTRIBUTE, SELECTORS, YOUTUBE_HOST, YOUTUBE_PATHNAME} from "@/lib/utils-initials";
-import {showRateBezel} from "@/lib/ytr-bezel";
-import {RateAction, sendRateRequest} from "@/lib/ytr-messaging";
+import { Rating } from "@/lib/types";
+import { DOM_ATTRIBUTE, SELECTORS, YOUTUBE_HOST, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
+import { showRateBezel } from "@/lib/ytr-bezel";
+import { RateAction, sendRateRequest } from "@/lib/ytr-messaging";
 
 let gLastRating = Rating.Like;
 
@@ -140,18 +140,21 @@ export async function rateVideo(isLike: boolean | null) {
     return;
   }
 
-  if (!elLike) {
+  window.ytrUserInteracted = true;
+
+  const isAnyRateButtonPresent = Boolean(elLike ?? elDislike);
+  if (!isAnyRateButtonPresent) {
     await rateVideoViaApi(null);
     return;
   }
 
-  if (!getIsActive(elLike)) {
+  const elRated = getRatedButton();
+  if (!elRated) {
     return;
   }
 
-  window.ytrUserInteracted = true;
-  gLastRating = Rating.Like;
+  gLastRating = elRated === elDislike ? Rating.Dislike : Rating.Like;
   showIndicator(false);
-  elLike.click();
-  elLike.blur();
+  elRated.click();
+  elRated.blur();
 }
