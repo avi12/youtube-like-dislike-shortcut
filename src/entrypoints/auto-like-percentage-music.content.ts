@@ -6,9 +6,11 @@ import {
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
-  StorageKey
+  StorageKey,
+  URL_PARAM
 } from "@/lib/utils-initials";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
+import { YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./auto-like-percentage.content/CsuiAutoLikePercent.svelte";
 import {
@@ -24,6 +26,27 @@ let isInitialRatingCheckPending = true;
 
 function getIsAdPlaying() {
   return Boolean(document.querySelector(SELECTORS.adShowingMusic));
+}
+
+// The whole queue streams through one MediaSource, so the video element keeps the same
+// currentSrc and keeps its clock running across an automatic track change. Only the player
+// itself knows which track started, pushed over from the main world by ytr-rate-context
+let playerVideoId = "";
+
+function getTrackVideoId() {
+  if (playerVideoId) {
+    return playerVideoId;
+  }
+  const elTrackLink = document.querySelector(SELECTORS.trackLinkMusic);
+  if (!(elTrackLink instanceof HTMLAnchorElement)) {
+    return "";
+  }
+  return new URLSearchParams(elTrackLink.search).get(URL_PARAM.videoId) ?? "";
+}
+
+function getTrackDuration() {
+  const elProgressBar = document.querySelector(SELECTORS.progressBarMusic);
+  return Number(elProgressBar?.getAttribute(DOM_ATTRIBUTE.ariaValueMax));
 }
 
 function watchForInitialRating() {
@@ -159,6 +182,35 @@ export default defineContentScript({
       activeShadowUi = null;
     }
 
+    function resetForNewTrack() {
+      sharedState.hasMountedForCurrentNav = false;
+      sharedState.subscriptionDecision = undefined;
+      unmountUi();
+      watchForInitialRating();
+    }
+
+    let lastTrackVideoId = getTrackVideoId();
+    function handleIfTrackChanged() {
+      const isAdPlaying = getIsAdPlaying();
+      if (isAdPlaying) {
+        return;
+      }
+      const trackVideoId = getTrackVideoId();
+      const isSameTrack = !trackVideoId || trackVideoId === lastTrackVideoId;
+      if (isSameTrack) {
+        return;
+      }
+      lastTrackVideoId = trackVideoId;
+      resetForNewTrack();
+    }
+
+    // The player's data-change event is the only prompt signal; the observer below re-checks
+    // so a track that started behind an ad still resets once the ad is over
+    ytrMessenger.onMessage(YtrMessage.trackVideoIdChanged, ({ data }) => {
+      playerVideoId = data;
+      handleIfTrackChanged();
+    });
+
     function syncUi() {
       if (getIsUnmountRequired()) {
         unmountUi();
@@ -172,31 +224,15 @@ export default defineContentScript({
 
     watchMountState(syncUi);
 
-    new MutationObserver(syncUi).observe(document, OBSERVER_OPTIONS);
+    new MutationObserver(() => {
+      handleIfTrackChanged();
+      syncUi();
+    }).observe(document, OBSERVER_OPTIONS);
 
     storage.watch<typeof initial.isAutoLike>(StorageKey.isAutoLike, isAutoLikeUpdated => {
       window.ytrAutoLikeEnabled = isAutoLikeUpdated ?? initial.isAutoLike;
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
-
-    function resetForNewTrack() {
-      sharedState.hasMountedForCurrentNav = false;
-      sharedState.subscriptionDecision = undefined;
-      unmountUi();
-      watchForInitialRating();
-    }
-
-    let lastTrackSource = document.querySelector("video")?.currentSrc ?? "";
-    function handleIfTrackChanged() {
-      const trackSource = document.querySelector("video")?.currentSrc;
-      if (!trackSource || trackSource === lastTrackSource) {
-        return;
-      }
-      lastTrackSource = trackSource;
-      resetForNewTrack();
-    }
-
-    document.addEventListener("loadstart", handleIfTrackChanged, { capture: true });
 
     document.addEventListener("timeupdate", async e => {
       handleIfTrackChanged();
@@ -219,7 +255,8 @@ export default defineContentScript({
         return;
       }
 
-      const { duration, currentTime } = elTarget;
+      const { currentTime } = elTarget;
+      const duration = getTrackDuration();
 
       if (getIsAdPlaying()) {
         sharedState.lastTimeUpdate = currentTime;
@@ -232,7 +269,7 @@ export default defineContentScript({
       }
 
       const delta = currentTime - sharedState.lastTimeUpdate;
-      const isValidDelta = delta > 0 && delta < 1 && Boolean(duration) && duration !== Infinity;
+      const isValidDelta = delta > 0 && delta < 1 && Boolean(duration);
       if (isValidDelta) {
         sharedState.percentageWatched += (delta / duration) * 100;
         const isAutoLikeTriggered =
