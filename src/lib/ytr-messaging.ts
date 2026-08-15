@@ -8,7 +8,8 @@ export enum RateAction {
 }
 
 export enum YtrMessage {
-  getRateContext = "ytr-rate:getRateContext"
+  getRateContext = "ytr-rate:getRateContext",
+  trackVideoIdChanged = "ytr-rate:trackVideoIdChanged"
 }
 
 export interface RateResult {
@@ -33,6 +34,7 @@ export interface RateContext {
 
 type YtrProtocol = {
   [YtrMessage.getRateContext]: (action: RateAction) => RateContextResult | null;
+  [YtrMessage.trackVideoIdChanged]: (videoId: string) => void;
 };
 
 export const ytrMessenger = defineCustomEventMessaging<YtrProtocol>({ namespace: "ytr" });

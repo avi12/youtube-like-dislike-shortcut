@@ -67,6 +67,8 @@ export enum SELECTORS {
   toggleButtonsShortsVideo = "reel-action-bar-view-model",
   toggleButtonsMusicVideo = "ytmusic-player-bar ytmusic-like-button-renderer",
   adShowingMusic = "#movie_player.ad-showing",
+  progressBarMusic = "ytmusic-player-bar #progress-bar",
+  trackLinkMusic = "#movie_player a.ytp-title-link",
   likeButton = "like-button-view-model button, yt-button-shape.like button",
   dislikeButton = "dislike-button-view-model button, yt-button-shape.dislike button",
   buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
@@ -79,11 +81,17 @@ export enum SELECTORS {
 
 export enum DOM_ATTRIBUTE {
   ariaPressed = "aria-pressed",
+  ariaValueMax = "aria-valuemax",
   subscribed = "subscribed"
 }
 
 export enum YOUTUBE_EVENT {
-  navigateFinish = "yt-navigate-finish"
+  navigateFinish = "yt-navigate-finish",
+  videoDataChange = "onVideoDataChange"
+}
+
+export enum URL_PARAM {
+  videoId = "v"
 }
 
 export enum YOUTUBE_PATHNAME {

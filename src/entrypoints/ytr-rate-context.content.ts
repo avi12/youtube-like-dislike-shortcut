@@ -1,5 +1,11 @@
 import { YTCFG_KEY } from "@/lib/types";
-import { SELECTORS, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
+import {
+  getElementByMutationObserver,
+  SELECTORS,
+  YOUTUBE_EVENT,
+  YOUTUBE_HOST,
+  YOUTUBE_PATHNAME
+} from "@/lib/utils-initials";
 import { RateAction, type RateContext, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { findRateParamInInnertube, type RateParamField } from "@/lib/ytr-rate-fetch";
 
@@ -70,9 +76,39 @@ function getContextForRate(action: RateAction) {
   };
 }
 
+// YouTube Music streams a whole queue through one media element and fires no navigation
+// event between tracks, so the isolated world can only learn of a new track from the
+// player's own data-change event, which fires here with the new video id already in place
+async function watchTrackVideoId() {
+  const isMusicTopFrame = location.hostname === YOUTUBE_HOST.music && self === top;
+  if (!isMusicTopFrame) {
+    return;
+  }
+
+  const elPlayer = document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer)
+    ?? await getElementByMutationObserver<MoviePlayerElement>(SELECTORS.moviePlayer);
+
+  let lastVideoId = "";
+  function pushIfTrackChanged() {
+    const videoId = getVideoId();
+    const isSameTrack = !videoId || videoId === lastVideoId;
+    if (isSameTrack) {
+      return;
+    }
+    lastVideoId = videoId;
+    ytrMessenger.sendMessage(YtrMessage.trackVideoIdChanged, videoId).catch(() => {});
+  }
+
+  elPlayer.addEventListener(YOUTUBE_EVENT.videoDataChange, pushIfTrackChanged);
+  pushIfTrackChanged();
+}
+
 export default defineContentScript({
-  matches: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/*"],
+  matches: ["https://www.youtube.com/*", "https://www.youtube-nocookie.com/*", "https://music.youtube.com/*"],
   world: "MAIN",
   allFrames: true,
-  main: () => ytrMessenger.onMessage(YtrMessage.getRateContext, ({ data }) => getContextForRate(data))
+  main() {
+    ytrMessenger.onMessage(YtrMessage.getRateContext, ({ data }) => getContextForRate(data));
+    void watchTrackVideoId();
+  }
 });
