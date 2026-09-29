@@ -46,7 +46,9 @@ function getTrackVideoId() {
 
 function getTrackDuration() {
   const elProgressBar = document.querySelector(SELECTORS.progressBarMusic);
-  return Number(elProgressBar?.getAttribute(DOM_ATTRIBUTE.ariaValueMax));
+  const seconds = elProgressBar?.getAttribute(DOM_ATTRIBUTE.ariaValueMax)
+    ?? elProgressBar?.getAttribute(DOM_ATTRIBUTE.max);
+  return Number(seconds);
 }
 
 function watchForInitialRating() {
