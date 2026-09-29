@@ -69,20 +69,14 @@ Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pn
 
 ## Package
 
+Packaging builds first, so there is no separate build step to run.
+
 | Browser | Command                |
 |---------|------------------------|
 | Chrome  | `pnpm package`         |
 | Opera   | `pnpm package:opera`   |
 | Firefox | `pnpm package:firefox` |
-
-## Build & Package
-
-| Browser | Command                      |
-|---------|------------------------------|
-| Chrome  | `pnpm build:package`         |
-| Opera   | `pnpm build:package:opera`   |
-| Firefox | `pnpm build:package:firefox` |
-| All     | `pnpm build:package:all`     |
+| All     | `pnpm package:all`     |
 
 ## Contribution
 
