@@ -33,7 +33,7 @@ Available for:
 - [Google Chrome](https://chrome.google.com/webstore/detail/fdkpkpelkkdkjhpacficichkfifijipc) 120+ ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?color=white&label=users&style=flat-square)
 - [Mozilla Firefox](https://addons.mozilla.org/addon/youtube-like-dislike-shortcut)
   117+ ![Mozilla Add-on](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=users&style=flat-square)
-- [Opera](https://addons.opera.com/en/extensions/details/youtube-like-dislike-shortcut) 106+
+- [Opera](https://addons.opera.com/en/extensions/details/youtube-like-dislike-shortcut) 106+ ![Opera Add-ons](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Faddons.opera.com%2Fen%2Fextensions%2Fdetails%2Fyoutube-like-dislike-shortcut%2F&search=Downloads%3C%2Fdt%3E%3Cdd%3E%28%5B0-9%2C%5D%2B%29%3C%2Fdd%3E&replace=%241&color=white&label=downloads&style=flat-square)
 
 Made by [Avi](https://avi12.com)
 
