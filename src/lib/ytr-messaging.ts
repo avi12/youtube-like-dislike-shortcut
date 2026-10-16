@@ -12,13 +12,13 @@ export enum YtrMessage {
   trackVideoIdChanged = "ytr-rate:trackVideoIdChanged"
 }
 
-export interface RateResult {
+interface RateResult {
   success: boolean;
   videoId?: string;
   error?: string;
 }
 
-export interface RateContextResult {
+interface RateContextResult {
   context: RateContext;
   params?: string;
 }
