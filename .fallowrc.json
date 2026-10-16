@@ -21,6 +21,7 @@
     "@sveltejs/vite-plugin-svelte",
     "@wxt-dev/module-svelte",
     "chokidar",
+    "crx3",
     "postcss-html",
     "web-ext-run"
   ],

@@ -13,6 +13,9 @@ stats.html
 stats-*.json
 .wxt/
 
+# Chrome .crx signing key (scripts/pack-crx.ts) - fixes the extension ID, never commit
+keys/
+
 # local env files
 chrome.env
 firefox.env

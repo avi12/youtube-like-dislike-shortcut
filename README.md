@@ -78,6 +78,9 @@ Packaging builds first, so there is no separate build step to run.
 | Firefox | `pnpm package:firefox` |
 | All     | `pnpm package:all`     |
 
+`pnpm crx` packages Chrome and signs it into a `.crx` for GitHub releases. The signing key is created
+in the gitignored `keys/` folder on the first run - keep it, since it fixes the extension ID
+
 ## Contribution
 
 Feel free to contribute! Keep in mind that the license I chose
