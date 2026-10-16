@@ -49,12 +49,11 @@
     "eslint-plugin-import-newlines": "^2.0.0",
     "eslint-plugin-perfectionist": "^5.12.1",
     "eslint-plugin-svelte": "^3.23.1",
-    "fallow": "^2.104.0",
+    "fallow": "^3.33.1",
     "globals": "^17.13.0",
     "postcss-html": "^2.0.0",
     "stylelint": "^17.16.0",
     "stylelint-config-ccb": "^3.32.0",
-    "svelte": "5.56.4",
     "svelte-eslint-parser": "^1.9.0",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
@@ -67,6 +66,7 @@
     "acorn": "8.16.0"
   },
   "dependencies": {
-    "@webext-core/messaging": "^4.0.0"
+    "@webext-core/messaging": "^4.0.0",
+    "svelte": "5.56.4"
   }
 }
