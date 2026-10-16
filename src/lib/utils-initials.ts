@@ -6,15 +6,14 @@ interface StoredObject {
   [key: string]: StoredValue;
 }
 
-function isPlainObject(value: StoredValue): value is StoredObject {
+function isPlainObject(value: StoredValue | undefined): value is StoredObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function mergeWithFallback(fallback: StoredObject, stored: StoredObject) {
   const result: StoredObject = { ...fallback };
-  for (const key in stored) {
+  for (const [key, storedEntry] of Object.entries(stored)) {
     const fallbackEntry = fallback[key];
-    const storedEntry = stored[key];
     result[key] = isPlainObject(fallbackEntry) && isPlainObject(storedEntry)
       ? mergeWithFallback(fallbackEntry, storedEntry)
       : storedEntry;

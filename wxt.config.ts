@@ -1,3 +1,4 @@
+import type { Plugin } from "vite";
 import { readFileSync } from "fs";
 import { defineConfig } from "wxt";
 import packageJson from "./package.json" with { type: "json" };
@@ -28,6 +29,29 @@ function getMinimumVersionChromeOrOpera(browser: string) {
   }
 
   return { minimum_chrome_version: "120.0" };
+}
+
+const ENTRYPOINT_IMPORTER_ENVIRONMENT = "inline";
+const STUBBED_CSS_ID = "\0stubbed-css";
+
+// WXT imports every entrypoint in a bare "inline" Vite environment to read its options, and Vite's CSS
+// plugin crashes there on any stylesheet the entrypoint pulls in. Its options never depend on styles
+function stubCssWhileImportingEntrypoints(): Plugin {
+  return {
+    name: "stub-css-while-importing-entrypoints",
+    enforce: "pre",
+    applyToEnvironment: environment => environment.name === ENTRYPOINT_IMPORTER_ENVIRONMENT,
+    resolveId: {
+      filter: { id: /\.css(?:\?|$)/ },
+      handler: () => STUBBED_CSS_ID
+    },
+    load(moduleId) {
+      if (moduleId !== STUBBED_CSS_ID) {
+        return;
+      }
+      return "export default \"\";";
+    }
+  };
 }
 
 // See https://wxt.dev/api/config.html
@@ -75,10 +99,12 @@ export default defineConfig({
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
     excludeSources: parseGitignoreAsExcludes(),
+    artifactTemplate: "{{name}}-{{version}}-{{browser}}.zip",
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   modules: ["@wxt-dev/module-svelte"],
   vite: ({ mode }) => ({
+    plugins: [stubCssWhileImportingEntrypoints()],
     build: {
       sourcemap: mode === "development" ? "inline" : false
     },
