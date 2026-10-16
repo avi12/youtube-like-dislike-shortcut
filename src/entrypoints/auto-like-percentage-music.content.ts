@@ -156,16 +156,17 @@ export default defineContentScript({
         return;
       }
       const elContainer = document.querySelector<HTMLElement>(SELECTORS.toggleButtonsMusicVideo);
-      const isContainerPresent = Boolean(elContainer);
-      if (!isContainerPresent) {
+      if (!elContainer) {
         return;
       }
+      const isTimeInfoBeforeButtons = Boolean(elContainer.parentElement?.previousElementSibling?.matches(SELECTORS.timeInfoMusic));
+      const append = isTimeInfoBeforeButtons ? "before" : "after";
       isMounting = true;
       activeShadowUi = await createShadowRootUi(ctx, {
         name: elementNameToInject,
         position: "inline",
-        append: "after",
-        anchor: SELECTORS.toggleButtonsMusicVideo,
+        append,
+        anchor: elContainer,
         onMount(elContainer) {
           return mount(CsuiAutoLikePercent, { target: elContainer });
         },
@@ -176,6 +177,7 @@ export default defineContentScript({
         }
       });
       activeShadowUi.mount();
+      activeShadowUi.shadowHost.dataset.append = append;
       isMounting = false;
     }
 

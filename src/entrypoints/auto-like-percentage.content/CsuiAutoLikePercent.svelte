@@ -19,8 +19,12 @@
     color: unset !important;
   }
 
-  :host(ytr-percentage-music) {
+  :host(ytr-percentage-music[data-append="after"]) {
     margin-left: 6px !important;
+  }
+
+  :host(ytr-percentage-music[data-append="before"]) {
+    margin-right: 6px !important;
   }
 
   :host(ytr-percentage) {

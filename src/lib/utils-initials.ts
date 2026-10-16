@@ -66,6 +66,7 @@ export enum SELECTORS {
   toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
   toggleButtonsShortsVideo = "reel-action-bar-view-model",
   toggleButtonsMusicVideo = "ytmusic-player-bar ytmusic-like-button-renderer, ytmusic-miniplayer segmented-like-dislike-button-view-model",
+  timeInfoMusic = ".ytMusicMiniPlayerTimeInfo",
   adShowingMusic = "#movie_player.ad-showing",
   progressBarMusic = "ytmusic-player-bar #progress-bar, ytmusic-miniplayer input.ytMusicMiniPlayerProgressBar",
   trackLinkMusic = "#movie_player a.ytp-title-link",
