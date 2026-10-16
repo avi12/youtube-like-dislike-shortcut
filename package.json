@@ -67,6 +67,6 @@
     "acorn": "8.16.0"
   },
   "dependencies": {
-    "@webext-core/messaging": "^3.0.3"
+    "@webext-core/messaging": "^4.0.0"
   }
 }
