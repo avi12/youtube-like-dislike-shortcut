@@ -9,6 +9,7 @@ import {
   StorageKey,
   URL_PARAM
 } from "@/lib/utils-initials";
+import { getWatchedSeconds } from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
@@ -272,10 +273,9 @@ export default defineContentScript({
         sharedState.lastTimeUpdate = currentTime;
       }
 
-      const delta = currentTime - sharedState.lastTimeUpdate;
-      const isValidDelta = delta > 0 && delta < 1 && Boolean(duration);
-      if (isValidDelta) {
-        sharedState.percentageWatched += (delta / duration) * 100;
+      const watchedSeconds = getWatchedSeconds(sharedState.lastTimeUpdate, currentTime, elTarget.playbackRate);
+      if (watchedSeconds > 0 && Boolean(duration)) {
+        sharedState.percentageWatched += (watchedSeconds / duration) * 100;
         const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&

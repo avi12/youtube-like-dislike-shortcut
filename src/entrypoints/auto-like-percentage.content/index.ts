@@ -11,6 +11,7 @@ import {
   YOUTUBE_EVENT,
   YOUTUBE_PATHNAME
 } from "@/lib/utils-initials";
+import { getWatchedSeconds } from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
@@ -281,11 +282,10 @@ export default defineContentScript({
         sharedState.lastTimeUpdate = currentTime;
       }
       const previousTimeUpdate = sharedState.lastTimeUpdate;
-      const delta = currentTime - previousTimeUpdate;
-      const isDeltaInRange = delta > 0 && delta < 1;
+      const watchedSeconds = getWatchedSeconds(previousTimeUpdate, currentTime, elTarget.playbackRate);
       const isDurationUsable = Boolean(duration) && duration !== Infinity;
-      if (isDeltaInRange && isDurationUsable) {
-        sharedState.percentageWatched += (delta / duration) * 100;
+      if (watchedSeconds > 0 && isDurationUsable) {
+        sharedState.percentageWatched += (watchedSeconds / duration) * 100;
         const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
