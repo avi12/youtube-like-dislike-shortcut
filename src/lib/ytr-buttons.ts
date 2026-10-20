@@ -23,14 +23,20 @@ function getShortsRateButtons() {
     return {};
   }
 
-  const rateButtonsSelector = `${SELECTORS.likeButton}, ${SELECTORS.dislikeButton}`;
-  const elKnownRateButtons = elActionBar.querySelectorAll<HTMLButtonElement>(rateButtonsSelector);
-  const elToggleButtons = elKnownRateButtons.length > 0
-    ? elKnownRateButtons
-    : elActionBar.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`);
+  const elKnownLike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.likeButton) ?? undefined;
+  const elKnownDislike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.dislikeButton) ?? undefined;
+  if (elKnownLike || elKnownDislike) {
+    return { elLike: elKnownLike, elDislike: elKnownDislike };
+  }
+
+  const elToggleButtons = elActionBar.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`);
+  const isLikeDislikePair = elToggleButtons.length === 2;
+  if (!isLikeDislikePair) {
+    return {};
+  }
   return {
-    elLike: elToggleButtons.item(0) ?? undefined,
-    elDislike: elToggleButtons.item(1) ?? undefined
+    elLike: elToggleButtons.item(0),
+    elDislike: elToggleButtons.item(1)
   };
 }
 
