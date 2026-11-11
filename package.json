@@ -30,6 +30,7 @@
     "crx": "pnpm package && tsx scripts/pack-crx.ts",
     "package:all": "concurrently \"pnpm package\" \"pnpm package:opera\" \"pnpm package:firefox\" --names Chrome,Opera,Firefox",
     "svelte:check": "pnpx svelte-check",
+    "typecheck": "tsrs --noEmit --fast",
     "lint:fix": "eslint --fix",
     "stylelint:fix": "stylelint \"src/**/*.{css,svelte}\" --fix",
     "postinstall": "wxt prepare"
@@ -57,6 +58,7 @@
     "stylelint": "^17.16.0",
     "stylelint-config-ccb": "^3.32.0",
     "svelte-eslint-parser": "^1.9.0",
+    "tsrs": "0.24.0-ts7.1.0-beta",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.2",
