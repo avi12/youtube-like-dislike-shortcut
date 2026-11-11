@@ -36,7 +36,7 @@
 
   :global(body) {
     margin: 0;
-    font-family: Roboto, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     font-weight: 700;
     font-size: 14px;
     font-variant-numeric: tabular-nums;
