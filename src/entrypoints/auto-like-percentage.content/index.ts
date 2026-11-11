@@ -1,5 +1,6 @@
 import { storage } from "#imports";
 import { mount, unmount } from "svelte";
+import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
   DOM_ATTRIBUTE,
   getStorage,
@@ -11,7 +12,12 @@ import {
   YOUTUBE_EVENT,
   YOUTUBE_PATHNAME
 } from "@/lib/utils-initials";
-import { getWatchedSeconds } from "@/lib/watch-progress";
+import {
+  clearWatchedPercentage,
+  getWatchedSeconds,
+  loadWatchedPercentage,
+  saveWatchedPercentage
+} from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
@@ -77,6 +83,14 @@ function watchForInitialRating() {
   sharedState.lastTimeUpdate = 0;
   window.ytrUserInteracted = false;
 
+  const hrefWhenStarted = location.href;
+  void loadWatchedPercentage().then(savedPercentage => {
+    const isSameVideo = location.href === hrefWhenStarted;
+    if (isSameVideo) {
+      sharedState.percentageWatched += savedPercentage;
+    }
+  });
+
   const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
   const anyButtonSelector = `:where(${containerSelector}) button[${DOM_ATTRIBUTE.ariaPressed}]`;
 
@@ -90,6 +104,9 @@ function watchForInitialRating() {
       sharedState.isRatedInitially = isRated;
     }
     sharedState.isRatingResolved = true;
+    if (isRated || sharedState.isUserInteracted) {
+      void clearWatchedPercentage();
+    }
   }
 
   ratingWatchObserver = new MutationObserver(mutations => {
@@ -156,6 +173,10 @@ export default defineContentScript({
       })
     ]);
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
+    sharedState.isSurfaceEnabled = await getIsCurrentSurfaceEnabled();
+    watchIsCurrentSurfaceEnabled(isEnabled => {
+      sharedState.isSurfaceEnabled = isEnabled;
+    });
 
     watchForInitialRating();
 
@@ -199,6 +220,10 @@ export default defineContentScript({
       }
     }
 
+    async function refreshIsSurfaceEnabled() {
+      sharedState.isSurfaceEnabled = await getIsCurrentSurfaceEnabled();
+    }
+
     function handleIfNavigated() {
       if (location.href === sharedState.lastHref) {
         return;
@@ -206,6 +231,7 @@ export default defineContentScript({
       sharedState.lastHref = location.href;
       sharedState.hasMountedForCurrentNav = false;
       sharedState.isShorts = getIsShorts();
+      void refreshIsSurfaceEnabled();
       sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
       sharedState.subscriptionDecision = undefined;
       unmountUi();
@@ -286,6 +312,7 @@ export default defineContentScript({
       const isDurationUsable = Boolean(duration) && duration !== Infinity;
       if (watchedSeconds > 0 && isDurationUsable) {
         sharedState.percentageWatched += (watchedSeconds / duration) * 100;
+        void saveWatchedPercentage(sharedState.percentageWatched);
         const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
@@ -295,6 +322,7 @@ export default defineContentScript({
           !sharedState.isCurrentlyRated;
         if (isAutoLikeTriggered) {
           await rateVideo(true);
+          await clearWatchedPercentage();
         }
       }
       sharedState.lastTimeUpdate = currentTime;
@@ -314,6 +342,7 @@ export default defineContentScript({
       }
       sharedState.isUserInteracted = true;
       window.ytrUserInteracted = true;
+      void clearWatchedPercentage();
     }
 
     document.addEventListener("pointerdown", markUserInteractedIfRateButton, { capture: true });
