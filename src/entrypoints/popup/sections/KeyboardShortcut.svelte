@@ -212,7 +212,7 @@
     display: flex;
     flex-direction: column-reverse;
     align-items: start;
-    padding-block: 12px;
+    padding-block: 10px;
   }
 
   .head-wrapper {
@@ -226,7 +226,7 @@
   h2 {
     margin: 0;
     font-weight: 500;
-    font-size: 1.25rem;
+    font-size: 1rem;
     letter-spacing: 0;
   }
 

@@ -23,7 +23,7 @@
   h1 {
     margin: 0;
     font-weight: 500;
-    font-size: 2rem;
+    font-size: 1.5rem;
     letter-spacing: 0;
   }
 </style>

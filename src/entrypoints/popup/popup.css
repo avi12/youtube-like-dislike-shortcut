@@ -36,6 +36,7 @@ html {
   --md-spring-effects: 200ms cubic-bezier(0.2, 0, 0, 1);
   --md-font: "Roboto Flex", roboto, arial, sans-serif;
 
+  overflow: hidden;
   background-color: var(--md-surface);
   color: var(--md-on-surface);
   color-scheme: light dark;
@@ -45,7 +46,7 @@ html {
 body {
   width: 752px;
   margin: 0;
-  padding: 16px 24px 24px;
+  padding: 12px 24px;
   font-family: var(--md-font);
   font-size: 1rem;
   letter-spacing: 0.01em;
@@ -113,7 +114,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
   html,
   html *,
-  .md-button {
+  html *::before,
+  html *::after {
     transition: none;
   }
 }

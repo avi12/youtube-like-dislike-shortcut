@@ -46,9 +46,9 @@
 
   input[type="number"] {
     box-sizing: border-box;
-    width: 4.5rem;
-    min-height: 48px;
-    padding: 12px 28px 12px 16px;
+    width: 5.5rem;
+    min-height: 40px;
+    padding: 8px 32px 8px 16px;
     border: none;
     border-radius: var(--md-shape-small);
     background-color: transparent;

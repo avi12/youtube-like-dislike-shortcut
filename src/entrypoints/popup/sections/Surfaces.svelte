@@ -7,9 +7,10 @@
 
   interface Props {
     enabledSurfaces: EnabledSurfaces;
+    disabled: boolean;
   }
 
-  let { enabledSurfaces = $bindable() }: Props = $props();
+  let { enabledSurfaces = $bindable(), disabled }: Props = $props();
 
   const surfaceLabels: Record<Surface, string> = {
     [Surface.youtube]: "YouTube",
@@ -18,35 +19,35 @@
   };
 </script>
 
-<section class="surfaces-section">
-  <h2>Where should I work?</h2>
+<div class="surfaces">
+  <h3>Only auto-like on</h3>
   <div class="content">
     {#each Object.values(Surface) as surface (surface)}
       <ToggleSwitch
-        disabled={keys.isRecording}
+        disabled={keys.isRecording || disabled}
         onchange={e => storage.setItem(StorageKey.enabledSurfaces, { ...enabledSurfaces, [surface]: e.currentTarget.checked })}
         bind:checked={enabledSurfaces[surface]}>
         {surfaceLabels[surface]}
       </ToggleSwitch>
     {/each}
   </div>
-</section>
+</div>
 
 <style>
-  .surfaces-section {
-    padding-block: 12px;
+  .surfaces {
+    margin-top: 12px;
   }
 
-  h2 {
-    margin: 0 0 16px;
+  h3 {
+    margin: 0 0 8px;
+    color: var(--md-on-surface-variant);
     font-weight: 500;
-    font-size: 1.25rem;
-    letter-spacing: 0;
+    font-size: 0.875rem;
   }
 
   .content {
     display: flex;
-    justify-content: space-between;
+    gap: 40px;
     align-items: center;
   }
 </style>

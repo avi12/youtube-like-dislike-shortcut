@@ -19,8 +19,10 @@
 
 <style>
   .button-shortcut {
-    min-height: 48px;
-    padding-inline: 28px;
+    justify-content: center;
+    min-inline-size: 10rem;
+    min-height: 40px;
+    padding-inline: 24px;
     border-radius: var(--md-shape-large);
     font-size: 1rem;
 

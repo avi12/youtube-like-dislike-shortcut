@@ -22,6 +22,7 @@
     --md-button-bg: var(--md-primary-container);
     --md-button-color: var(--md-on-primary-container);
 
+    min-height: 32px;
     padding-inline: 16px;
   }
 </style>

@@ -27,6 +27,7 @@
     --md-button-bg: transparent;
     --md-button-color: var(--md-primary);
 
+    min-height: 32px;
     padding-inline: 16px;
     box-shadow: inset 0 0 0 1px var(--md-outline);
 

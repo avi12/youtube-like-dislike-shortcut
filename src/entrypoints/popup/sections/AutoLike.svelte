@@ -2,16 +2,19 @@
   import { storage } from "#imports";
   import Textbox from "@/entrypoints/popup/components/Textbox.svelte";
   import ToggleSwitch from "@/entrypoints/popup/components/ToggleSwitch.svelte";
+  import Surfaces from "@/entrypoints/popup/sections/Surfaces.svelte";
   import { keys } from "@/entrypoints/popup/sections/keyboard.svelte.js";
+  import { type EnabledSurfaces } from "@/lib/surfaces";
   import { StorageKey } from "@/lib/utils-initials";
 
   interface Props {
+    enabledSurfaces: EnabledSurfaces;
     isAutoLike: boolean;
     autoLikeThreshold: number;
     isAutoLikeSubscribedChannels: boolean;
   }
 
-  let { isAutoLike = $bindable(), autoLikeThreshold = $bindable(), isAutoLikeSubscribedChannels = $bindable() }: Props = $props();
+  let { enabledSurfaces, isAutoLike = $bindable(), autoLikeThreshold = $bindable(), isAutoLikeSubscribedChannels = $bindable() }: Props = $props();
 
   $effect(() => {
     storage.setItem(StorageKey.isAutoLike, isAutoLike);
@@ -35,23 +38,29 @@
     </div>
     <ToggleSwitch disabled={keys.isRecording} bind:checked={isAutoLikeSubscribedChannels}>Auto-like in subscribed channels</ToggleSwitch>
   </div>
+  <Surfaces {enabledSurfaces} disabled={!isAutoLike && !isAutoLikeSubscribedChannels} />
 </section>
 
 <style>
   .auto-like-section {
-    padding-block: 12px;
+    padding-block: 10px;
   }
 
   h2 {
-    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    min-block-size: 32px;
+    margin: 0 0 8px;
     font-weight: 500;
-    font-size: 1.25rem;
+    font-size: 1rem;
     letter-spacing: 0;
   }
 
   .content {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 40px;
+    row-gap: 8px;
     align-items: center;
   }
 

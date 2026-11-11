@@ -2,7 +2,6 @@
   import { storage } from "#imports";
   import AutoLike from "@/entrypoints/popup/sections/AutoLike.svelte";
   import KeyboardShortcut from "@/entrypoints/popup/sections/KeyboardShortcut.svelte";
-  import Surfaces from "@/entrypoints/popup/sections/Surfaces.svelte";
   import { keys, ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
   import { type EnabledSurfaces } from "@/lib/surfaces";
   import { type ButtonTriggers } from "@/lib/types";
@@ -42,17 +41,20 @@
   <KeyboardShortcut type={ShortcutType.like}>Like</KeyboardShortcut>
   <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
   <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
-  <Surfaces {enabledSurfaces} />
-  <AutoLike {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
+  <AutoLike {enabledSurfaces} {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
 </main>
 
 <style>
+  main > :global(section + section) {
+    border-top: 1px solid var(--md-outline-variant);
+  }
+
   main {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 16px;
-    padding: 24px;
+    gap: 0;
+    margin-top: 12px;
+    padding: 10px 24px;
     border-radius: var(--md-shape-extra-large);
     background-color: var(--md-surface-container);
   }
