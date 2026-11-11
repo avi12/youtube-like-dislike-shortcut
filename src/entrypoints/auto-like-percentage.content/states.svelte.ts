@@ -12,6 +12,7 @@ interface SharedState {
   isLiveOrPremiere: boolean;
   isShorts: boolean;
   isAutoLikeEnabled: boolean;
+  isSurfaceEnabled: boolean;
   subscriptionDecision: SubscriptionDecision | undefined;
   hasMountedForCurrentNav: boolean;
   lastHref: string;
@@ -29,13 +30,14 @@ export const sharedState: SharedState = $state({
   isLiveOrPremiere: false,
   isShorts: false,
   isAutoLikeEnabled: false,
+  isSurfaceEnabled: true,
   subscriptionDecision: undefined,
   hasMountedForCurrentNav: false,
   lastHref: ""
 });
 
 export function getIsUnmountRequired() {
-  if (!sharedState.isAutoLikeEnabled) {
+  if (!sharedState.isAutoLikeEnabled || !sharedState.isSurfaceEnabled) {
     return true;
   }
   if (sharedState.isShorts || sharedState.isLiveOrPremiere) {

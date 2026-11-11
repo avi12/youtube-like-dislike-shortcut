@@ -212,15 +212,7 @@
     display: flex;
     flex-direction: column-reverse;
     align-items: start;
-
-    &:not(:first-child) {
-      padding-top: 20px;
-    }
-
-    &:not(:last-child) {
-      padding-bottom: 16px;
-      border-bottom: 1px solid rgb(121 129 145 / 20%);
-    }
+    padding-block: 12px;
   }
 
   .head-wrapper {
@@ -228,13 +220,14 @@
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
   }
 
   h2 {
     margin: 0;
-    font-weight: 400;
+    font-weight: 500;
     font-size: 1.25rem;
+    letter-spacing: 0;
   }
 
   .shortcut-wrapper {
@@ -244,6 +237,6 @@
   }
 
   .error {
-    color: var(--button-shortcut-error-bg);
+    color: var(--md-error);
   }
 </style>

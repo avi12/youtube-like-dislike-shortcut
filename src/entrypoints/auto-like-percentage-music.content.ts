@@ -1,5 +1,6 @@
 import { storage } from "#imports";
 import { mount, unmount } from "svelte";
+import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
   DOM_ATTRIBUTE,
   getStorage,
@@ -143,6 +144,10 @@ export default defineContentScript({
       })
     ]);
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
+    sharedState.isSurfaceEnabled = await getIsCurrentSurfaceEnabled();
+    watchIsCurrentSurfaceEnabled(isEnabled => {
+      sharedState.isSurfaceEnabled = isEnabled;
+    });
 
     let isMounting = false;
     let activeShadowUi: Awaited<ReturnType<typeof createShadowRootUi>> | null = null;

@@ -56,38 +56,49 @@
 </script>
 
 <article class="themes">
-  <button class:selected={theme.selected === ThemeMode.auto} onclick={() => (theme.selected = ThemeMode.auto)}>
+  <button aria-label="auto theme" aria-pressed={theme.selected === ThemeMode.auto} class:selected={theme.selected === ThemeMode.auto} onclick={() => (theme.selected = ThemeMode.auto)}>
     <ThemeAuto checked={theme.selected === ThemeMode.auto} />
   </button>
-  <button class:selected={theme.selected === ThemeMode.light} onclick={() => (theme.selected = ThemeMode.light)}>
+  <button aria-label="light theme" aria-pressed={theme.selected === ThemeMode.light} class:selected={theme.selected === ThemeMode.light} onclick={() => (theme.selected = ThemeMode.light)}>
     <ThemeLight checked={theme.selected === ThemeMode.light} />
   </button>
-  <button class:selected={theme.selected === ThemeMode.dark} onclick={() => (theme.selected = ThemeMode.dark)}>
+  <button aria-label="dark theme" aria-pressed={theme.selected === ThemeMode.dark} class:selected={theme.selected === ThemeMode.dark} onclick={() => (theme.selected = ThemeMode.dark)}>
     <ThemeDark checked={theme.selected === ThemeMode.dark} />
   </button>
 </article>
 
 <style>
   .themes {
+    --theme-switcher-button-color-active: var(--md-on-primary-container);
+    --theme-switcher-button-color-inactive: var(--md-on-surface-variant);
+
     display: flex;
     gap: 4px;
     align-items: center;
-    padding: 8px;
-    border-radius: 24px;
-    background-color: var(--theme-switcher-bg);
+    padding: 4px;
+    border-radius: var(--md-shape-full);
+    background-color: var(--md-surface-container);
 
     & button {
-      display: flex;
-      align-items: center;
-      width: 30px;
-      height: 30px;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
       border: none;
-      border-radius: 50%;
+      border-radius: var(--md-shape-large);
       background-color: transparent;
+      transition:
+        border-radius var(--md-spring-spatial),
+        background-color var(--md-spring-effects);
+
+      &:hover:not(.selected) {
+        background-color: var(--md-surface-container-high);
+      }
     }
 
     & button.selected {
-      background-color: var(--theme-switcher-button-bg);
+      border-radius: var(--md-shape-full);
+      background-color: var(--md-primary-container);
     }
   }
 </style>

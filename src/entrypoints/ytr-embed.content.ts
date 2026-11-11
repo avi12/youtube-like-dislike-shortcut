@@ -1,4 +1,5 @@
 import { storage } from "#imports";
+import { getCurrentSurface, getEnabledSurfaces, watchEnabledSurfaces } from "@/lib/surfaces";
 import { Rating } from "@/lib/types";
 import {
   getActionPressed,
@@ -43,6 +44,8 @@ async function rateIfNeeded(e: KeyboardEvent) {
   showRateBezel(gLastRating, rating !== null);
 }
 
+let enabledSurfaces = initial.enabledSurfaces;
+
 async function init() {
   window.ytrLastButtonTriggers = await getStorage({
     storageKey: StorageKey.buttonTriggers,
@@ -50,10 +53,16 @@ async function init() {
     updateWindowKey: "ytrLastButtonTriggers"
   });
 
+  enabledSurfaces = await getEnabledSurfaces();
+  watchEnabledSurfaces(updatedSurfaces => {
+    enabledSurfaces = updatedSurfaces;
+  });
+
   document.addEventListener("keydown", e => {
     const { activeElement } = document;
     const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
-    if (isFocusedOnInput) {
+    const isSurfaceEnabled = enabledSurfaces[getCurrentSurface()];
+    if (isFocusedOnInput || !isSurfaceEnabled) {
       return;
     }
     void rateIfNeeded(e);

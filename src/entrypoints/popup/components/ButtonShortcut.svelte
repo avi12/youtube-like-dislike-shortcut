@@ -13,41 +13,31 @@
   const { active = false, error = false, disabled = false, children, onclick }: Props = $props();
 </script>
 
-<button class="button-shortcut quick-transition" class:active class:error {disabled} {onclick}>
+<button class="md-button button-shortcut" class:active class:error {disabled} {onclick}>
   {@render children?.()}
 </button>
 
 <style>
   .button-shortcut {
-    padding: 14.5px 16px;
-    border: 1.5px solid var(--button-shortcut-border);
-    border-radius: 12px;
-    background-color: var(--button-shortcut-bg);
-    color: var(--button-shortcut-color);
-    box-shadow: var(--button-shortcut-shadow);
+    min-height: 48px;
+    padding-inline: 28px;
+    border-radius: var(--md-shape-large);
+    font-size: 1rem;
 
     &.active {
-      border: 1.5px solid var(--button-shortcut-active-border-color);
-      background-color: var(--button-shortcut-active-bg);
-      color: var(--button-shortcut-active-color);
-    }
+      --md-button-bg: var(--md-primary);
+      --md-button-color: var(--md-on-primary);
 
-    &:disabled {
-      border: 1.5px solid var(--button-disabled-border-color);
-      background-color: var(--button-disabled-bg);
-      color: var(--button-disabled-color);
-      cursor: not-allowed;
+      border-radius: var(--md-shape-full);
     }
 
     &.error {
-      border: 1.5px solid var(--button-shortcut-error-border-color);
-      background-color: var(--button-shortcut-error-bg);
-      color: var(--button-shortcut-error-color);
+      --md-button-bg: var(--md-error);
+      --md-button-color: var(--md-on-error);
 
       &:disabled {
-        background-color: var(--button-shortcut-error-bg);
-        color: var(--button-shortcut-error-color);
-        filter: var(--button-shortcut-error-disabled-filter);
+        background-color: var(--md-error-container);
+        color: var(--md-on-error-container);
       }
     }
   }

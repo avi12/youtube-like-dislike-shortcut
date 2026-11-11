@@ -39,13 +39,14 @@
 
 <style>
   .auto-like-section {
-    padding-top: 20px;
+    padding-block: 12px;
   }
 
   h2 {
     margin: 0 0 16px;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 500;
+    font-size: 1.25rem;
+    letter-spacing: 0;
   }
 
   .content {
@@ -56,7 +57,7 @@
 
   .auto-like-container {
     display: flex;
-    gap: 8px;
+    gap: 16px;
     align-items: center;
   }
 </style>

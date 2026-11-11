@@ -27,7 +27,9 @@ export enum StorageKey {
   autoLikeThreshold = "sync:autoLikeThreshold",
   isAutoLikeSubscribedChannels = "sync:isAutoLikeSubscribedChannels",
   buttonTriggers = "local:buttonTriggers",
-  theme = "local:theme"
+  theme = "local:theme",
+  watchProgress = "local:watchProgress",
+  enabledSurfaces = "sync:enabledSurfaces"
 }
 
 export async function getStorage<K extends keyof typeof window>({
@@ -119,7 +121,14 @@ const buttonTriggers: ButtonTriggers = {
   }
 };
 
+export enum Surface {
+  youtube = "youtube",
+  shorts = "shorts",
+  music = "music"
+}
+
 export const initial = {
+  enabledSurfaces: { [Surface.youtube]: true, [Surface.shorts]: true, [Surface.music]: true },
   buttonTriggers,
   isAutoLike: false,
   isAutoLikeSubscribedChannels: false,

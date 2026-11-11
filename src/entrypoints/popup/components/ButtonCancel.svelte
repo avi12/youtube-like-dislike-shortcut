@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { MouseEventHandler } from "svelte/elements";
   import { fade } from "svelte/transition";
-  import IconCancel from "@/entrypoints/popup/components/icons/IconCancel.svelte";
 
   interface Props {
     onclick: MouseEventHandler<HTMLButtonElement>;
@@ -10,21 +9,19 @@
   const { onclick }: Props = $props();
 </script>
 
-<button class="button-cancel quick-transition" in:fade={{ duration: 200 }} {onclick}>
-  <IconCancel />
+<button class="md-button button-cancel" in:fade={{ duration: 200 }} {onclick}>
+  <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 4L4 12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33333" />
+    <path d="M4 4L12 12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33333" />
+  </svg>
   Cancel
 </button>
 
 <style>
   .button-cancel {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 0.65625rem 1rem;
-    border: 1.5px solid var(--button-cancel-border-color);
-    border-radius: 32px;
-    background-color: var(--button-cancel-bg);
-    color: var(--button-cancel-color);
-    font-size: 0.875rem;
+    --md-button-bg: var(--md-primary-container);
+    --md-button-color: var(--md-on-primary-container);
+
+    padding-inline: 16px;
   }
 </style>

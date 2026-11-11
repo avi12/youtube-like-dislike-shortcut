@@ -1,3 +1,4 @@
+import { getIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import { Rating } from "@/lib/types";
 import { DOM_ATTRIBUTE, SELECTORS, YOUTUBE_HOST, YOUTUBE_PATHNAME } from "@/lib/utils-initials";
 import { showRateBezel } from "@/lib/ytr-bezel";
@@ -112,6 +113,11 @@ async function rateVideoViaApi(isLike: boolean | null) {
  * Falls back to YouTube's innertube API when the requested DOM control isn't available
  */
 export async function rateVideo(isLike: boolean | null) {
+  const isSurfaceEnabled = await getIsCurrentSurfaceEnabled();
+  if (!isSurfaceEnabled) {
+    return;
+  }
+
   const { elLike, elDislike } = getRateButtons();
 
   const isLikeRequested = isLike === true;

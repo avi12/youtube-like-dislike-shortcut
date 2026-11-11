@@ -18,9 +18,10 @@
   });
 </script>
 
-<div class="textbox-wrapper" class:disabled={!isAutoLike}>
+<div class="textbox-wrapper">
   <section class="text-wrapper">
     <input
+      aria-label="Auto-like threshold in percent"
       bind:value
       disabled={disabled || !isAutoLike}
       onkeydown={e => {
@@ -40,32 +41,35 @@
 <style>
   .textbox-wrapper {
     display: flex;
-    gap: 24px;
     align-items: center;
-    color: var(--textbox-label-color);
-
-    &.disabled {
-      color: var(--button-disabled-color);
-    }
   }
 
   input[type="number"] {
-    width: 3.5rem;
-    padding: 14.5px 6px 14.5px 16px;
-    border: 1.5px solid var(--textbox-border);
-    border-radius: 12px;
-    background-color: var(--textbox-bg);
-    color: var(--textbox-color);
-    font-size: 0.875rem;
-
-    &:focus {
-      outline: none;
-    }
+    box-sizing: border-box;
+    width: 4.5rem;
+    min-height: 48px;
+    padding: 12px 28px 12px 16px;
+    border: none;
+    border-radius: var(--md-shape-small);
+    background-color: transparent;
+    color: var(--md-on-surface);
+    font: inherit;
+    font-size: 1rem;
+    box-shadow: inset 0 0 0 1px var(--md-outline);
 
     &:disabled {
-      background-color: var(--textbox-bg-disabled);
-      color: var(--textbox-color-disabled);
+      color: var(--md-disabled-content);
+      box-shadow: inset 0 0 0 1px var(--md-disabled-container);
       cursor: not-allowed;
+    }
+
+    &:hover:enabled {
+      box-shadow: inset 0 0 0 1px var(--md-on-surface);
+    }
+
+    &:focus:enabled {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--md-primary);
     }
   }
 
@@ -77,11 +81,10 @@
       content: "%";
       position: absolute;
       top: 50%;
-      right: 0;
-      width: 1rem;
-      color: var(--textbox-suffix-color);
+      right: 12px;
+      color: var(--md-on-surface-variant);
       pointer-events: none;
-      translate: -150% -50%;
+      translate: 0 -50%;
     }
   }
 </style>
