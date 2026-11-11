@@ -135,6 +135,13 @@ export const initial = {
   autoLikeThreshold: 70
 };
 
+export function getCurrentSurface() {
+  if (location.hostname === YOUTUBE_HOST.music) {
+    return Surface.music;
+  }
+  return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts) ? Surface.shorts : Surface.youtube;
+}
+
 const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
@@ -159,7 +166,7 @@ function getIsElementInViewport(elElement: HTMLElement) {
 
 export function getVisibleElement<T extends HTMLElement>(selector: string) {
   const elements = document.querySelectorAll<T>(selector);
-  const isShorts = location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
+  const isShorts = getCurrentSurface() === Surface.shorts;
   return elements.values().find(isShorts ? getIsElementInViewport : getIsElementVisible);
 }
 

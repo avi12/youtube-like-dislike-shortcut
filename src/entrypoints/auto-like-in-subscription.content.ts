@@ -1,7 +1,9 @@
 import { storage } from "#imports";
+import { getEnabledSurfaces, watchEnabledSurfaces } from "@/lib/surfaces";
 import {
   addNavigationListener,
   DOM_ATTRIBUTE,
+  getCurrentSurface,
   getElementByMutationObserver,
   initial,
   OBSERVER_OPTIONS,
@@ -38,6 +40,11 @@ let lastTitle: string | undefined;
 let isNavigationHandled = false;
 let isUserSubscribeClickPending = false;
 let isAutoLikeSubscribedChannels = initial.isAutoLikeSubscribedChannels;
+let enabledSurfaces = initial.enabledSurfaces;
+
+function getIsAutoLikeActive() {
+  return isAutoLikeSubscribedChannels && enabledSurfaces[getCurrentSurface()];
+}
 
 async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
   if (isNavigationHandled) {
@@ -45,7 +52,7 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
     return true;
   }
 
-  if (!isAutoLikeSubscribedChannels) {
+  if (!getIsAutoLikeActive()) {
     announceSubscriptionDecision(SubscriptionDecision.released);
     observer?.disconnect();
     return true;
@@ -125,7 +132,7 @@ async function addTemporaryBodyListener() {
   isUserSubscribeClickPending = false;
   resetSubscriptionDecision();
 
-  if (!isAutoLikeSubscribedChannels) {
+  if (!getIsAutoLikeActive()) {
     announceSubscriptionDecision(SubscriptionDecision.released);
     return;
   }
@@ -186,6 +193,10 @@ export default defineContentScript({
       announceSubscriptionDecision(SubscriptionDecision.released);
     }
 
+    enabledSurfaces = await getEnabledSurfaces();
+    watchEnabledSurfaces(updatedSurfaces => {
+      enabledSurfaces = updatedSurfaces;
+    });
     addStorageListener();
     await addNavigationListener(addTemporaryBodyListener);
     await addFollowButtonObserver();

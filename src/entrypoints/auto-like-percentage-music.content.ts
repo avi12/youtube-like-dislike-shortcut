@@ -283,6 +283,7 @@ export default defineContentScript({
         sharedState.percentageWatched += (watchedSeconds / duration) * 100;
         const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
+          sharedState.isSurfaceEnabled &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
           !sharedState.isUserInteracted &&
           !sharedState.isRatedInitially &&

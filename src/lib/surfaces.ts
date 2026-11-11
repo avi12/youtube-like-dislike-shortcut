@@ -1,22 +1,9 @@
 import { storage } from "#imports";
-import {
-  initial,
-  StorageKey,
-  Surface,
-  YOUTUBE_HOST,
-  YOUTUBE_PATHNAME
-} from "@/lib/utils-initials";
+import { getCurrentSurface, initial, StorageKey, type Surface } from "@/lib/utils-initials";
 
 export type EnabledSurfaces = Record<Surface, boolean>;
 
-export function getCurrentSurface() {
-  if (location.hostname === YOUTUBE_HOST.music) {
-    return Surface.music;
-  }
-  return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts) ? Surface.shorts : Surface.youtube;
-}
-
-export function resolveEnabledSurfaces(stored: Partial<EnabledSurfaces> | null): EnabledSurfaces {
+export function resolveEnabledSurfaces(stored: Partial<EnabledSurfaces> | null) {
   return { ...initial.enabledSurfaces, ...stored };
 }
 

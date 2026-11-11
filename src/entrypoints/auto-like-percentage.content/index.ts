@@ -3,14 +3,15 @@ import { mount, unmount } from "svelte";
 import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
   DOM_ATTRIBUTE,
+  getCurrentSurface,
   getStorage,
   getVisibleElement,
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
   StorageKey,
-  YOUTUBE_EVENT,
-  YOUTUBE_PATHNAME
+  Surface,
+  YOUTUBE_EVENT
 } from "@/lib/utils-initials";
 import {
   clearWatchedPercentage,
@@ -52,10 +53,6 @@ const uiManagers: UiManager[] = [
     isMounting: false
   }
 ];
-
-function getIsShorts() {
-  return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts);
-}
 
 function getIsAdPlaying() {
   return Boolean(document.querySelector(SELECTORS.adOverlay));
@@ -149,7 +146,7 @@ export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
-    sharedState.isShorts = getIsShorts();
+    sharedState.isShorts = getCurrentSurface() === Surface.shorts;
     sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.isAdPlaying = getIsAdPlaying();
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
@@ -230,7 +227,7 @@ export default defineContentScript({
       }
       sharedState.lastHref = location.href;
       sharedState.hasMountedForCurrentNav = false;
-      sharedState.isShorts = getIsShorts();
+      sharedState.isShorts = getCurrentSurface() === Surface.shorts;
       void refreshIsSurfaceEnabled();
       sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
       sharedState.subscriptionDecision = undefined;
@@ -315,6 +312,7 @@ export default defineContentScript({
         void saveWatchedPercentage(sharedState.percentageWatched);
         const isAutoLikeTriggered =
           window.ytrAutoLikeEnabled &&
+          sharedState.isSurfaceEnabled &&
           sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
           !sharedState.isLiveOrPremiere &&
           !sharedState.isUserInteracted &&
