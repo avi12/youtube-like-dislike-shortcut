@@ -12,13 +12,16 @@ function client(url) {
     const ws = new WebSocket(url);
     let nextId = 1;
     const pending = new Map();
-    ws.addEventListener("open", () => resolve({
-      send: (method, params = {}) => new Promise((res, rej) => {
-        const id = nextId++;
-        pending.set(id, { res, rej });
-        ws.send(JSON.stringify({ id, method, params }));
+    ws.addEventListener("open", () =>
+      resolve({
+        send: (method, params = {}) =>
+          new Promise((res, rej) => {
+            const id = nextId++;
+            pending.set(id, { res, rej });
+            ws.send(JSON.stringify({ id, method, params }));
+          })
       })
-    }));
+    );
     ws.addEventListener("error", error => reject(error));
     ws.addEventListener("message", event => {
       const message = JSON.parse(event.data);

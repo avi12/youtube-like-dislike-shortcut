@@ -55,8 +55,8 @@ function getRateContext(): RateContext | null {
       client: {
         clientName: existingClient?.clientName ?? "WEB",
         clientVersion,
-        ...hl && { hl },
-        ...gl && { gl }
+        ...(hl && { hl }),
+        ...(gl && { gl })
       }
     },
     delegatedSessionId: ytcfg?.get(YTCFG_KEY.delegatedSessionId) ?? "",
@@ -72,7 +72,7 @@ function getContextForRate(action: RateAction) {
   const isEmbed = location.pathname.startsWith(YOUTUBE_PATHNAME.embed);
   return {
     context,
-    ...!isEmbed && { params: findRateParamInInnertube(window.ytInitialData, paramFieldForAction[action]) }
+    ...(!isEmbed && { params: findRateParamInInnertube(window.ytInitialData, paramFieldForAction[action]) })
   };
 }
 
@@ -85,8 +85,9 @@ async function watchTrackVideoId() {
     return;
   }
 
-  const elPlayer = document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer)
-    ?? await getElementByMutationObserver<MoviePlayerElement>(SELECTORS.moviePlayer);
+  const elPlayer =
+    document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer) ??
+    (await getElementByMutationObserver<MoviePlayerElement>(SELECTORS.moviePlayer));
 
   let lastVideoId = "";
   function pushIfTrackChanged() {

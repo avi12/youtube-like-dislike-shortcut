@@ -1,6 +1,9 @@
 const targets = await (await fetch("http://localhost:9225/json")).json();
 const anyPage = targets.find(t => t.type === "page" && t.webSocketDebuggerUrl);
-if (!anyPage) { console.log("No page target"); process.exit(1); }
+if (!anyPage) {
+  console.log("No page target");
+  process.exit(1);
+}
 const ws = new WebSocket(anyPage.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"));
 await new Promise(r => ws.addEventListener("open", () => r()));
 const send = (id, method, params) => {

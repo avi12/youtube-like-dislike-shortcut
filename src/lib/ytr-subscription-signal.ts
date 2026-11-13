@@ -11,7 +11,9 @@ declare global {
   }
 }
 
-function isSubscriptionDecision(value: SubscriptionDecision | string | null | undefined): value is SubscriptionDecision {
+function isSubscriptionDecision(
+  value: SubscriptionDecision | string | null | undefined
+): value is SubscriptionDecision {
   return value === SubscriptionDecision.claimed || value === SubscriptionDecision.released;
 }
 

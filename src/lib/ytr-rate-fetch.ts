@@ -34,13 +34,7 @@ interface NextRequestBody {
   videoId: string;
 }
 
-function buildHeaders({
-  Authorization,
-  context
-}: {
-  Authorization: string;
-  context: RateContext;
-}) {
+function buildHeaders({ Authorization, context }: { Authorization: string; context: RateContext }) {
   const { clientNameNumber, clientVersion, sessionIndex, delegatedSessionId } = context;
   return {
     Authorization,
@@ -48,8 +42,8 @@ function buildHeaders({
     "X-YouTube-Client-Name": String(clientNameNumber),
     "X-YouTube-Client-Version": clientVersion,
     "X-Origin": "https://www.youtube.com",
-    ...sessionIndex && { "X-Goog-AuthUser": sessionIndex },
-    ...delegatedSessionId && { "X-Goog-PageId": delegatedSessionId }
+    ...(sessionIndex && { "X-Goog-AuthUser": sessionIndex }),
+    ...(delegatedSessionId && { "X-Goog-PageId": delegatedSessionId })
   };
 }
 
@@ -61,7 +55,9 @@ function pickParamFromButtonContainer(container: ButtonViewModelContainer | unde
     if (direct) {
       return direct;
     }
-    const nested = innertubeCommand?.modalEndpoint?.modal?.modalWithTitleAndButtonRenderer?.button?.buttonRenderer?.navigationEndpoint?.signInEndpoint?.nextEndpoint?.likeEndpoint?.[field];
+    const nested =
+      innertubeCommand?.modalEndpoint?.modal?.modalWithTitleAndButtonRenderer?.button?.buttonRenderer
+        ?.navigationEndpoint?.signInEndpoint?.nextEndpoint?.likeEndpoint?.[field];
     if (nested) {
       return nested;
     }
@@ -71,11 +67,16 @@ function pickParamFromButtonContainer(container: ButtonViewModelContainer | unde
 
 function pickParamFromToggle(container: ToggleButtonViewModelContainer | undefined, field: RateParamField) {
   const inner = container?.toggleButtonViewModel?.toggleButtonViewModel;
-  return pickParamFromButtonContainer(inner?.defaultButtonViewModel, field)
-    ?? pickParamFromButtonContainer(inner?.toggledButtonViewModel, field);
+  return (
+    pickParamFromButtonContainer(inner?.defaultButtonViewModel, field) ??
+    pickParamFromButtonContainer(inner?.toggledButtonViewModel, field)
+  );
 }
 
-export function findRateParamInInnertube(root: YtInitialData | InnertubeNextResponse | undefined, field: RateParamField) {
+export function findRateParamInInnertube(
+  root: YtInitialData | InnertubeNextResponse | undefined,
+  field: RateParamField
+) {
   if (!root) {
     return undefined;
   }
@@ -95,7 +96,8 @@ export function findRateParamInInnertube(root: YtInitialData | InnertubeNextResp
       }
     }
   }
-  const { quickActionButtons = [] } = playerOverlays?.playerOverlayRenderer?.fullscreenQuickActionsBar?.quickActionsViewModel ?? {};
+  const { quickActionButtons = [] } =
+    playerOverlays?.playerOverlayRenderer?.fullscreenQuickActionsBar?.quickActionsViewModel ?? {};
   for (const quickButton of quickActionButtons) {
     const { likeButtonViewModel, dislikeButtonViewModel } = quickButton;
     const fromLike = pickParamFromToggle(likeButtonViewModel, field);
@@ -156,7 +158,7 @@ export async function executeRateRequest({
     body: JSON.stringify({
       context: innertubeContext,
       target: { videoId },
-      ...params && { params }
+      ...(params && { params })
     } satisfies RateRequestBody)
   });
   return response.ok;

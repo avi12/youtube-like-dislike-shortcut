@@ -1,5 +1,6 @@
-import { storage } from "#imports";
 import { mount, unmount } from "svelte";
+
+import { storage } from "#imports";
 import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
   DOM_ATTRIBUTE,
@@ -21,6 +22,7 @@ import {
 } from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
+
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
 import { getIsFreshMountAllowed, getIsUnmountRequired, sharedState, watchMountState } from "./states.svelte";
 
@@ -258,74 +260,76 @@ export default defineContentScript({
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
 
-    document.addEventListener("timeupdate", async e => {
-      handleIfNavigated();
+    document.addEventListener(
+      "timeupdate",
+      async e => {
+        handleIfNavigated();
 
-      if (window.ytrUserInteracted) {
-        sharedState.isUserInteracted = true;
-        return;
-      }
-
-      sharedState.isAdPlaying = getIsAdPlaying();
-      sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
-      const { isRatedInitially, isUserInteracted, isAdPlaying, isAdInitiallyPlaying } = sharedState;
-      const isRatingFinalized = isRatedInitially || isUserInteracted;
-      if (isRatingFinalized) {
-        return;
-      }
-
-      const isInitialAdFinished = isAdInitiallyPlaying && !isAdPlaying;
-      if (isInitialAdFinished) {
-        sharedState.percentageWatched = 0;
-        sharedState.isAdInitiallyPlaying = false;
-      }
-      const isImmediatePostNavigationAd = !isAdInitiallyPlaying && isAdPlaying && sharedState.percentageWatched === 0;
-      if (isImmediatePostNavigationAd) {
-        sharedState.isAdInitiallyPlaying = true;
-        sharedState.percentageWatched = 0;
-      }
-
-      const { target: elTarget } = e;
-      const isTargetVideo = elTarget instanceof HTMLVideoElement;
-      if (!isTargetVideo) {
-        return;
-      }
-      const { duration, currentTime } = elTarget;
-      if (isAdPlaying) {
-        sharedState.lastTimeUpdate = currentTime;
-        return;
-      }
-      if (sharedState.isLiveOrPremiere) {
-        sharedState.lastTimeUpdate = currentTime;
-        return;
-      }
-
-      const isLastTimeUpdateSet = Boolean(sharedState.lastTimeUpdate);
-      if (!isLastTimeUpdateSet) {
-        sharedState.lastTimeUpdate = currentTime;
-      }
-      const previousTimeUpdate = sharedState.lastTimeUpdate;
-      const watchedSeconds = getWatchedSeconds(previousTimeUpdate, currentTime, elTarget.playbackRate);
-      const isDurationUsable = Boolean(duration) && duration !== Infinity;
-      if (watchedSeconds > 0 && isDurationUsable) {
-        sharedState.percentageWatched += (watchedSeconds / duration) * 100;
-        void saveWatchedPercentage(sharedState.percentageWatched);
-        const isAutoLikeTriggered =
-          window.ytrAutoLikeEnabled &&
-          sharedState.isSurfaceEnabled &&
-          sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
-          !sharedState.isLiveOrPremiere &&
-          !sharedState.isUserInteracted &&
-          !sharedState.isRatedInitially &&
-          !sharedState.isCurrentlyRated;
-        if (isAutoLikeTriggered) {
-          await rateVideo(true);
-          await clearWatchedPercentage();
+        if (window.ytrUserInteracted) {
+          sharedState.isUserInteracted = true;
+          return;
         }
-      }
-      sharedState.lastTimeUpdate = currentTime;
-    },
-    { capture: true }
+
+        sharedState.isAdPlaying = getIsAdPlaying();
+        sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
+        const { isRatedInitially, isUserInteracted, isAdPlaying, isAdInitiallyPlaying } = sharedState;
+        const isRatingFinalized = isRatedInitially || isUserInteracted;
+        if (isRatingFinalized) {
+          return;
+        }
+
+        const isInitialAdFinished = isAdInitiallyPlaying && !isAdPlaying;
+        if (isInitialAdFinished) {
+          sharedState.percentageWatched = 0;
+          sharedState.isAdInitiallyPlaying = false;
+        }
+        const isImmediatePostNavigationAd = !isAdInitiallyPlaying && isAdPlaying && sharedState.percentageWatched === 0;
+        if (isImmediatePostNavigationAd) {
+          sharedState.isAdInitiallyPlaying = true;
+          sharedState.percentageWatched = 0;
+        }
+
+        const { target: elTarget } = e;
+        const isTargetVideo = elTarget instanceof HTMLVideoElement;
+        if (!isTargetVideo) {
+          return;
+        }
+        const { duration, currentTime } = elTarget;
+        if (isAdPlaying) {
+          sharedState.lastTimeUpdate = currentTime;
+          return;
+        }
+        if (sharedState.isLiveOrPremiere) {
+          sharedState.lastTimeUpdate = currentTime;
+          return;
+        }
+
+        const isLastTimeUpdateSet = Boolean(sharedState.lastTimeUpdate);
+        if (!isLastTimeUpdateSet) {
+          sharedState.lastTimeUpdate = currentTime;
+        }
+        const previousTimeUpdate = sharedState.lastTimeUpdate;
+        const watchedSeconds = getWatchedSeconds(previousTimeUpdate, currentTime, elTarget.playbackRate);
+        const isDurationUsable = Boolean(duration) && duration !== Infinity;
+        if (watchedSeconds > 0 && isDurationUsable) {
+          sharedState.percentageWatched += (watchedSeconds / duration) * 100;
+          void saveWatchedPercentage(sharedState.percentageWatched);
+          const isAutoLikeTriggered =
+            window.ytrAutoLikeEnabled &&
+            sharedState.isSurfaceEnabled &&
+            sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
+            !sharedState.isLiveOrPremiere &&
+            !sharedState.isUserInteracted &&
+            !sharedState.isRatedInitially &&
+            !sharedState.isCurrentlyRated;
+          if (isAutoLikeTriggered) {
+            await rateVideo(true);
+            await clearWatchedPercentage();
+          }
+        }
+        sharedState.lastTimeUpdate = currentTime;
+      },
+      { capture: true }
     );
 
     function markUserInteractedIfRateButton(e: Event) {
@@ -334,7 +338,9 @@ export default defineContentScript({
       if (!isTargetElement) {
         return;
       }
-      const isInsideRateButtons = Boolean(elTarget.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`));
+      const isInsideRateButtons = Boolean(
+        elTarget.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
+      );
       if (!isInsideRateButtons) {
         return;
       }

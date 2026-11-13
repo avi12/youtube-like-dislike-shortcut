@@ -1,7 +1,8 @@
-import "@/lib/ytr-bezel.css";
 import { createIconElement, svgs } from "@/lib/icons";
 import { type Rating } from "@/lib/types";
 import { SELECTORS } from "@/lib/utils-initials";
+
+import "@/lib/ytr-bezel.css";
 
 const FALLBACK_BEZEL_CLASS = "ytr-fallback-bezel";
 const PLAY_BUTTON_SELECTORS = [".ytp-play-button", ".player-control-play-pause-icon"];
@@ -23,7 +24,6 @@ function getPlayButtonIconSize() {
 function getBezelHost() {
   return document.fullscreenElement instanceof HTMLElement ? document.fullscreenElement : document.body;
 }
-
 
 export function showRateBezel(rating: Rating, isRated: boolean) {
   const elPlayer = document.querySelector<HTMLElement>(SELECTORS.moviePlayer);

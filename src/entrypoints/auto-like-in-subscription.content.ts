@@ -11,13 +11,7 @@ import {
   StorageKey,
   YOUTUBE_HOST
 } from "@/lib/utils-initials";
-import {
-  getIsInLibrary,
-  getIsSubscribed,
-  getRateButtons,
-  getRatedButton,
-  rateVideo
-} from "@/lib/ytr-buttons";
+import { getIsInLibrary, getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import {
   announceSubscriptionDecision,
   resetSubscriptionDecision,

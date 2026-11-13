@@ -1,11 +1,5 @@
 import { storage } from "#imports";
-import {
-  getActionPressed,
-  getStorage,
-  initial,
-  ShortcutType,
-  StorageKey
-} from "@/lib/utils-initials";
+import { getActionPressed, getStorage, initial, ShortcutType, StorageKey } from "@/lib/utils-initials";
 import { rateVideo } from "@/lib/ytr-buttons";
 
 async function rateIfNeeded(e: KeyboardEvent) {
@@ -37,16 +31,20 @@ async function init() {
     updateWindowKey: "ytrLastButtonTriggers"
   });
 
-  document.addEventListener("keydown", async e => {
-    const { activeElement } = document;
-    const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
+  document.addEventListener(
+    "keydown",
+    async e => {
+      const { activeElement } = document;
+      const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
 
-    if (isFocusedOnInput) {
-      return;
-    }
+      if (isFocusedOnInput) {
+        return;
+      }
 
-    await rateIfNeeded(e);
-  }, { capture: true });
+      await rateIfNeeded(e);
+    },
+    { capture: true }
+  );
 
   storage.watch<typeof initial.buttonTriggers>(StorageKey.buttonTriggers, buttonTriggers => {
     window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;

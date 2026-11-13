@@ -1,6 +1,8 @@
-import type { Plugin } from "vite";
 import { readFileSync } from "fs";
+
+import type { Plugin } from "vite";
 import { defineConfig } from "wxt";
+
 import packageJson from "./package.json" with { type: "json" };
 import { MusicCommand } from "./src/lib/ytmusic-command";
 
@@ -15,9 +17,7 @@ function parseGitignoreAsExcludes() {
 const url = packageJson.repository;
 const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
 
-const sharedPermissions: Browser.runtime.ManifestPermission[] = [
-  "storage"
-];
+const sharedPermissions: Browser.runtime.ManifestPermission[] = ["storage"];
 
 function getMinimumVersionChromeOrOpera(browser: string) {
   if (browser === "firefox") {
@@ -49,7 +49,7 @@ function stubCssWhileImportingEntrypoints(): Plugin {
       if (moduleId !== STUBBED_CSS_ID) {
         return;
       }
-      return "export default \"\";";
+      return 'export default "";';
     }
   };
 }
@@ -58,7 +58,7 @@ function stubCssWhileImportingEntrypoints(): Plugin {
 export default defineConfig({
   srcDir: "src",
   publicDir: "src/public",
-  manifest: ({ browser })=> ({
+  manifest: ({ browser }) => ({
     name: "YouTube Like-Dislike Shortcut",
     description: "Shift+Plus or Numpad Plus to like, Shift+Minus or Numpad Minus to dislike. Can't get any simpler.",
     homepage_url: url,
@@ -76,8 +76,8 @@ export default defineConfig({
       }
     },
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
-    ...browser !== "firefox" && { offline_enabled: true },
-    ...browser === "firefox" && {
+    ...(browser !== "firefox" && { offline_enabled: true }),
+    ...(browser === "firefox" && {
       browser_specific_settings: {
         gecko: {
           id: "youtube-like-dislike-shortcut@avi12.com",
@@ -92,7 +92,7 @@ export default defineConfig({
         name: author,
         url
       }
-    },
+    }),
     ...getMinimumVersionChromeOrOpera(browser)
   }),
   outDir: "build",

@@ -10,7 +10,7 @@ use 100% type safety in typescript.
 make the UI as accessible as possible.  
 support for chromium browsers (chrome, opera) and firefox mv3 is mandatory.  
 don't use abbreviations, use full words for variables and function names. Exception: event handler parameters use `e` instead of `event`.
-Use modern browser and CSS features.  
+Use modern browser and CSS features.
 
 use DRY wherever possible while retaining maintainability and prioritizing readability.  
 In every message in the UI, don't add full stops.  
@@ -31,9 +31,10 @@ avoid using hardcoded strings, use enums instead.
 Avoid using `setTimeout` unless absolutely necessary.  
 If you need to use a hardcoded number or a string, first try to use an enum, and if no enum exists, either make the enum if it makes sense, or put in a descriptive variable.  
 The dev server script (scripts/dev-server.ts) is configured such that on every file modification under src/, the extension is automatically rebuilt and reloaded and every YouTube page is reloaded, allowing proper content scripts reinjections.  
-Avoid comments unless absolutely necessary, prefer using descriptive variables and functions.  
+Avoid comments unless absolutely necessary, prefer using descriptive variables and functions.
 
 Variable naming rules:
+
 1. Boolean variables must be prefixed with "is" and be phrased positively (use `isEnabled`/`!isEnabled`, never `isDisabled` or `isNotX`)
 2. Element variables must be prefixed with "el"
 3. Index variables, unless they come from the YouTube API, must be prefixed with "i". Exception: inside a for loop or higher-order function where it is obvious what the index represents, keep just "i". Otherwise use the full word prefixed with "i" (e.g. `iButton`, `iShortcut`)

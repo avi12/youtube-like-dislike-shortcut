@@ -13,14 +13,17 @@ function client(url) {
     let nextId = 1;
     const pending = new Map();
     const events = [];
-    ws.addEventListener("open", () => resolve({
-      send: (method, params = {}) => new Promise((res, rej) => {
-        const id = nextId++;
-        pending.set(id, { res, rej });
-        ws.send(JSON.stringify({ id, method, params }));
-      }),
-      events
-    }));
+    ws.addEventListener("open", () =>
+      resolve({
+        send: (method, params = {}) =>
+          new Promise((res, rej) => {
+            const id = nextId++;
+            pending.set(id, { res, rej });
+            ws.send(JSON.stringify({ id, method, params }));
+          }),
+        events
+      })
+    );
     ws.addEventListener("error", error => reject(error));
     ws.addEventListener("message", event => {
       const message = JSON.parse(event.data);
@@ -51,7 +54,7 @@ async function evalIn(target, expression, contextId) {
     expression,
     returnByValue: true,
     awaitPromise: true,
-    ...contextId && { contextId }
+    ...(contextId && { contextId })
   });
   if (result.exceptionDetails) {
     throw new Error(result.exceptionDetails.text);
@@ -60,7 +63,9 @@ async function evalIn(target, expression, contextId) {
 }
 
 const targets = await listTargets();
-const serviceWorkerTarget = targets.find(target => target.type === "service_worker" && target.url?.includes(EXTENSION_ID));
+const serviceWorkerTarget = targets.find(
+  target => target.type === "service_worker" && target.url?.includes(EXTENSION_ID)
+);
 const watchTarget = targets.find(target => target.type === "page" && target.url?.includes("youtube.com/watch"));
 if (!serviceWorkerTarget || !watchTarget) {
   console.log("Missing target", { serviceWorker: Boolean(serviceWorkerTarget), watch: Boolean(watchTarget) });
@@ -110,7 +115,8 @@ await watch.send("Page.reload");
 await wait(8);
 
 const isolatedContext = watch.events.findLast(
-  event => event.method === "Runtime.executionContextCreated" &&
+  event =>
+    event.method === "Runtime.executionContextCreated" &&
     event.params.context.origin === `chrome-extension://${EXTENSION_ID}`
 );
 if (!isolatedContext) {
@@ -140,13 +146,16 @@ const readPageState = `(() => {
 
 console.log("Content script:", await evalIn(watch, readContentScriptState, isolatedContextId));
 
-await evalIn(watch, `(() => {
+await evalIn(
+  watch,
+  `(() => {
   const video = document.querySelector("video");
   video.muted = true;
   video.currentTime = 0;
   video.playbackRate = ${PLAYBACK_RATE};
   return video.play();
-})()`);
+})()`
+);
 
 let beforeUnrate = null;
 for (let i = 0; i < 60; i++) {
@@ -171,25 +180,37 @@ const afterUnrate = await evalIn(watch, readPageState);
 console.log("After un-rate:", afterUnrate);
 console.log("Content script:", await evalIn(watch, readContentScriptState, isolatedContextId));
 
-const actionsRect = await evalIn(watch, `(() => {
+const actionsRect = await evalIn(
+  watch,
+  `(() => {
   const { top, left, width, height } = document.querySelector("ytd-watch-flexy:not([hidden]) #actions").getBoundingClientRect();
   return { x: Math.round(left) - 8, y: Math.round(top) - 8, width: Math.round(width) + 16, height: Math.round(height) + 16, scale: 2 };
-})()`);
-const { data } = await watch.send("Page.captureScreenshot", { format: "png", clip: actionsRect, captureBeyondViewport: true });
+})()`
+);
+const { data } = await watch.send("Page.captureScreenshot", {
+  format: "png",
+  clip: actionsRect,
+  captureBeyondViewport: true
+});
 await (await import("node:fs/promises")).writeFile(SCREENSHOT_PATH, Buffer.from(data, "base64"));
 console.log("Saved screenshot:", SCREENSHOT_PATH);
 
 await evalIn(watch, `document.querySelector("video").pause()`);
-await evalIn(serviceWorker, `Promise.all([
+await evalIn(
+  serviceWorker,
+  `Promise.all([
   chrome.storage.sync.remove(["isAutoLike", "autoLikeThreshold"]),
   chrome.storage.local.remove(["isAutoLike", "autoLikeThreshold"])
-])`);
+])`
+);
 
 const isStillPlaying = afterUnrate.currentTime - beforeUnrate.currentTime > 0;
 const isCountingStopped = afterUnrate.percentage === beforeUnrate.percentage;
 const isStillUnrated = afterUnrate.likePressed !== "true" && afterUnrate.dislikePressed !== "true";
 console.log("\n== VERDICT ==");
-console.log(isStillPlaying && isCountingStopped && isStillUnrated
-  ? "PASS - counting froze and the video was never auto-liked"
-  : `FAIL - kept playing: ${isStillPlaying}, counting stopped: ${isCountingStopped}, still un-rated: ${isStillUnrated}`);
+console.log(
+  isStillPlaying && isCountingStopped && isStillUnrated
+    ? "PASS - counting froze and the video was never auto-liked"
+    : `FAIL - kept playing: ${isStillPlaying}, counting stopped: ${isCountingStopped}, still un-rated: ${isStillUnrated}`
+);
 process.exit(0);

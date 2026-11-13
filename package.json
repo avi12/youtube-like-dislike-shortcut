@@ -2,16 +2,11 @@
   "name": "youtube-like-dislike-shortcut",
   "version": "2.7.0",
   "description": "Like videos with Shift+Plus or Numpad Plus, dislike with Shift+Minus or Numpad Minus.",
-  "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
-  "type": "module",
+  "homepage": "https://avi12.com/youtube-like-dislike-shortcut",
   "license": "GPL-3.0-or-later",
   "author": "Avi <avi6106@gmail.com>",
-  "homepage": "https://avi12.com/youtube-like-dislike-shortcut",
-  "packageManager": "pnpm@11.3.0",
-  "engines": {
-    "node": ">=22.13",
-    "pnpm": ">=11"
-  },
+  "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
+  "type": "module",
   "scripts": {
     "dev": "tsx scripts/dev-server.ts",
     "dev:with-profile": "tsx scripts/dev-server.ts --browser chrome --with-profile",
@@ -34,6 +29,10 @@
     "lint:fix": "avi12-lint --fix",
     "postinstall": "wxt prepare",
     "lint": "avi12-lint"
+  },
+  "dependencies": {
+    "@webext-core/messaging": "^4.0.0",
+    "svelte": "5.57.2"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
@@ -68,8 +67,9 @@
   "overrides": {
     "acorn": "8.16.0"
   },
-  "dependencies": {
-    "@webext-core/messaging": "^4.0.0",
-    "svelte": "5.57.2"
-  }
+  "engines": {
+    "node": ">=22.13",
+    "pnpm": ">=11"
+  },
+  "packageManager": "pnpm@11.3.0"
 }

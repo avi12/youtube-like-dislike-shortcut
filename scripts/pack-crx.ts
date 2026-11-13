@@ -3,9 +3,10 @@
  * gitignored keys/ folder and is created on the first run - keep it, since it fixes the extension ID
  */
 
-import writeCrx3File from "crx3";
 import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+
+import writeCrx3File from "crx3";
 
 const PROJECT_ROOT = resolve(import.meta.dirname, "..");
 const CHROME_BUILD_DIR = resolve(PROJECT_ROOT, "build/chrome-mv3-prod");

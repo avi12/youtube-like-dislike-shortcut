@@ -51,7 +51,7 @@ Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pn
 ## Dev
 
 | Browser                | Command                         |
-|------------------------|---------------------------------|
+| ---------------------- | ------------------------------- |
 | Chrome                 | `pnpm dev`                      |
 | Chrome (with profile)  | `pnpm dev:with-profile`         |
 | Opera                  | `pnpm dev:opera`                |
@@ -62,7 +62,7 @@ Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pn
 ## Build
 
 | Browser | Command              |
-|---------|----------------------|
+| ------- | -------------------- |
 | Chrome  | `pnpm build`         |
 | Opera   | `pnpm build:opera`   |
 | Firefox | `pnpm build:firefox` |
@@ -72,7 +72,7 @@ Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pn
 Packaging builds first, so there is no separate build step to run.
 
 | Browser | Command                |
-|---------|------------------------|
+| ------- | ---------------------- |
 | Chrome  | `pnpm package`         |
 | Opera   | `pnpm package:opera`   |
 | Firefox | `pnpm package:firefox` |

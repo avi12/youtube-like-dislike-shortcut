@@ -1,4 +1,5 @@
 import { defineCustomEventMessaging } from "@webext-core/messaging/page";
+
 import { type InnertubeContext } from "@/lib/types";
 
 export enum RateAction {
@@ -44,8 +45,14 @@ export interface RateRequest {
 }
 
 export function isRateRequest(message: unknown): message is RateRequest {
-  return typeof message === "object" && message !== null && "action" in message
-    && (message.action === RateAction.like || message.action === RateAction.dislike || message.action === RateAction.removelike);
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "action" in message &&
+    (message.action === RateAction.like ||
+      message.action === RateAction.dislike ||
+      message.action === RateAction.removelike)
+  );
 }
 
 export function sendRateRequest(action: RateAction) {

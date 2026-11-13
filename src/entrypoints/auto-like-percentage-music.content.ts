@@ -1,5 +1,6 @@
-import { storage } from "#imports";
 import { mount, unmount } from "svelte";
+
+import { storage } from "#imports";
 import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
   DOM_ATTRIBUTE,
@@ -14,6 +15,7 @@ import { getWatchedSeconds } from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
+
 import CsuiAutoLikePercent from "./auto-like-percentage.content/CsuiAutoLikePercent.svelte";
 import {
   getIsFreshMountAllowed,
@@ -48,8 +50,8 @@ function getTrackVideoId() {
 
 function getTrackDuration() {
   const elProgressBar = document.querySelector(SELECTORS.progressBarMusic);
-  const seconds = elProgressBar?.getAttribute(DOM_ATTRIBUTE.ariaValueMax)
-    ?? elProgressBar?.getAttribute(DOM_ATTRIBUTE.max);
+  const seconds =
+    elProgressBar?.getAttribute(DOM_ATTRIBUTE.ariaValueMax) ?? elProgressBar?.getAttribute(DOM_ATTRIBUTE.max);
   return Number(seconds);
 }
 
@@ -109,11 +111,15 @@ function watchForInitialRating() {
   // track's rating until the new track's metadata loads, so wait for that to
   // settle before resolving instead of reading the stale buttons right away
   trackSettleController = new AbortController();
-  document.addEventListener("loadedmetadata", e => {
-    if (e.target instanceof HTMLVideoElement) {
-      applyState();
-    }
-  }, { capture: true, signal: trackSettleController.signal });
+  document.addEventListener(
+    "loadedmetadata",
+    e => {
+      if (e.target instanceof HTMLVideoElement) {
+        applyState();
+      }
+    },
+    { capture: true, signal: trackSettleController.signal }
+  );
 
   const isButtonPresentInitially = Boolean(document.querySelector(anyButtonSelector));
   if (isInitialRatingCheckPending && isButtonPresentInitially) {
@@ -165,7 +171,9 @@ export default defineContentScript({
       if (!elContainer) {
         return;
       }
-      const isTimeInfoBeforeButtons = Boolean(elContainer.parentElement?.previousElementSibling?.matches(SELECTORS.timeInfoMusic));
+      const isTimeInfoBeforeButtons = Boolean(
+        elContainer.parentElement?.previousElementSibling?.matches(SELECTORS.timeInfoMusic)
+      );
       const append = isTimeInfoBeforeButtons ? "before" : "after";
       isMounting = true;
       activeShadowUi = await createShadowRootUi(ctx, {
@@ -244,56 +252,60 @@ export default defineContentScript({
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
 
-    document.addEventListener("timeupdate", async e => {
-      handleIfTrackChanged();
+    document.addEventListener(
+      "timeupdate",
+      async e => {
+        handleIfTrackChanged();
 
-      const isUserInteractedGlobal = window.ytrUserInteracted;
-      if (isUserInteractedGlobal) {
-        sharedState.isUserInteracted = true;
-        return;
-      }
-
-      const { isRatedInitially, isUserInteracted } = sharedState;
-      const isRatingFinalized = isRatedInitially || isUserInteracted;
-      if (isRatingFinalized) {
-        return;
-      }
-
-      const { target: elTarget } = e;
-      const isTargetVideo = elTarget instanceof HTMLVideoElement;
-      if (!isTargetVideo) {
-        return;
-      }
-
-      const { currentTime } = elTarget;
-      const duration = getTrackDuration();
-
-      if (getIsAdPlaying()) {
-        sharedState.lastTimeUpdate = currentTime;
-        return;
-      }
-
-      const isLastTimeUpdateSet = Boolean(sharedState.lastTimeUpdate);
-      if (!isLastTimeUpdateSet) {
-        sharedState.lastTimeUpdate = currentTime;
-      }
-
-      const watchedSeconds = getWatchedSeconds(sharedState.lastTimeUpdate, currentTime, elTarget.playbackRate);
-      if (watchedSeconds > 0 && Boolean(duration)) {
-        sharedState.percentageWatched += (watchedSeconds / duration) * 100;
-        const isAutoLikeTriggered =
-          window.ytrAutoLikeEnabled &&
-          sharedState.isSurfaceEnabled &&
-          sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
-          !sharedState.isUserInteracted &&
-          !sharedState.isRatedInitially &&
-          !sharedState.isCurrentlyRated;
-        if (isAutoLikeTriggered) {
-          await rateVideo(true);
+        const isUserInteractedGlobal = window.ytrUserInteracted;
+        if (isUserInteractedGlobal) {
+          sharedState.isUserInteracted = true;
+          return;
         }
-      }
-      sharedState.lastTimeUpdate = currentTime;
-    }, { capture: true });
+
+        const { isRatedInitially, isUserInteracted } = sharedState;
+        const isRatingFinalized = isRatedInitially || isUserInteracted;
+        if (isRatingFinalized) {
+          return;
+        }
+
+        const { target: elTarget } = e;
+        const isTargetVideo = elTarget instanceof HTMLVideoElement;
+        if (!isTargetVideo) {
+          return;
+        }
+
+        const { currentTime } = elTarget;
+        const duration = getTrackDuration();
+
+        if (getIsAdPlaying()) {
+          sharedState.lastTimeUpdate = currentTime;
+          return;
+        }
+
+        const isLastTimeUpdateSet = Boolean(sharedState.lastTimeUpdate);
+        if (!isLastTimeUpdateSet) {
+          sharedState.lastTimeUpdate = currentTime;
+        }
+
+        const watchedSeconds = getWatchedSeconds(sharedState.lastTimeUpdate, currentTime, elTarget.playbackRate);
+        if (watchedSeconds > 0 && Boolean(duration)) {
+          sharedState.percentageWatched += (watchedSeconds / duration) * 100;
+          const isAutoLikeTriggered =
+            window.ytrAutoLikeEnabled &&
+            sharedState.isSurfaceEnabled &&
+            sharedState.percentageWatched >= window.ytrAutoLikeThreshold &&
+            !sharedState.isUserInteracted &&
+            !sharedState.isRatedInitially &&
+            !sharedState.isCurrentlyRated;
+          if (isAutoLikeTriggered) {
+            await rateVideo(true);
+          }
+        }
+        sharedState.lastTimeUpdate = currentTime;
+      },
+      { capture: true }
+    );
 
     function markUserInteractedIfRateButton(e: Event) {
       const { target: elTarget } = e;

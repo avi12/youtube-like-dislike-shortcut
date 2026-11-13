@@ -49,9 +49,9 @@ async function rateInEmbed(action: RateAction) {
 }
 
 function init() {
-  browser.runtime.onMessage.addListener(({ action }) => location.pathname.startsWith("/embed/")
-    ? rateInEmbed(action)
-    : rateVideoOnPage(action));
+  browser.runtime.onMessage.addListener(({ action }) =>
+    location.pathname.startsWith("/embed/") ? rateInEmbed(action) : rateVideoOnPage(action)
+  );
 }
 
 export default defineContentScript({

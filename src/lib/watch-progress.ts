@@ -75,5 +75,7 @@ export async function clearWatchedPercentage() {
   if (!videoId) {
     return;
   }
-  await updateProgress(progress => Object.fromEntries(Object.entries(progress).filter(([storedVideoId]) => storedVideoId !== videoId)));
+  await updateProgress(progress =>
+    Object.fromEntries(Object.entries(progress).filter(([storedVideoId]) => storedVideoId !== videoId))
+  );
 }

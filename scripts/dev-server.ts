@@ -15,11 +15,12 @@
  * Pass --with-profile to copy the user's real browser profile on first run
  */
 
-import chokidar from "chokidar";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { homedir, platform } from "node:os";
 import { resolve, join } from "node:path";
+
+import chokidar from "chokidar";
 import webExtRun from "web-ext-run";
 import { consoleStream as webExtConsoleStream } from "web-ext-run/util/logger";
 
@@ -61,12 +62,7 @@ const edgeBinaryByPlatform: Partial<Record<NodeJS.Platform, string>> = {
   linux: "/usr/bin/microsoft-edge"
 };
 
-const WXT_BIN = resolve(
-  PROJECT_ROOT,
-  "node_modules",
-  ".bin",
-  process.platform === "win32" ? "wxt.cmd" : "wxt"
-);
+const WXT_BIN = resolve(PROJECT_ROOT, "node_modules", ".bin", process.platform === "win32" ? "wxt.cmd" : "wxt");
 
 function buildExtension() {
   const args = ["build", "--mode", "prod", "-b", BROWSER];
@@ -119,11 +115,9 @@ async function fetchCdpTargets(port: number): Promise<CdpTarget[]> {
 async function reloadYouTubeTabs(port: number) {
   const targets = await fetchCdpTargets(port);
   // Only reload top-level pages (not iframes) so embed-hosting pages keep their iframe state.
-  const youtubeTabs = targets.filter(target =>
-    target.type === "page"
-    && target.url?.includes("youtube.com")
-    && target.webSocketDebuggerUrl
-    && !target.parentId
+  const youtubeTabs = targets.filter(
+    target =>
+      target.type === "page" && target.url?.includes("youtube.com") && target.webSocketDebuggerUrl && !target.parentId
   );
   await Promise.all(
     youtubeTabs.map(tab =>
@@ -165,42 +159,39 @@ async function main() {
 
   const runOptions = IS_FIREFOX
     ? {
-      target: "firefox-desktop" as const,
-      sourceDir: OUTPUT_DIR,
-      startUrl: [START_URL],
-      keepProfileChanges: useExistingProfile,
-      ...useExistingProfile && { firefoxProfile: PROFILE_DIR },
-      args: ["--marionette", "--remote-debugging-port=9230"],
-      noReload: true,
-      noInput: true
-    }
+        target: "firefox-desktop" as const,
+        sourceDir: OUTPUT_DIR,
+        startUrl: [START_URL],
+        keepProfileChanges: useExistingProfile,
+        ...(useExistingProfile && { firefoxProfile: PROFILE_DIR }),
+        args: ["--marionette", "--remote-debugging-port=9230"],
+        noReload: true,
+        noInput: true
+      }
     : {
-      target: "chromium" as const,
-      sourceDir: OUTPUT_DIR,
-      startUrl: [START_URL],
-      keepProfileChanges: useExistingProfile,
-      ...useExistingProfile && { chromiumProfile: PROFILE_DIR },
-      ...chromiumBinary && { chromiumBinary },
-      args: chromiumArgs,
-      noReload: true,
-      noInput: true
-    };
+        target: "chromium" as const,
+        sourceDir: OUTPUT_DIR,
+        startUrl: [START_URL],
+        keepProfileChanges: useExistingProfile,
+        ...(useExistingProfile && { chromiumProfile: PROFILE_DIR }),
+        ...(chromiumBinary && { chromiumBinary }),
+        args: chromiumArgs,
+        noReload: true,
+        noInput: true
+      };
 
   const runner = await webExtRun.cmd.run(runOptions, { shouldExitProgram: false });
   console.log(`${BROWSER} launched with extension sideloaded.\n`);
 
   console.log("Watching for file changes...\n");
 
-  const watcher = chokidar.watch(
-    [join(PROJECT_ROOT, "src"), join(PROJECT_ROOT, "wxt.config.ts")],
-    {
-      ignoreInitial: true,
-      awaitWriteFinish: {
-        stabilityThreshold: STABILITY_THRESHOLD_MS,
-        pollInterval: POLL_INTERVAL_MS
-      }
+  const watcher = chokidar.watch([join(PROJECT_ROOT, "src"), join(PROJECT_ROOT, "wxt.config.ts")], {
+    ignoreInitial: true,
+    awaitWriteFinish: {
+      stabilityThreshold: STABILITY_THRESHOLD_MS,
+      pollInterval: POLL_INTERVAL_MS
     }
-  );
+  });
 
   let isRebuilding = false;
   let pendingChange: string | null = null;
@@ -255,10 +246,14 @@ async function main() {
     isExiting = true;
     try {
       await watcher.close();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     try {
       await runner.exit();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     process.exit(0);
   }
 

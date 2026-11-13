@@ -14,9 +14,10 @@ function mergeWithFallback(fallback: StoredObject, stored: StoredObject) {
   const result: StoredObject = { ...fallback };
   for (const [key, storedEntry] of Object.entries(stored)) {
     const fallbackEntry = fallback[key];
-    result[key] = isPlainObject(fallbackEntry) && isPlainObject(storedEntry)
-      ? mergeWithFallback(fallbackEntry, storedEntry)
-      : storedEntry;
+    result[key] =
+      isPlainObject(fallbackEntry) && isPlainObject(storedEntry)
+        ? mergeWithFallback(fallbackEntry, storedEntry)
+        : storedEntry;
   }
   return result;
 }
@@ -107,17 +108,17 @@ const buttonTriggers: ButtonTriggers = {
   like: {
     primary: ["Equal"],
     modifiers: ["shiftKey"],
-    secondary: true 
+    secondary: true
   },
   dislike: {
     primary: ["Minus"],
     modifiers: ["shiftKey"],
-    secondary: true 
+    secondary: true
   },
   unrate: {
     primary: ["Digit0"],
     modifiers: ["shiftKey"],
-    secondary: true 
+    secondary: true
   }
 };
 
@@ -145,13 +146,13 @@ export function getCurrentSurface() {
 const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
-export function isModifier(key: string): key is typeof MODIFIER_KEYS[number] {
+export function isModifier(key: string): key is (typeof MODIFIER_KEYS)[number] {
   return MODIFIER_KEYS.some(item => item === key);
 }
 
 export const OBSERVER_OPTIONS = Object.freeze<MutationObserverInit>({
   childList: true,
-  subtree: true 
+  subtree: true
 });
 
 function getIsElementVisible(elElement: HTMLElement) {
@@ -235,13 +236,7 @@ function isComboPressed({
   return modifiers.every(modifier => event[modifier]);
 }
 
-function getSecondaryKeyFromPrimary({
-  modifiers,
-  primary
-}: {
-  modifiers: Modifier[];
-  primary: string[];
-}) {
+function getSecondaryKeyFromPrimary({ modifiers, primary }: { modifiers: Modifier[]; primary: string[] }) {
   const formattedModifiers = modifiers.map(keyToModifier).join(" + ");
   const formattedPrimary = (formattedModifiers ? `${formattedModifiers} + ` : "") + primary.join(" + ");
   return defaultAdditionalShortcuts[formattedPrimary];

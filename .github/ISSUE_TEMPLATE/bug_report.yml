@@ -31,11 +31,11 @@ body:
       label: What browser(s) can you reproduce the issue on?
       multiple: true
       options:
-      - Chrome
-      - Firefox
-      - Opera
-      - Vivaldi
-      - Brave
+        - Chrome
+        - Firefox
+        - Opera
+        - Vivaldi
+        - Brave
     validations:
       required: true
   - type: dropdown
@@ -43,9 +43,9 @@ body:
     attributes:
       label: What OS does it occur on?
       options:
-      - Windows
-      - macOS
-      - Linux
+        - Windows
+        - macOS
+        - Linux
     validations:
       required: true
   - type: input
