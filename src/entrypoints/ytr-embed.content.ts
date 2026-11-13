@@ -19,7 +19,10 @@ const rateActionMap: Record<ShortcutType, RateAction> = {
 let gLastRating = Rating.LIKE;
 
 async function rateIfNeeded(event: KeyboardEvent) {
-  const shortcutType = getActionPressed(event, window.ytrLastButtonTriggers);
+  const shortcutType = getActionPressed({
+    event,
+    buttonTriggers: window.ytrLastButtonTriggers
+  });
   if (!shortcutType) {
     return;
   }
@@ -37,7 +40,10 @@ async function rateIfNeeded(event: KeyboardEvent) {
     gLastRating = rating;
   }
 
-  showRateBezel(gLastRating, rating !== null);
+  showRateBezel({
+    rating: gLastRating,
+    isRated: rating !== null
+  });
 }
 
 async function init() {

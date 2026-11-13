@@ -2,10 +2,10 @@ const POLL_INTERVAL_MS = 500;
 const MAX_POLLS = 60;
 const TWENTY_FIVE_SECONDS_MS = 25000;
 const SIX_SECONDS_MS = 6000;
-// Reuses the existing edge://newtab tab — no new window pops up.
+// Reuses the existing edge://newtab tab - no new window pops up.
 const VIDEO_ID = "e7gFaim6vLs";
 
-function client(url, name) {
+function client({ url, name }) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(url);
     let nextId = 1;
@@ -54,7 +54,7 @@ function client(url, name) {
     });
   });
 }
-async function evalIn(target, expr) {
+async function evalIn({ target, expr }) {
   const result = await target.send("Runtime.evaluate", {
     expression: expr,
     returnByValue: true,
@@ -100,15 +100,15 @@ const attachLog = (connection, label) =>
     }
   });
 
-// SW may be dormant — wake it by attaching to the browser-level CDP and discovering targets.
+// SW may be dormant - wake it by attaching to the browser-level CDP and discovering targets.
 const browserVer = await (await fetch("http://localhost:9225/json/version")).json();
-const browserClient = await client(
-  browserVer.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"),
-  "browser"
-);
+const browserClient = await client({
+  url: browserVer.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"),
+  name: "browser"
+});
 await browserClient.send("Target.setDiscoverTargets", { discover: true });
 const attachedSet = new Set();
-async function tryAttach(target, label) {
+async function tryAttach({ target, label }) {
   if (attachedSet.has(target.id)) {
     return;
   }
@@ -116,7 +116,10 @@ async function tryAttach(target, label) {
   attachedSet.add(target.id);
   console.log(`[${label}] attaching`, target.id, target.url);
   try {
-    const connection = await client(wsUrl(target), label);
+    const connection = await client({
+      url: wsUrl(target),
+      name: label
+    });
     await connection.send("Runtime.enable");
     attachLog(connection, label);
   } catch (err) {
@@ -131,15 +134,24 @@ async function discoverAndAttach() {
     }
 
     if (target.type === "service_worker" && target.url?.includes("/background.js") && !target.url.includes("eimadpb")) {
-      await tryAttach(target, "sw");
+      await tryAttach({
+        target,
+        label: "sw"
+      });
     } else if (target.url?.includes("/offscreen.html")) {
-      await tryAttach(target, "off");
+      await tryAttach({
+        target,
+        label: "off"
+      });
     } else if (
       target.type === "iframe" &&
       target.url?.includes("youtube.com/watch") &&
       target.url?.includes("mute=1")
     ) {
-      await tryAttach(target, "hid");
+      await tryAttach({
+        target,
+        label: "hid"
+      });
     }
   }
 }
@@ -155,10 +167,10 @@ if (!host) {
   // Use any extension's browser-attached target to create a new tab in the same window.
   // The "browser" endpoint exposes Target.* without needing a page target.
   const browserRes = await (await fetch("http://localhost:9225/json/version")).json();
-  const browser = await client(
-    browserRes.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"),
-    "browser"
-  );
+  const browser = await client({
+    url: browserRes.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"),
+    name: "browser"
+  });
   const created = await browser.send("Target.createTarget", {
     url: `https://www.youtube.com/watch?v=${VIDEO_ID}`,
     newWindow: false,
@@ -170,7 +182,10 @@ if (!host) {
 }
 
 console.log("Reusing tab:", host.id, host.url);
-const watch = await client(wsUrl(host), "watch");
+const watch = await client({
+  url: wsUrl(host),
+  name: "watch"
+});
 await watch.send("Runtime.enable");
 await watch.send("Page.enable");
 attachLog(watch, "watch");
@@ -182,10 +197,10 @@ let baseline = null;
 for (let i = 0; i < MAX_POLLS && !baseline; i++) {
   await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   try {
-    baseline = await evalIn(
-      watch,
-      `(()=>{const b=document.querySelector("like-button-view-model button");return b?{pressed:b.getAttribute("aria-pressed"),label:b.getAttribute("aria-label")}:null;})()`
-    );
+    baseline = await evalIn({
+      target: watch,
+      expr: `(()=>{const b=document.querySelector("like-button-view-model button");return b?{pressed:b.getAttribute("aria-pressed"),label:b.getAttribute("aria-label")}:null;})()`
+    });
   } catch {}
 }
 console.log("Baseline:", baseline);
@@ -196,7 +211,10 @@ const hostPage = (await listTargets()).find(
   target => target.type === "page" && target.url?.includes("mapsplatform.google.com")
 );
 if (hostPage) {
-  const hostClient = await client(wsUrl(hostPage), "host");
+  const hostClient = await client({
+    url: wsUrl(hostPage),
+    name: "host"
+  });
   await hostClient.send("Page.enable");
   await hostClient.send("Page.reload");
   await new Promise(resolve => setTimeout(resolve, SIX_SECONDS_MS));
@@ -212,7 +230,10 @@ if (!embedT) {
   process.exit(1);
 }
 
-const embed = await client(wsUrl(embedT), "embed");
+const embed = await client({
+  url: wsUrl(embedT),
+  name: "embed"
+});
 await embed.send("Runtime.enable");
 attachLog(embed, "embed");
 await embed.send("Runtime.evaluate", {
@@ -231,10 +252,10 @@ let after = null;
 for (let i = 0; i < MAX_POLLS && !after; i++) {
   await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   try {
-    after = await evalIn(
-      watch,
-      `(()=>{const b=document.querySelector("like-button-view-model button");return b?{pressed:b.getAttribute("aria-pressed"),label:b.getAttribute("aria-label")}:null;})()`
-    );
+    after = await evalIn({
+      target: watch,
+      expr: `(()=>{const b=document.querySelector("like-button-view-model button");return b?{pressed:b.getAttribute("aria-pressed"),label:b.getAttribute("aria-label")}:null;})()`
+    });
   } catch {}
 }
 console.log("After:", after);
@@ -242,7 +263,7 @@ console.log("After:", after);
 console.log("\n== VERDICT ==");
 console.log(
   baseline?.pressed === "false" && after?.pressed === "true"
-    ? "PASS — like persisted"
+    ? "PASS - like persisted"
     : `FAIL  baseline=${baseline?.pressed}  after=${after?.pressed}`
 );
 process.exit(0);

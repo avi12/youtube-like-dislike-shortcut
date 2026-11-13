@@ -26,7 +26,7 @@ export interface ButtonTriggers {
 /**
  * Keys recognised by YouTube's `ytcfg.get(...)` configuration store on the embed
  * and watch pages. Names match the literal keys YouTube ships in the page bootstrap.
- * Reverse-engineered from observation — YouTube publishes no official documentation
+ * Reverse-engineered from observation - YouTube publishes no official documentation
  * for Innertube and these key names occasionally change.
  */
 export enum YtcfgKey {
@@ -150,7 +150,7 @@ export type InnertubeNextResponse = YtInitialData;
 
 /**
  * Overload signatures for `ytcfg.get(...)` so each known key returns its precise value type.
- * Reverse-engineered from observation — YouTube publishes no official documentation.
+ * Reverse-engineered from observation - YouTube publishes no official documentation.
  */
 interface YtcfgGetter {
   (key: YtcfgKey.INNERTUBE_CONTEXT): InnertubeContext | undefined;

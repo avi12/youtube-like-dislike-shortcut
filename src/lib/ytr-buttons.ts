@@ -59,7 +59,10 @@ function showIndicator(isRated: boolean) {
     return;
   }
 
-  showRateBezel(gLastRating, isRated);
+  showRateBezel({
+    rating: gLastRating,
+    isRated
+  });
 }
 
 export function getRatedButton() {

@@ -10,13 +10,16 @@ function isPlainObject(value: StoredValue | undefined): value is StoredObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function mergeWithFallback(fallback: StoredObject, stored: StoredObject) {
+function mergeWithFallback({ fallback, stored }: { fallback: StoredObject; stored: StoredObject }) {
   const result: StoredObject = { ...fallback };
   for (const [key, storedEntry] of Object.entries(stored)) {
     const fallbackEntry = fallback[key];
     result[key] =
       isPlainObject(fallbackEntry) && isPlainObject(storedEntry)
-        ? mergeWithFallback(fallbackEntry, storedEntry)
+        ? mergeWithFallback({
+            fallback: fallbackEntry,
+            stored: storedEntry
+          })
         : storedEntry;
   }
   return result;
@@ -50,7 +53,13 @@ export async function getStorage<Key extends keyof typeof window>({
   }
   const isMergeableObject = isPlainObject(value) && isPlainObject(fallback);
   if (isMergeableObject) {
-    Object.assign(value, mergeWithFallback(fallback, value));
+    Object.assign(
+      value,
+      mergeWithFallback({
+        fallback,
+        stored: value
+      })
+    );
   }
 
   window[updateWindowKey] = value;
@@ -249,7 +258,7 @@ function getSecondaryKeyFromPrimary({ modifiers, primary }: { modifiers: Modifie
   return defaultAdditionalShortcuts[formattedPrimary];
 }
 
-export function getActionPressed(event: KeyboardEvent, buttonTriggers: ButtonTriggers) {
+export function getActionPressed({ event, buttonTriggers }: { event: KeyboardEvent; buttonTriggers: ButtonTriggers }) {
   for (const actionName of Object.values(ShortcutType)) {
     const { primary, modifiers, secondary } = buttonTriggers[actionName];
     const isComboMatch = isComboPressed({

@@ -4,7 +4,7 @@
  *   1. Full wxt build (no incremental, no stale transitive imports)
  *   2. Reload the extension in the browser
  *   3. Reload every YouTube tab via CDP (except tabs hosting cross-origin iframes,
- *      which would lose their state — we reload only top-level YouTube pages)
+ *      which would lose their state - we reload only top-level YouTube pages)
  *
  * Usage:
  *   pnpm dev                       - Edge (default)
@@ -89,7 +89,15 @@ interface CdpTarget {
   parentId?: string;
 }
 
-async function sendCdpMessage(websocketUrl: string, method: string, params: Record<string, unknown> = {}) {
+async function sendCdpMessage({
+  websocketUrl,
+  method,
+  params = {}
+}: {
+  websocketUrl: string;
+  method: string;
+  params?: Record<string, unknown>;
+}) {
   const websocket = new WebSocket(websocketUrl);
   await new Promise<void>(resolveAck => {
     websocket.onopen = () =>
@@ -130,7 +138,13 @@ async function reloadYouTubeTabs(port: number) {
   );
   await Promise.all(
     youtubeTabs.map(tab =>
-      sendCdpMessage(tab.webSocketDebuggerUrl ?? "", "Runtime.evaluate", { expression: "location.reload()" })
+      sendCdpMessage({
+        websocketUrl: tab.webSocketDebuggerUrl ?? "",
+        method: "Runtime.evaluate",
+        params: {
+          expression: "location.reload()"
+        }
+      })
     )
   );
 }

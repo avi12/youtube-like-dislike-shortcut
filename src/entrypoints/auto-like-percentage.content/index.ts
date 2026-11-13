@@ -325,7 +325,11 @@ export default defineContentScript({
         }
 
         const previousTimeUpdate = sharedState.lastTimeUpdate;
-        const watchedSeconds = getWatchedSeconds(previousTimeUpdate, currentTime, elTarget.playbackRate);
+        const watchedSeconds = getWatchedSeconds({
+          previousTime: previousTimeUpdate,
+          currentTime,
+          playbackRate: elTarget.playbackRate
+        });
         const isDurationUsable = Boolean(duration) && duration !== Infinity;
         if (watchedSeconds > 0 && isDurationUsable) {
           sharedState.percentageWatched += (watchedSeconds / duration) * PERCENT;

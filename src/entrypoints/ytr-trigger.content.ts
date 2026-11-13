@@ -3,7 +3,12 @@ import { getActionPressed, getStorage, initial, ShortcutType, StorageKey } from 
 import { rateVideo } from "@/lib/ytr-buttons";
 
 async function rateIfNeeded(event: KeyboardEvent) {
-  switch (getActionPressed(event, window.ytrLastButtonTriggers)) {
+  switch (
+    getActionPressed({
+      event,
+      buttonTriggers: window.ytrLastButtonTriggers
+    })
+  ) {
     case ShortcutType.LIKE:
       event.stopPropagation();
       event.preventDefault();

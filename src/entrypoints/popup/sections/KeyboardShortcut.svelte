@@ -71,14 +71,17 @@
     return code;
   }
 
-  function getIsKeyCombosTheSame(keyCombo1: string[], keyCombo2: string[]) {
-    return keyCombo1.join(" + ") === keyCombo2.join(" + ");
+  function getIsKeyCombosTheSame({ left, right }: { left: string[]; right: string[] }) {
+    return left.join(" + ") === right.join(" + ");
   }
 
   function getIsConflicting(newKeyCombo: string[]) {
     for (const currentType of Object.values(ShortcutType)) {
       const isDifferentType = currentType !== type;
-      const isSameCombo = getIsKeyCombosTheSame(keys.combos[currentType], newKeyCombo);
+      const isSameCombo = getIsKeyCombosTheSame({
+         left: keys.combos[currentType],
+         right: newKeyCombo 
+      });
       if (isDifferentType && isSameCombo) {
         error = `Conflicts with ${currentType}'s shortcut`;
         return true;
@@ -211,7 +214,7 @@
         }} />
     {:else}
       <ButtonReset
-        disabled={getIsKeyCombosTheSame(keys.combos[type], defaultShortcuts[type]) || keys.isRecording}
+        disabled={getIsKeyCombosTheSame({ left: keys.combos[type], right: defaultShortcuts[type] }) || keys.isRecording}
         onclick={() => {
           pressedKeys.clear();
           keys.combos = { ...keys.combos, [type]: defaultShortcuts[type] };

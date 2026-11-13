@@ -304,7 +304,11 @@ export default defineContentScript({
           sharedState.lastTimeUpdate = currentTime;
         }
 
-        const watchedSeconds = getWatchedSeconds(sharedState.lastTimeUpdate, currentTime, elTarget.playbackRate);
+        const watchedSeconds = getWatchedSeconds({
+          previousTime: sharedState.lastTimeUpdate,
+          currentTime,
+          playbackRate: elTarget.playbackRate
+        });
         if (watchedSeconds > 0 && Boolean(duration)) {
           sharedState.percentageWatched += (watchedSeconds / duration) * PERCENT;
           const isAutoLikeTriggered =

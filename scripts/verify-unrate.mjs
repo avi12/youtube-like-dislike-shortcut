@@ -69,7 +69,7 @@ const wsUrl = target => target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "
 const listTargets = async () => (await fetch(`${CDP_ORIGIN}/json`)).json();
 const wait = seconds => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
-async function evalIn(target, expression, contextId) {
+async function evalIn({ target, expression, contextId }) {
   const result = await target.send("Runtime.evaluate", {
     expression,
     returnByValue: true,
@@ -100,7 +100,10 @@ if (!serviceWorkerTarget || !watchTarget) {
 
 const serviceWorker = await client(wsUrl(serviceWorkerTarget));
 await serviceWorker.send("Runtime.enable");
-await evalIn(serviceWorker, `chrome.storage.sync.set({ isAutoLike: true, autoLikeThreshold: ${AUTO_LIKE_THRESHOLD} })`);
+await evalIn({
+  target: serviceWorker,
+  expression: `chrome.storage.sync.set({ isAutoLike: true, autoLikeThreshold: ${AUTO_LIKE_THRESHOLD} })`
+});
 console.log(`Auto-like enabled, threshold ${AUTO_LIKE_THRESHOLD}%`);
 
 const watch = await client(wsUrl(watchTarget));
@@ -128,13 +131,22 @@ const READ_RATING = `(() => {
   };
 })()`;
 
-const ratingBefore = await evalIn(watch, READ_RATING);
+const ratingBefore = await evalIn({
+  target: watch,
+  expression: READ_RATING
+});
 const IS_RATED_BEFORE = ratingBefore.likePressed === "true" || ratingBefore.dislikePressed === "true";
 if (IS_RATED_BEFORE) {
   console.log("Video was rated, clearing it first:", ratingBefore);
   await pressUnrate();
   await wait(SHORT_WAIT_SECONDS);
-  console.log("Cleared:", await evalIn(watch, READ_RATING));
+  console.log(
+    "Cleared:",
+    await evalIn({
+      target: watch,
+      expression: READ_RATING
+    })
+  );
 }
 
 await watch.send("Page.reload");
@@ -171,23 +183,33 @@ const READ_PAGE_STATE = `(() => {
   };
 })()`;
 
-console.log("Content script:", await evalIn(watch, READ_CONTENT_SCRIPT_STATE, isolatedContextId));
+console.log(
+  "Content script:",
+  await evalIn({
+    target: watch,
+    expression: READ_CONTENT_SCRIPT_STATE,
+    contextId: isolatedContextId
+  })
+);
 
-await evalIn(
-  watch,
-  `(() => {
+await evalIn({
+  target: watch,
+  expression: `(() => {
   const video = document.querySelector("video");
   video.muted = true;
   video.currentTime = 0;
   video.playbackRate = ${PLAYBACK_RATE};
   return video.play();
 })()`
-);
+});
 
 let beforeUnrate = null;
 for (let i = 0; i < MAX_POLLS; i++) {
   await wait(POLL_INTERVAL_SECONDS);
-  const state = await evalIn(watch, READ_PAGE_STATE);
+  const state = await evalIn({
+    target: watch,
+    expression: READ_PAGE_STATE
+  });
   if (Number.parseFloat(state.percentage ?? "") > MIN_PERCENTAGE) {
     beforeUnrate = state;
     break;
@@ -196,7 +218,13 @@ for (let i = 0; i < MAX_POLLS; i++) {
 console.log("Counting before un-rate:", beforeUnrate);
 
 if (!beforeUnrate) {
-  console.log("FAIL - the percentage counter never started:", await evalIn(watch, READ_PAGE_STATE));
+  console.log(
+    "FAIL - the percentage counter never started:",
+    await evalIn({
+      target: watch,
+      expression: READ_PAGE_STATE
+    })
+  );
   process.exit(1);
 }
 
@@ -204,17 +232,27 @@ await pressUnrate();
 console.log("Pressed the un-rate shortcut on an un-rated video");
 
 await wait(SECONDS_AFTER_UNRATE);
-const afterUnrate = await evalIn(watch, READ_PAGE_STATE);
+const afterUnrate = await evalIn({
+  target: watch,
+  expression: READ_PAGE_STATE
+});
 console.log("After un-rate:", afterUnrate);
-console.log("Content script:", await evalIn(watch, READ_CONTENT_SCRIPT_STATE, isolatedContextId));
+console.log(
+  "Content script:",
+  await evalIn({
+    target: watch,
+    expression: READ_CONTENT_SCRIPT_STATE,
+    contextId: isolatedContextId
+  })
+);
 
-const actionsRect = await evalIn(
-  watch,
-  `(() => {
+const actionsRect = await evalIn({
+  target: watch,
+  expression: `(() => {
   const { top, left, width, height } = document.querySelector("ytd-watch-flexy:not([hidden]) #actions").getBoundingClientRect();
   return { x: Math.round(left) - 8, y: Math.round(top) - 8, width: Math.round(width) + 16, height: Math.round(height) + 16, scale: 2 };
 })()`
-);
+});
 const { data } = await watch.send("Page.captureScreenshot", {
   format: "png",
   clip: actionsRect,
@@ -223,14 +261,17 @@ const { data } = await watch.send("Page.captureScreenshot", {
 await (await import("node:fs/promises")).writeFile(SCREENSHOT_PATH, Buffer.from(data, "base64"));
 console.log("Saved screenshot:", SCREENSHOT_PATH);
 
-await evalIn(watch, `document.querySelector("video").pause()`);
-await evalIn(
-  serviceWorker,
-  `Promise.all([
+await evalIn({
+  target: watch,
+  expression: `document.querySelector("video").pause()`
+});
+await evalIn({
+  target: serviceWorker,
+  expression: `Promise.all([
   chrome.storage.sync.remove(["isAutoLike", "autoLikeThreshold"]),
   chrome.storage.local.remove(["isAutoLike", "autoLikeThreshold"])
 ])`
-);
+});
 
 const IS_STILL_PLAYING = afterUnrate.currentTime - beforeUnrate.currentTime > 0;
 const IS_COUNTING_STOPPED = afterUnrate.percentage === beforeUnrate.percentage;

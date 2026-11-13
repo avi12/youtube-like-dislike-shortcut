@@ -82,7 +82,10 @@ function getContextForRate(action: RateAction) {
   return {
     context,
     ...(!isEmbed && {
-      params: findRateParamInInnertube(window.ytInitialData, paramFieldForAction[action])
+      params: findRateParamInInnertube({
+        root: window.ytInitialData,
+        field: paramFieldForAction[action]
+      })
     })
   };
 }

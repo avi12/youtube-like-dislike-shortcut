@@ -25,7 +25,7 @@ function getBezelHost() {
   return document.fullscreenElement instanceof HTMLElement ? document.fullscreenElement : document.body;
 }
 
-export function showRateBezel(rating: Rating, isRated: boolean) {
+export function showRateBezel({ rating, isRated }: { rating: Rating; isRated: boolean }) {
   const elPlayer = document.querySelector<HTMLElement>(SELECTORS.MOVIE_PLAYER);
   if (!elPlayer) {
     return;

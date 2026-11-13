@@ -51,7 +51,13 @@ function buildHeaders({ Authorization, context }: { Authorization: string; conte
   };
 }
 
-function pickParamFromButtonContainer(container: ButtonViewModelContainer | undefined, field: RateParamField) {
+function pickParamFromButtonContainer({
+  container,
+  field
+}: {
+  container: ButtonViewModelContainer | undefined;
+  field: RateParamField;
+}) {
   const { commands = [] } = container?.buttonViewModel?.onTap?.serialCommand ?? {};
   for (const command of commands) {
     const { innertubeCommand } = command;
@@ -70,15 +76,27 @@ function pickParamFromButtonContainer(container: ButtonViewModelContainer | unde
   return undefined;
 }
 
-function pickParamFromToggle(container: ToggleButtonViewModelContainer | undefined, field: RateParamField) {
+function pickParamFromToggle({
+  container,
+  field
+}: {
+  container: ToggleButtonViewModelContainer | undefined;
+  field: RateParamField;
+}) {
   const inner = container?.toggleButtonViewModel?.toggleButtonViewModel;
   return (
-    pickParamFromButtonContainer(inner?.defaultButtonViewModel, field) ??
-    pickParamFromButtonContainer(inner?.toggledButtonViewModel, field)
+    pickParamFromButtonContainer({
+      container: inner?.defaultButtonViewModel,
+      field
+    }) ??
+    pickParamFromButtonContainer({
+      container: inner?.toggledButtonViewModel,
+      field
+    })
   );
 }
 
-export function findRateParamInInnertube(root: YtInitialData | undefined, field: RateParamField) {
+export function findRateParamInInnertube({ root, field }: { root: YtInitialData | undefined; field: RateParamField }) {
   if (!root) {
     return undefined;
   }
@@ -89,12 +107,18 @@ export function findRateParamInInnertube(root: YtInitialData | undefined, field:
     const { topLevelButtons = [] } = content.videoPrimaryInfoRenderer?.videoActions?.menuRenderer ?? {};
     for (const button of topLevelButtons) {
       const { likeButtonViewModel, dislikeButtonViewModel } = button.segmentedLikeDislikeButtonViewModel ?? {};
-      const fromLike = pickParamFromToggle(likeButtonViewModel?.likeButtonViewModel, field);
+      const fromLike = pickParamFromToggle({
+        container: likeButtonViewModel?.likeButtonViewModel,
+        field
+      });
       if (fromLike) {
         return fromLike;
       }
 
-      const fromDislike = pickParamFromToggle(dislikeButtonViewModel?.dislikeButtonViewModel, field);
+      const fromDislike = pickParamFromToggle({
+        container: dislikeButtonViewModel?.dislikeButtonViewModel,
+        field
+      });
       if (fromDislike) {
         return fromDislike;
       }
@@ -104,12 +128,18 @@ export function findRateParamInInnertube(root: YtInitialData | undefined, field:
     playerOverlays?.playerOverlayRenderer?.fullscreenQuickActionsBar?.quickActionsViewModel ?? {};
   for (const quickButton of quickActionButtons) {
     const { likeButtonViewModel, dislikeButtonViewModel } = quickButton;
-    const fromLike = pickParamFromToggle(likeButtonViewModel, field);
+    const fromLike = pickParamFromToggle({
+      container: likeButtonViewModel,
+      field
+    });
     if (fromLike) {
       return fromLike;
     }
 
-    const fromDislike = pickParamFromToggle(dislikeButtonViewModel, field);
+    const fromDislike = pickParamFromToggle({
+      container: dislikeButtonViewModel,
+      field
+    });
     if (fromDislike) {
       return fromDislike;
     }
@@ -144,7 +174,10 @@ export async function fetchRateParamsFromNext({
   }
 
   const parsed: InnertubeNextResponse | null = await response.json().catch(() => null);
-  const param = findRateParamInInnertube(parsed ?? undefined, RATE_PARAM_FIELD[action]);
+  const param = findRateParamInInnertube({
+    root: parsed ?? undefined,
+    field: RATE_PARAM_FIELD[action]
+  });
   console.debug("[ytr-fetch] /next", {
     action,
     hasParam: Boolean(param)
