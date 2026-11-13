@@ -32,7 +32,7 @@ export function getSubscriptionDecision() {
 }
 
 export function onSubscriptionDecision(callback: (decision: SubscriptionDecision | undefined) => void) {
-  const handler = (event: Event) => {
+  function handler(event: Event) {
     if (!(event instanceof CustomEvent)) {
       return;
     }
@@ -40,7 +40,7 @@ export function onSubscriptionDecision(callback: (decision: SubscriptionDecision
     const { detail } = event;
     const decision = isSubscriptionDecision(detail) ? detail : undefined;
     callback(decision);
-  };
+  }
   document.addEventListener(SUBSCRIPTION_DECISION_EVENT, handler);
   return () => document.removeEventListener(SUBSCRIPTION_DECISION_EVENT, handler);
 }

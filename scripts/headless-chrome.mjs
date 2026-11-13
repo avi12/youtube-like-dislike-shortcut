@@ -55,8 +55,8 @@ export async function launchMutedHeadlessChrome({
     }
   });
 
-  const send = (method, params = {}, sessionId) =>
-    new Promise((resolve, reject) => {
+  function send(method, params = {}, sessionId) {
+    return new Promise((resolve, reject) => {
       const id = nextId++;
       pending.set(id, {
         resolve,
@@ -71,6 +71,7 @@ export async function launchMutedHeadlessChrome({
         })}\0`
       );
     });
+  }
 
   const extensionId = extensionPath
     ? (await send("Extensions.loadUnpacked", { path: extensionPath })).id
@@ -114,4 +115,6 @@ export async function launchMutedHeadlessChrome({
   };
 }
 
-export const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+export function sleep(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}

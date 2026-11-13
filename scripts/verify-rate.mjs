@@ -72,8 +72,8 @@ async function listTargets() {
 function wsUrl(target) {
   return target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
 }
-const formatArgs = argument =>
-  (argument ?? [])
+function formatArgs(argument) {
+  return (argument ?? [])
     .map(x => {
       if (x.value !== undefined) {
         return JSON.stringify(x.value);
@@ -89,8 +89,9 @@ const formatArgs = argument =>
       return x.description ?? "";
     })
     .join(" ");
-const attachLog = (connection, label) =>
-  connection.on(message => {
+}
+function attachLog(connection, label) {
+  return connection.on(message => {
     if (message.method === "Runtime.consoleAPICalled") {
       console.log(`[${label}:${message.params.type}] ${formatArgs(message.params.args)}`);
     }
@@ -99,6 +100,7 @@ const attachLog = (connection, label) =>
       console.log(`[${label}:EXCEPTION] ${message.params.exceptionDetails.text}`);
     }
   });
+}
 
 // SW may be dormant - wake it by attaching to the browser-level CDP and discovering targets.
 const browserVer = await (await fetch("http://localhost:9225/json/version")).json();

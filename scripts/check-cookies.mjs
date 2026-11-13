@@ -7,7 +7,7 @@ if (!anyPage) {
 
 const socket = new WebSocket(anyPage.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"));
 await new Promise(resolve => socket.addEventListener("open", () => resolve()));
-const send = (id, method, params) => {
+function send(id, method, params) {
   socket.send(
     JSON.stringify({
       id,
@@ -16,16 +16,16 @@ const send = (id, method, params) => {
     })
   );
   return new Promise(resolve => {
-    const onMsg = event => {
+    function onMsg(event) {
       const message = JSON.parse(event.data);
       if (message.id === id) {
         socket.removeEventListener("message", onMsg);
         resolve(message.result);
       }
-    };
+    }
     socket.addEventListener("message", onMsg);
   });
-};
+}
 const cookies = await send(1, "Network.getAllCookies", {});
 const ytCookies = cookies.cookies.filter(cookie => cookie.domain.includes("youtube.com"));
 const sortedYt = [...new Set(ytCookies.map(cookie => `${cookie.domain}|${cookie.name}`))].sort();

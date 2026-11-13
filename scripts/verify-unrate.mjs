@@ -65,9 +65,15 @@ function client(url) {
   });
 }
 
-const wsUrl = target => target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
-const listTargets = async () => (await fetch(`${CDP_ORIGIN}/json`)).json();
-const wait = seconds => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+function wsUrl(target) {
+  return target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
+}
+async function listTargets() {
+  return (await fetch(`${CDP_ORIGIN}/json`)).json();
+}
+function wait(seconds) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
 
 async function evalIn({ target, expression, contextId }) {
   const result = await target.send("Runtime.evaluate", {

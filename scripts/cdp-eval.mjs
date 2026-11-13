@@ -55,7 +55,9 @@ function client(url) {
   });
 }
 
-const wsUrl = target => target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
+function wsUrl(target) {
+  return target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
+}
 const targets = await (await fetch(`${CDP_ORIGIN}/json`)).json();
 const watchTarget = targets.find(target => target.type === "page" && target.url?.includes(URL_FILTER));
 const watch = await client(wsUrl(watchTarget));

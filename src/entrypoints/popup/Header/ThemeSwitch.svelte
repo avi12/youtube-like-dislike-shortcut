@@ -15,7 +15,9 @@
   const { selectedTheme }: Props = $props();
 
   const instanceDarkTheme = matchMedia("(prefers-color-scheme: dark)");
-  const getIsDark = () => instanceDarkTheme.matches;
+  function getIsDark() {
+    return instanceDarkTheme.matches;
+  }
 
   function setTheme(themeMode = ThemeMode.AUTO) {
     const isAutoMode = themeMode === ThemeMode.AUTO;

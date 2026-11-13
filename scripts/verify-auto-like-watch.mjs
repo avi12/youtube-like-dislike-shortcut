@@ -26,8 +26,8 @@ const browser = await launchMutedHeadlessChrome({
   profileDirectory: "Profile 1"
 });
 
-const readRating = () =>
-  browser.evaluate(
+function readRating() {
+  return browser.evaluate(
     `(() => {
   const visiblePressed = selector => [...document.querySelectorAll(selector)].filter(el => el.getClientRects().length > 0).map(el => el.ariaPressed);
   return {
@@ -38,15 +38,17 @@ const readRating = () =>
   };
 })()`
   );
+}
 
-const clickVisible = selector =>
-  browser.evaluate(
+function clickVisible(selector) {
+  return browser.evaluate(
     `(() => {
   const el = [...document.querySelectorAll(${JSON.stringify(selector)})].find(candidate => candidate.getClientRects().length > 0);
   el?.click();
   return Boolean(el);
 })()`
   );
+}
 
 async function waitForButtons() {
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
@@ -124,7 +126,9 @@ try {
     flatten: true
   });
   await browser.send("Runtime.enable", {}, workerSessionId);
-  const setStorage = values => browser.evaluate(`chrome.storage.sync.set(${JSON.stringify(values)})`, workerSessionId);
+  function setStorage(values) {
+    return browser.evaluate(`chrome.storage.sync.set(${JSON.stringify(values)})`, workerSessionId);
+  }
 
   await setStorage({ isAutoLike: false });
   await setInitialRating(videoId);

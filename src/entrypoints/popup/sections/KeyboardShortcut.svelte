@@ -79,8 +79,8 @@
     for (const currentType of Object.values(ShortcutType)) {
       const isDifferentType = currentType !== type;
       const isSameCombo = getIsKeyCombosTheSame({
-         left: keys.combos[currentType],
-         right: newKeyCombo 
+        left: keys.combos[currentType],
+        right: newKeyCombo 
       });
       if (isDifferentType && isSameCombo) {
         error = `Conflicts with ${currentType}'s shortcut`;

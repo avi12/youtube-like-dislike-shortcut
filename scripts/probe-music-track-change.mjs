@@ -107,7 +107,9 @@ const INSTALL = `(() => {
 
 const DRAIN = `(() => { const entries = window.__ytrProbeLog ?? []; window.__ytrProbeLog = []; return JSON.stringify(entries); })()`;
 
-const wsUrl = target => target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
+function wsUrl(target) {
+  return target.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225");
+}
 const targets = await (await fetch(`${CDP_ORIGIN}/json`)).json();
 const musicTarget = targets.find(target => target.type === "page" && target.url?.includes("music.youtube.com"));
 if (!musicTarget) {
@@ -117,12 +119,13 @@ if (!musicTarget) {
 
 const page = await client(wsUrl(musicTarget));
 await page.send("Runtime.enable");
-const evaluate = expression =>
-  page.send("Runtime.evaluate", {
+function evaluate(expression) {
+  return page.send("Runtime.evaluate", {
     expression,
     returnByValue: true,
     awaitPromise: true
   });
+}
 const installed = await evaluate(INSTALL);
 console.log("Install:", installed.result?.value ?? installed.exceptionDetails?.text);
 
