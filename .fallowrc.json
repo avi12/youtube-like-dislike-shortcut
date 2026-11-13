@@ -12,7 +12,7 @@
     "src/entrypoints/auto-like-in-subscription.content.ts",
     "src/entrypoints/auto-like-percentage-music.content/index.ts"
   ],
-  "ignorePatterns": ["tests/**", "scripts/**"],
+  "ignorePatterns": [".claude/**", "tests/**", "scripts/**"],
   "ignoreDependencies": [
     "#imports",
     "@sveltejs/vite-plugin-svelte",

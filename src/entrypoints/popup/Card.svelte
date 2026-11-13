@@ -17,7 +17,7 @@
 
   $effect(() => {
     const { like, dislike, unrate } = keys.combos;
-    storage.setItem<ButtonTriggers>(StorageKey.buttonTriggers, {
+    storage.setItem<ButtonTriggers>(StorageKey.BUTTON_TRIGGERS, {
       like: {
         primary: like.filter(key => !isModifier(key)),
         modifiers: like.filter(isModifier),
@@ -38,9 +38,9 @@
 </script>
 
 <main>
-  <KeyboardShortcut type={ShortcutType.like}>Like</KeyboardShortcut>
-  <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
-  <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
+  <KeyboardShortcut type={ShortcutType.LIKE}>Like</KeyboardShortcut>
+  <KeyboardShortcut type={ShortcutType.DISLIKE}>Dislike</KeyboardShortcut>
+  <KeyboardShortcut type={ShortcutType.UNRATE}>Un-rate</KeyboardShortcut>
   <AutoLike {autoLikeThreshold} {enabledSurfaces} {isAutoLike} {isAutoLikeSubscribedChannels} />
 </main>
 

@@ -3,14 +3,14 @@ import { defineCustomEventMessaging } from "@webext-core/messaging/page";
 import { type InnertubeContext } from "@/lib/types";
 
 export enum RateAction {
-  like = "like",
-  dislike = "dislike",
-  removelike = "removelike"
+  LIKE = "like",
+  DISLIKE = "dislike",
+  REMOVELIKE = "removelike"
 }
 
 export enum YtrMessage {
-  getRateContext = "ytr-rate:getRateContext",
-  trackVideoIdChanged = "ytr-rate:trackVideoIdChanged"
+  GET_RATE_CONTEXT = "ytr-rate:getRateContext",
+  TRACK_VIDEO_ID_CHANGED = "ytr-rate:trackVideoIdChanged"
 }
 
 interface RateResult {
@@ -34,8 +34,8 @@ export interface RateContext {
 }
 
 interface YtrProtocol {
-  [YtrMessage.getRateContext]: (action: RateAction) => RateContextResult | null;
-  [YtrMessage.trackVideoIdChanged]: (videoId: string) => void;
+  [YtrMessage.GET_RATE_CONTEXT]: (action: RateAction) => RateContextResult | null;
+  [YtrMessage.TRACK_VIDEO_ID_CHANGED]: (videoId: string) => void;
 }
 
 export const ytrMessenger = defineCustomEventMessaging<YtrProtocol>({ namespace: "ytr" });
@@ -49,9 +49,9 @@ export function isRateRequest(message: unknown): message is RateRequest {
     typeof message === "object" &&
     message !== null &&
     "action" in message &&
-    (message.action === RateAction.like ||
-      message.action === RateAction.dislike ||
-      message.action === RateAction.removelike)
+    (message.action === RateAction.LIKE ||
+      message.action === RateAction.DISLIKE ||
+      message.action === RateAction.REMOVELIKE)
   );
 }
 

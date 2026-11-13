@@ -1,22 +1,22 @@
 import { Rating } from "@/lib/types";
-import { DOM_ATTRIBUTE, getCurrentSurface, SELECTORS, Surface } from "@/lib/utils-initials";
+import { DomAttribute, getCurrentSurface, SELECTORS, Surface } from "@/lib/utils-initials";
 import { showRateBezel } from "@/lib/ytr-bezel";
 import { RateAction, sendRateRequest } from "@/lib/ytr-messaging";
 
-let gLastRating = Rating.Like;
+let gLastRating = Rating.LIKE;
 
 function getIsActive(elButton: HTMLElement) {
   return elButton.ariaPressed === "true";
 }
 
 function getShortsRateButtons() {
-  const elActionBar = document.querySelector<HTMLElement>(SELECTORS.toggleButtonsShortsVideo);
+  const elActionBar = document.querySelector<HTMLElement>(SELECTORS.TOGGLE_BUTTONS_SHORTS_VIDEO);
   if (elActionBar === null) {
     return {};
   }
 
-  const elKnownLike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.likeButton) ?? undefined;
-  const elKnownDislike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.dislikeButton) ?? undefined;
+  const elKnownLike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.LIKE_BUTTON) ?? undefined;
+  const elKnownDislike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.DISLIKE_BUTTON) ?? undefined;
   if (elKnownLike || elKnownDislike) {
     return {
       elLike: elKnownLike,
@@ -24,7 +24,7 @@ function getShortsRateButtons() {
     };
   }
 
-  const elToggleButtons = elActionBar.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`);
+  const elToggleButtons = elActionBar.querySelectorAll<HTMLButtonElement>(`button[${DomAttribute.ARIA_PRESSED}]`);
   const isLikeDislikePair = elToggleButtons.length === 2;
   if (!isLikeDislikePair) {
     return {};
@@ -37,24 +37,24 @@ function getShortsRateButtons() {
 }
 
 export function getRateButtons() {
-  if (getCurrentSurface() === Surface.shorts) {
+  if (getCurrentSurface() === Surface.SHORTS) {
     return getShortsRateButtons();
   }
 
-  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsMusicVideo}`;
+  const containerSelector = `${SELECTORS.TOGGLE_BUTTONS_NORMAL_VIDEO}, ${SELECTORS.TOGGLE_BUTTONS_MUSIC_VIDEO}`;
   const elButtonsRate = document.querySelector<HTMLElement>(containerSelector);
   if (elButtonsRate === null) {
     return {};
   }
 
   return {
-    elLike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.likeButton) ?? undefined,
-    elDislike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.dislikeButton) ?? undefined
+    elLike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.LIKE_BUTTON) ?? undefined,
+    elDislike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.DISLIKE_BUTTON) ?? undefined
   };
 }
 
 function showIndicator(isRated: boolean) {
-  const isShortsOrMusic = [Surface.shorts, Surface.music].includes(getCurrentSurface());
+  const isShortsOrMusic = [Surface.SHORTS, Surface.MUSIC].includes(getCurrentSurface());
   if (isShortsOrMusic) {
     return;
   }
@@ -76,25 +76,25 @@ export function getRatedButton() {
 }
 
 export function getIsSubscribed() {
-  const elSubscribe = document.querySelector(SELECTORS.buttonSubscribe);
-  return elSubscribe?.getAttribute(DOM_ATTRIBUTE.subscribed) !== null;
+  const elSubscribe = document.querySelector(SELECTORS.BUTTON_SUBSCRIBE);
+  return elSubscribe?.getAttribute(DomAttribute.SUBSCRIBED) !== null;
 }
 
 export function getIsInLibrary() {
-  const elFollowButton = document.querySelector(SELECTORS.buttonFollowMusic);
-  return elFollowButton?.getAttribute(DOM_ATTRIBUTE.subscribed) !== null;
+  const elFollowButton = document.querySelector(SELECTORS.BUTTON_FOLLOW_MUSIC);
+  return elFollowButton?.getAttribute(DomAttribute.SUBSCRIBED) !== null;
 }
 
 function getRateActionForFlag(isLike: boolean | null) {
   if (isLike === true) {
-    return RateAction.like;
+    return RateAction.LIKE;
   }
 
   if (isLike === false) {
-    return RateAction.dislike;
+    return RateAction.DISLIKE;
   }
 
-  return RateAction.removelike;
+  return RateAction.REMOVELIKE;
 }
 
 async function rateVideoViaApi(isLike: boolean | null) {
@@ -106,7 +106,7 @@ async function rateVideoViaApi(isLike: boolean | null) {
 
   const isRatingSet = isLike !== null;
   if (isRatingSet) {
-    gLastRating = isLike ? Rating.Like : Rating.Dislike;
+    gLastRating = isLike ? Rating.LIKE : Rating.DISLIKE;
   }
 
   showIndicator(isRatingSet);
@@ -127,7 +127,7 @@ export async function rateVideo(isLike: boolean | null) {
     }
 
     window.ytrUserInteracted = true;
-    gLastRating = Rating.Like;
+    gLastRating = Rating.LIKE;
     showIndicator(true);
 
     if (!getIsActive(elLike)) {
@@ -146,7 +146,7 @@ export async function rateVideo(isLike: boolean | null) {
     }
 
     window.ytrUserInteracted = true;
-    gLastRating = Rating.Dislike;
+    gLastRating = Rating.DISLIKE;
     showIndicator(true);
 
     if (!getIsActive(elDislike)) {
@@ -170,7 +170,7 @@ export async function rateVideo(isLike: boolean | null) {
     return;
   }
 
-  gLastRating = elRated === elDislike ? Rating.Dislike : Rating.Like;
+  gLastRating = elRated === elDislike ? Rating.DISLIKE : Rating.LIKE;
   showIndicator(false);
   elRated.click();
   elRated.blur();

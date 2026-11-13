@@ -1,5 +1,5 @@
 import { storage } from "#imports";
-import { StorageKey, URL_PARAM } from "@/lib/utils-initials";
+import { StorageKey, UrlParam } from "@/lib/utils-initials";
 
 const MAXIMUM_REAL_SECONDS_BETWEEN_TIME_UPDATES = 1;
 const RETENTION_DAYS = 7;
@@ -25,7 +25,7 @@ export function getWatchedSeconds(previousTime: number, currentTime: number, pla
 }
 
 function getVideoId() {
-  return new URLSearchParams(location.search).get(URL_PARAM.videoId);
+  return new URLSearchParams(location.search).get(UrlParam.VIDEO_ID);
 }
 
 function pruneProgress(progress: WatchProgress) {
@@ -39,14 +39,14 @@ function pruneProgress(progress: WatchProgress) {
 }
 
 async function readProgress() {
-  const stored = await storage.getItem<WatchProgress>(StorageKey.watchProgress);
+  const stored = await storage.getItem<WatchProgress>(StorageKey.WATCH_PROGRESS);
   return pruneProgress(stored ?? {});
 }
 
 function updateProgress(update: (progress: WatchProgress) => WatchProgress) {
   pendingWrite = pendingWrite.then(async () => {
     const updated = update(await readProgress());
-    await storage.setItem(StorageKey.watchProgress, updated);
+    await storage.setItem(StorageKey.WATCH_PROGRESS, updated);
   });
   return pendingWrite;
 }

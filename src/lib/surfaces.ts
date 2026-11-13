@@ -11,7 +11,7 @@ export function resolveEnabledSurfaces(stored: Partial<EnabledSurfaces> | null) 
 }
 
 export async function getEnabledSurfaces() {
-  return resolveEnabledSurfaces(await storage.getItem<Partial<EnabledSurfaces>>(StorageKey.enabledSurfaces));
+  return resolveEnabledSurfaces(await storage.getItem<Partial<EnabledSurfaces>>(StorageKey.ENABLED_SURFACES));
 }
 
 export async function getIsCurrentSurfaceEnabled() {
@@ -20,7 +20,7 @@ export async function getIsCurrentSurfaceEnabled() {
 }
 
 export function watchEnabledSurfaces(onChange: (enabledSurfaces: EnabledSurfaces) => void) {
-  return storage.watch<Partial<EnabledSurfaces>>(StorageKey.enabledSurfaces, stored => {
+  return storage.watch<Partial<EnabledSurfaces>>(StorageKey.ENABLED_SURFACES, stored => {
     onChange(resolveEnabledSurfaces(stored));
   });
 }

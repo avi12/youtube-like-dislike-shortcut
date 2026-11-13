@@ -17,10 +17,10 @@
   const instanceDarkTheme = matchMedia("(prefers-color-scheme: dark)");
   const getIsDark = () => instanceDarkTheme.matches;
 
-  function setTheme(themeMode = ThemeMode.auto) {
-    const isAutoMode = themeMode === ThemeMode.auto;
+  function setTheme(themeMode = ThemeMode.AUTO) {
+    const isAutoMode = themeMode === ThemeMode.AUTO;
     if (isAutoMode) {
-      theme.current = getIsDark() ? ThemeMode.dark : ThemeMode.light;
+      theme.current = getIsDark() ? ThemeMode.DARK : ThemeMode.LIGHT;
       return;
     }
 
@@ -34,10 +34,10 @@
 
   $effect(() => {
     setTheme(theme.selected);
-    storage.setItem(StorageKey.theme, theme.selected);
+    storage.setItem(StorageKey.THEME, theme.selected);
     document.documentElement.dataset.theme = theme.current;
 
-    const isAutoTheme = theme.selected === ThemeMode.auto;
+    const isAutoTheme = theme.selected === ThemeMode.AUTO;
     if (isAutoTheme) {
       instanceDarkTheme.addEventListener("change", () => {
         const elQuickTransitions = document.querySelectorAll(`.${CSS_CLASS_QUICK_TRANSITION}`);
@@ -56,14 +56,14 @@
 </script>
 
 <article class="themes">
-  <button class:selected={theme.selected === ThemeMode.auto} aria-label="auto theme" aria-pressed={theme.selected === ThemeMode.auto} onclick={() => (theme.selected = ThemeMode.auto)}>
-    <ThemeAuto checked={theme.selected === ThemeMode.auto} />
+  <button class:selected={theme.selected === ThemeMode.AUTO} aria-label="auto theme" aria-pressed={theme.selected === ThemeMode.AUTO} onclick={() => (theme.selected = ThemeMode.AUTO)}>
+    <ThemeAuto checked={theme.selected === ThemeMode.AUTO} />
   </button>
-  <button class:selected={theme.selected === ThemeMode.light} aria-label="light theme" aria-pressed={theme.selected === ThemeMode.light} onclick={() => (theme.selected = ThemeMode.light)}>
-    <ThemeLight checked={theme.selected === ThemeMode.light} />
+  <button class:selected={theme.selected === ThemeMode.LIGHT} aria-label="light theme" aria-pressed={theme.selected === ThemeMode.LIGHT} onclick={() => (theme.selected = ThemeMode.LIGHT)}>
+    <ThemeLight checked={theme.selected === ThemeMode.LIGHT} />
   </button>
-  <button class:selected={theme.selected === ThemeMode.dark} aria-label="dark theme" aria-pressed={theme.selected === ThemeMode.dark} onclick={() => (theme.selected = ThemeMode.dark)}>
-    <ThemeDark checked={theme.selected === ThemeMode.dark} />
+  <button class:selected={theme.selected === ThemeMode.DARK} aria-label="dark theme" aria-pressed={theme.selected === ThemeMode.DARK} onclick={() => (theme.selected = ThemeMode.DARK)}>
+    <ThemeDark checked={theme.selected === ThemeMode.DARK} />
   </button>
 </article>
 

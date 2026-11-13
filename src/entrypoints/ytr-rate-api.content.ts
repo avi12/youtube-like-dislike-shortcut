@@ -3,7 +3,7 @@ import { executeRateRequest, fetchRateParamsFromNext } from "@/lib/ytr-rate-fetc
 import { buildSapisidAuthorization } from "@/lib/ytr-sapisid";
 
 async function rateVideoOnPage(action: RateAction) {
-  const result = await ytrMessenger.sendMessage(YtrMessage.getRateContext, action).catch(() => null);
+  const result = await ytrMessenger.sendMessage(YtrMessage.GET_RATE_CONTEXT, action).catch(() => null);
   if (!result?.context || !result.params) {
     return {
       success: false,
@@ -47,7 +47,7 @@ async function rateVideoOnPage(action: RateAction) {
 }
 
 async function rateInEmbed(action: RateAction) {
-  const result = await ytrMessenger.sendMessage(YtrMessage.getRateContext, action).catch(() => null);
+  const result = await ytrMessenger.sendMessage(YtrMessage.GET_RATE_CONTEXT, action).catch(() => null);
   if (!result?.context) {
     return {
       success: false,

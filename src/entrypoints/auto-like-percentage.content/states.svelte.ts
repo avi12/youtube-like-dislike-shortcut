@@ -45,7 +45,7 @@ export function getIsUnmountRequired() {
     return true;
   }
 
-  if (sharedState.subscriptionDecision === SubscriptionDecision.claimed) {
+  if (sharedState.subscriptionDecision === SubscriptionDecision.CLAIMED) {
     return true;
   }
 

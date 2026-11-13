@@ -22,7 +22,7 @@ function handleDisconnect() {
 }
 
 function connect() {
-  activePort = browser.runtime.connect({ name: PortName.musicShortcut });
+  activePort = browser.runtime.connect({ name: PortName.MUSIC_SHORTCUT });
   activePort.onMessage.addListener(handleRateMessage);
   activePort.onDisconnect.addListener(handleDisconnect);
   sendFocusState();

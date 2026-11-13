@@ -33,6 +33,6 @@ console.log("All .youtube.com cookies:");
 for (const c of sortedYt) {
   console.log(" ", c);
 }
-const hasSapisid = sortedYt.some(c => /SAPISID|3PAPISID/.test(c));
-console.log("\nSAPISID present on youtube.com?", hasSapisid);
+const HAS_SAPISID = sortedYt.some(c => /SAPISID|3PAPISID/.test(c));
+console.log("\nSAPISID present on youtube.com?", HAS_SAPISID);
 process.exit(0);

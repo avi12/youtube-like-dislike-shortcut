@@ -47,7 +47,7 @@ function parseBrowserArg(): SupportedBrowser {
 const BROWSER = parseBrowserArg();
 const IS_FIREFOX = BROWSER === "firefox";
 const IS_CHROMIUM = !IS_FIREFOX;
-const WANTS_PROFILE = process.argv.includes("--with-profile");
+const IS_PROFILE_WANTED = process.argv.includes("--with-profile");
 const { LANG = "en" } = process.env;
 const START_URL = "https://www.youtube.com/watch?v=aiSla-5xq3w";
 
@@ -138,7 +138,7 @@ async function reloadYouTubeTabs(port: number) {
 async function main() {
   process.chdir(PROJECT_ROOT);
 
-  if (WANTS_PROFILE) {
+  if (IS_PROFILE_WANTED) {
     process.env[`${BROWSER === "edge" ? "EDGE" : BROWSER === "firefox" ? "FIREFOX" : "CHROME"}_WITH_PROFILE`] = "1";
   }
 
@@ -146,9 +146,9 @@ async function main() {
   buildExtension();
   console.log("Build complete.\n");
 
-  const WARN_LOG_LEVEL = 40;
+  const warnLogLevel = 40;
   webExtConsoleStream.write = ({ level, msg: message }) => {
-    if (level >= WARN_LOG_LEVEL) {
+    if (level >= warnLogLevel) {
       console.warn(message);
     }
   };
@@ -159,7 +159,7 @@ async function main() {
     "--disable-blink-features=AutomationControlled"
   ];
 
-  const useExistingProfile = WANTS_PROFILE && existsSync(PROFILE_DIR);
+  const useExistingProfile = IS_PROFILE_WANTED && existsSync(PROFILE_DIR);
   if (useExistingProfile && IS_CHROMIUM) {
     chromiumArgs.push("--profile-directory=Profile 1");
   }

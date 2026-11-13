@@ -68,13 +68,13 @@ export default defineConfig({
     permissions: sharedPermissions,
     host_permissions: ["https://www.youtube.com/*"],
     commands: {
-      [MusicCommand.like]: {
+      [MusicCommand.LIKE]: {
         description: "Like the YouTube Music song that's playing"
       },
-      [MusicCommand.dislike]: {
+      [MusicCommand.DISLIKE]: {
         description: "Dislike the YouTube Music song that's playing"
       },
-      [MusicCommand.unrate]: {
+      [MusicCommand.UNRATE]: {
         description: "Unrate the YouTube Music song that's playing"
       }
     },

@@ -13,9 +13,9 @@
   let { enabledSurfaces = $bindable(), disabled }: Props = $props();
 
   const surfaceLabels: Record<Surface, string> = {
-    [Surface.youtube]: "YouTube",
-    [Surface.shorts]: "YouTube Shorts",
-    [Surface.music]: "YouTube Music"
+    [Surface.YOUTUBE]: "YouTube",
+    [Surface.SHORTS]: "YouTube Shorts",
+    [Surface.MUSIC]: "YouTube Music"
   };
 </script>
 
@@ -25,7 +25,7 @@
     {#each Object.values(Surface) as surface (surface)}
       <ToggleSwitch
         disabled={keys.isRecording || disabled}
-        onchange={e => storage.setItem(StorageKey.enabledSurfaces, { ...enabledSurfaces, [surface]: e.currentTarget.checked })}
+        onchange={e => storage.setItem(StorageKey.ENABLED_SURFACES, { ...enabledSurfaces, [surface]: e.currentTarget.checked })}
         bind:checked={enabledSurfaces[surface]}>
         {surfaceLabels[surface]}
       </ToggleSwitch>

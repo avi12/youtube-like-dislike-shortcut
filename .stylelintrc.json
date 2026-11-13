@@ -1,3 +1,4 @@
 {
-  "extends": ["stylelint-config-avi12"]
+  "extends": ["stylelint-config-avi12"],
+  "ignoreFiles": [".claude/**"]
 }

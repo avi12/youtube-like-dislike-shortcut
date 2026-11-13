@@ -1,18 +1,18 @@
-import { YTCFG_KEY } from "@/lib/types";
+import { YtcfgKey } from "@/lib/types";
 import {
   getElementByMutationObserver,
   SELECTORS,
-  YOUTUBE_EVENT,
-  YOUTUBE_HOST,
-  YOUTUBE_PATHNAME
+  YoutubeEvent,
+  YoutubeHost,
+  YoutubePathname
 } from "@/lib/utils-initials";
 import { RateAction, type RateContext, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { findRateParamInInnertube, type RateParamField } from "@/lib/ytr-rate-fetch";
 
 const paramFieldForAction: Record<RateAction, RateParamField> = {
-  [RateAction.like]: "likeParams",
-  [RateAction.dislike]: "dislikeParams",
-  [RateAction.removelike]: "removeLikeParams"
+  [RateAction.LIKE]: "likeParams",
+  [RateAction.DISLIKE]: "dislikeParams",
+  [RateAction.REMOVELIKE]: "removeLikeParams"
 };
 
 interface MoviePlayerElement extends HTMLElement {
@@ -20,7 +20,7 @@ interface MoviePlayerElement extends HTMLElement {
 }
 
 function getVideoId() {
-  const elPlayer = document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer);
+  const elPlayer = document.querySelector<MoviePlayerElement>(SELECTORS.MOVIE_PLAYER);
   const fromPlayer = elPlayer?.getVideoData?.()?.video_id;
   if (fromPlayer) {
     return fromPlayer;
@@ -31,11 +31,11 @@ function getVideoId() {
     return embedVideoId;
   }
 
-  if (location.pathname === YOUTUBE_PATHNAME.watch) {
+  if (location.pathname === YoutubePathname.WATCH) {
     return "";
   }
 
-  const elTrailer = document.querySelector(SELECTORS.channelTrailerPlayer);
+  const elTrailer = document.querySelector(SELECTORS.CHANNEL_TRAILER_PLAYER);
   const data = elTrailer && "data" in elTrailer ? elTrailer.data : undefined;
   return data && typeof data === "object" && "videoId" in data && data.videoId ? String(data.videoId) : "";
 }
@@ -43,9 +43,9 @@ function getVideoId() {
 function getRateContext(): RateContext | null {
   const { ytcfg } = window;
   const videoId = getVideoId();
-  const clientNameNumber = ytcfg?.get(YTCFG_KEY.clientName);
-  const clientVersion = ytcfg?.get(YTCFG_KEY.clientVersion);
-  const existingClient = ytcfg?.get(YTCFG_KEY.innertubeContext)?.client;
+  const clientNameNumber = ytcfg?.get(YtcfgKey.CLIENT_NAME);
+  const clientVersion = ytcfg?.get(YtcfgKey.CLIENT_VERSION);
+  const existingClient = ytcfg?.get(YtcfgKey.INNERTUBE_CONTEXT)?.client;
   if (!videoId || clientNameNumber === undefined || !clientVersion) {
     return null;
   }
@@ -67,8 +67,8 @@ function getRateContext(): RateContext | null {
         })
       }
     },
-    delegatedSessionId: ytcfg?.get(YTCFG_KEY.delegatedSessionId) ?? "",
-    sessionIndex: ytcfg?.get(YTCFG_KEY.sessionIndex) ?? ""
+    delegatedSessionId: ytcfg?.get(YtcfgKey.DELEGATED_SESSION_ID) ?? "",
+    sessionIndex: ytcfg?.get(YtcfgKey.SESSION_INDEX) ?? ""
   };
 }
 
@@ -78,7 +78,7 @@ function getContextForRate(action: RateAction) {
     return null;
   }
 
-  const isEmbed = location.pathname.startsWith(YOUTUBE_PATHNAME.embed);
+  const isEmbed = location.pathname.startsWith(YoutubePathname.EMBED);
   return {
     context,
     ...(!isEmbed && {
@@ -91,14 +91,14 @@ function getContextForRate(action: RateAction) {
 // event between tracks, so the isolated world can only learn of a new track from the
 // player's own data-change event, which fires here with the new video id already in place
 async function watchTrackVideoId() {
-  const isMusicTopFrame = location.hostname === YOUTUBE_HOST.music && self === top;
+  const isMusicTopFrame = location.hostname === YoutubeHost.MUSIC && self === top;
   if (!isMusicTopFrame) {
     return;
   }
 
   const elPlayer =
-    document.querySelector<MoviePlayerElement>(SELECTORS.moviePlayer) ??
-    (await getElementByMutationObserver<MoviePlayerElement>(SELECTORS.moviePlayer));
+    document.querySelector<MoviePlayerElement>(SELECTORS.MOVIE_PLAYER) ??
+    (await getElementByMutationObserver<MoviePlayerElement>(SELECTORS.MOVIE_PLAYER));
 
   let lastVideoId = "";
   function pushIfTrackChanged() {
@@ -109,10 +109,10 @@ async function watchTrackVideoId() {
     }
 
     lastVideoId = videoId;
-    ytrMessenger.sendMessage(YtrMessage.trackVideoIdChanged, videoId).catch(() => {});
+    ytrMessenger.sendMessage(YtrMessage.TRACK_VIDEO_ID_CHANGED, videoId).catch(() => {});
   }
 
-  elPlayer.addEventListener(YOUTUBE_EVENT.videoDataChange, pushIfTrackChanged);
+  elPlayer.addEventListener(YoutubeEvent.VIDEO_DATA_CHANGE, pushIfTrackChanged);
   pushIfTrackChanged();
 }
 
@@ -121,7 +121,7 @@ export default defineContentScript({
   world: "MAIN",
   allFrames: true,
   main() {
-    ytrMessenger.onMessage(YtrMessage.getRateContext, ({ data }) => getContextForRate(data));
+    ytrMessenger.onMessage(YtrMessage.GET_RATE_CONTEXT, ({ data }) => getContextForRate(data));
     void watchTrackVideoId();
   }
 });

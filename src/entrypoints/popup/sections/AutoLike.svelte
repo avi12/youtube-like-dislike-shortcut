@@ -17,15 +17,15 @@
   let { enabledSurfaces, isAutoLike = $bindable(), autoLikeThreshold = $bindable(), isAutoLikeSubscribedChannels = $bindable() }: Props = $props();
 
   $effect(() => {
-    storage.setItem(StorageKey.isAutoLike, isAutoLike);
+    storage.setItem(StorageKey.IS_AUTO_LIKE, isAutoLike);
   });
 
   $effect(() => {
-    storage.setItem(StorageKey.autoLikeThreshold, autoLikeThreshold);
+    storage.setItem(StorageKey.AUTO_LIKE_THRESHOLD, autoLikeThreshold);
   });
 
   $effect(() => {
-    storage.setItem(StorageKey.isAutoLikeSubscribedChannels, isAutoLikeSubscribedChannels);
+    storage.setItem(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, isAutoLikeSubscribedChannels);
   });
 </script>
 

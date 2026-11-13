@@ -2,14 +2,14 @@ import { storage } from "#imports";
 import { getEnabledSurfaces, watchEnabledSurfaces } from "@/lib/surfaces";
 import {
   addNavigationListener,
-  DOM_ATTRIBUTE,
+  DomAttribute,
   getCurrentSurface,
   getElementByMutationObserver,
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
   StorageKey,
-  YOUTUBE_HOST
+  YoutubeHost
 } from "@/lib/utils-initials";
 import { getIsInLibrary, getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import {
@@ -20,13 +20,13 @@ import {
 
 function getIsFollowing() {
   const { hostname } = location;
-  return hostname === YOUTUBE_HOST.music ? getIsInLibrary() : getIsSubscribed();
+  return hostname === YoutubeHost.MUSIC ? getIsInLibrary() : getIsSubscribed();
 }
 
 function getFollowSelector() {
   const { hostname } = location;
-  const { buttonFollowMusic, buttonSubscribe } = SELECTORS;
-  return hostname === YOUTUBE_HOST.music ? buttonFollowMusic : buttonSubscribe;
+  const { BUTTON_FOLLOW_MUSIC, BUTTON_SUBSCRIBE } = SELECTORS;
+  return hostname === YoutubeHost.MUSIC ? BUTTON_FOLLOW_MUSIC : BUTTON_SUBSCRIBE;
 }
 
 let lastUrl: string | undefined;
@@ -47,7 +47,7 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
   }
 
   if (!getIsAutoLikeActive()) {
-    announceSubscriptionDecision(SubscriptionDecision.released);
+    announceSubscriptionDecision(SubscriptionDecision.RELEASED);
     observer?.disconnect();
     return true;
   }
@@ -59,7 +59,7 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
 
   const elAlreadyRated = getRatedButton();
   if (elAlreadyRated) {
-    announceSubscriptionDecision(SubscriptionDecision.released);
+    announceSubscriptionDecision(SubscriptionDecision.RELEASED);
     isNavigationHandled = true;
     observer?.disconnect();
     return true;
@@ -67,11 +67,11 @@ async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObs
 
   const isFollowing = getIsFollowing();
   if (!isFollowing) {
-    announceSubscriptionDecision(SubscriptionDecision.released);
+    announceSubscriptionDecision(SubscriptionDecision.RELEASED);
     return false;
   }
 
-  announceSubscriptionDecision(SubscriptionDecision.claimed);
+  announceSubscriptionDecision(SubscriptionDecision.CLAIMED);
   isNavigationHandled = true;
   await rateVideo(true);
   observer?.disconnect();
@@ -134,7 +134,7 @@ async function addTemporaryBodyListener() {
   resetSubscriptionDecision();
 
   if (!getIsAutoLikeActive()) {
-    announceSubscriptionDecision(SubscriptionDecision.released);
+    announceSubscriptionDecision(SubscriptionDecision.RELEASED);
     return;
   }
 
@@ -159,12 +159,12 @@ async function addTemporaryBodyListener() {
 }
 
 function addStorageListener() {
-  storage.watch<boolean>(StorageKey.isAutoLikeSubscribedChannels, async isAutoLike => {
+  storage.watch<boolean>(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, async isAutoLike => {
     const isAutoLikeSet = isAutoLike !== null;
     isAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
 
     if (!isAutoLikeSubscribedChannels) {
-      announceSubscriptionDecision(SubscriptionDecision.released);
+      announceSubscriptionDecision(SubscriptionDecision.RELEASED);
       return;
     }
 
@@ -176,7 +176,7 @@ async function addFollowButtonObserver() {
   const elFollowButton = await getElementByMutationObserver<HTMLButtonElement>(getFollowSelector());
   new MutationObserver(handleUserSubscribed).observe(elFollowButton, {
     attributes: true,
-    attributeFilter: [DOM_ATTRIBUTE.subscribed]
+    attributeFilter: [DomAttribute.SUBSCRIBED]
   });
 }
 
@@ -189,12 +189,12 @@ export default defineContentScript({
     document.addEventListener("click", markUserSubscribeClick, { capture: true });
     document.addEventListener("keydown", markUserSubscribeClick, { capture: true });
 
-    isAutoLikeSubscribedChannels = await storage.getItem<boolean>(StorageKey.isAutoLikeSubscribedChannels, {
+    isAutoLikeSubscribedChannels = await storage.getItem<boolean>(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, {
       fallback: initial.isAutoLikeSubscribedChannels
     });
 
     if (!isAutoLikeSubscribedChannels) {
-      announceSubscriptionDecision(SubscriptionDecision.released);
+      announceSubscriptionDecision(SubscriptionDecision.RELEASED);
     }
 
     enabledSurfaces = await getEnabledSurfaces();

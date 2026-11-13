@@ -4,19 +4,19 @@ import { rateVideo } from "@/lib/ytr-buttons";
 
 async function rateIfNeeded(e: KeyboardEvent) {
   switch (getActionPressed(e, window.ytrLastButtonTriggers)) {
-    case ShortcutType.like:
+    case ShortcutType.LIKE:
       e.stopPropagation();
       e.preventDefault();
       await rateVideo(true);
       break;
 
-    case ShortcutType.dislike:
+    case ShortcutType.DISLIKE:
       e.stopPropagation();
       e.preventDefault();
       await rateVideo(false);
       break;
 
-    case ShortcutType.unrate:
+    case ShortcutType.UNRATE:
       e.stopPropagation();
       e.preventDefault();
       await rateVideo(null);
@@ -26,7 +26,7 @@ async function rateIfNeeded(e: KeyboardEvent) {
 
 async function init() {
   window.ytrLastButtonTriggers = await getStorage({
-    storageKey: StorageKey.buttonTriggers,
+    storageKey: StorageKey.BUTTON_TRIGGERS,
     fallback: initial.buttonTriggers,
     updateWindowKey: "ytrLastButtonTriggers"
   });
@@ -45,7 +45,7 @@ async function init() {
     { capture: true }
   );
 
-  storage.watch<typeof initial.buttonTriggers>(StorageKey.buttonTriggers, buttonTriggers => {
+  storage.watch<typeof initial.buttonTriggers>(StorageKey.BUTTON_TRIGGERS, buttonTriggers => {
     window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;
   });
 }

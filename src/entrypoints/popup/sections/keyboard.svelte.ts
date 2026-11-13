@@ -17,9 +17,9 @@ export const keys = $state<{
 }>({
   combos: defaultShortcuts,
   combosSecondary: {
-    [ShortcutType.like]: false,
-    [ShortcutType.dislike]: false,
-    [ShortcutType.unrate]: false
+    [ShortcutType.LIKE]: false,
+    [ShortcutType.DISLIKE]: false,
+    [ShortcutType.UNRATE]: false
   },
   isRecording: false,
   currentlyRecording: null
@@ -32,8 +32,8 @@ export function initializeKeys({ like, dislike, unrate }: ButtonTriggers) {
     unrate: [...unrate.modifiers, ...unrate.primary]
   };
   keys.combosSecondary = {
-    [ShortcutType.like]: like.secondary,
-    [ShortcutType.dislike]: dislike.secondary,
-    [ShortcutType.unrate]: unrate.secondary
+    [ShortcutType.LIKE]: like.secondary,
+    [ShortcutType.DISLIKE]: dislike.secondary,
+    [ShortcutType.UNRATE]: unrate.secondary
   };
 }

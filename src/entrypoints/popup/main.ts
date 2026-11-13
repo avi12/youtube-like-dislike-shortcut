@@ -20,14 +20,14 @@ const {
 
 const [buttonTriggers, enabledSurfaces, selectedTheme, isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels] =
   await Promise.all([
-    storage.getItem<ButtonTriggers>(StorageKey.buttonTriggers, { fallback: defaultButtonTriggers }),
-    storage.getItem<Partial<EnabledSurfaces>>(StorageKey.enabledSurfaces),
-    storage.getItem<ThemeMode>(StorageKey.theme, { fallback: ThemeMode.auto }),
-    storage.getItem<typeof defaultIsAutoLike>(StorageKey.isAutoLike, { fallback: defaultIsAutoLike }),
-    storage.getItem<typeof defaultAutoLikeThreshold>(StorageKey.autoLikeThreshold, {
+    storage.getItem<ButtonTriggers>(StorageKey.BUTTON_TRIGGERS, { fallback: defaultButtonTriggers }),
+    storage.getItem<Partial<EnabledSurfaces>>(StorageKey.ENABLED_SURFACES),
+    storage.getItem<ThemeMode>(StorageKey.THEME, { fallback: ThemeMode.AUTO }),
+    storage.getItem<typeof defaultIsAutoLike>(StorageKey.IS_AUTO_LIKE, { fallback: defaultIsAutoLike }),
+    storage.getItem<typeof defaultAutoLikeThreshold>(StorageKey.AUTO_LIKE_THRESHOLD, {
       fallback: defaultAutoLikeThreshold
     }),
-    storage.getItem<typeof defaultIsAutoLikeSubscribedChannels>(StorageKey.isAutoLikeSubscribedChannels, {
+    storage.getItem<typeof defaultIsAutoLikeSubscribedChannels>(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, {
       fallback: defaultIsAutoLikeSubscribedChannels
     })
   ]);
@@ -40,7 +40,7 @@ mount(Popup, {
   target: elTarget,
   props: {
     enabledSurfaces: resolveEnabledSurfaces(enabledSurfaces),
-    selectedTheme: selectedTheme ?? ThemeMode.auto,
+    selectedTheme: selectedTheme ?? ThemeMode.AUTO,
     isAutoLike: isAutoLike ?? defaultIsAutoLike,
     autoLikeThreshold: autoLikeThreshold ?? defaultAutoLikeThreshold,
     isAutoLikeSubscribedChannels: isAutoLikeSubscribedChannels ?? defaultIsAutoLikeSubscribedChannels

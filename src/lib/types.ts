@@ -7,8 +7,8 @@ import { type initial } from "@/lib/utils-initials";
 export type Modifier = "shiftKey" | "ctrlKey" | "altKey" | "metaKey";
 
 export const enum Rating {
-  Like = "like",
-  Dislike = "dislike"
+  LIKE = "like",
+  DISLIKE = "dislike"
 }
 
 interface ButtonTrigger {
@@ -29,12 +29,12 @@ export interface ButtonTriggers {
  * Reverse-engineered from observation — YouTube publishes no official documentation
  * for Innertube and these key names occasionally change.
  */
-export enum YTCFG_KEY {
-  innertubeContext = "INNERTUBE_CONTEXT",
-  clientName = "INNERTUBE_CONTEXT_CLIENT_NAME",
-  clientVersion = "INNERTUBE_CONTEXT_CLIENT_VERSION",
-  delegatedSessionId = "DELEGATED_SESSION_ID",
-  sessionIndex = "SESSION_INDEX"
+export enum YtcfgKey {
+  INNERTUBE_CONTEXT = "INNERTUBE_CONTEXT",
+  CLIENT_NAME = "INNERTUBE_CONTEXT_CLIENT_NAME",
+  CLIENT_VERSION = "INNERTUBE_CONTEXT_CLIENT_VERSION",
+  DELEGATED_SESSION_ID = "DELEGATED_SESSION_ID",
+  SESSION_INDEX = "SESSION_INDEX"
 }
 
 /**
@@ -153,11 +153,11 @@ export type InnertubeNextResponse = YtInitialData;
  * Reverse-engineered from observation — YouTube publishes no official documentation.
  */
 interface YtcfgGetter {
-  (key: YTCFG_KEY.innertubeContext): InnertubeContext | undefined;
-  (key: YTCFG_KEY.clientName): number | undefined;
-  (key: YTCFG_KEY.clientVersion): string | undefined;
-  (key: YTCFG_KEY.delegatedSessionId): string | undefined;
-  (key: YTCFG_KEY.sessionIndex): string | undefined;
+  (key: YtcfgKey.INNERTUBE_CONTEXT): InnertubeContext | undefined;
+  (key: YtcfgKey.CLIENT_NAME): number | undefined;
+  (key: YtcfgKey.CLIENT_VERSION): string | undefined;
+  (key: YtcfgKey.DELEGATED_SESSION_ID): string | undefined;
+  (key: YtcfgKey.SESSION_INDEX): string | undefined;
 }
 
 declare global {

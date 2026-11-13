@@ -8,9 +8,9 @@ import {
 import { RateAction, type RateContext } from "@/lib/ytr-messaging";
 
 const LIKE_API_URLS: Record<RateAction, string> = {
-  [RateAction.like]: "/youtubei/v1/like/like",
-  [RateAction.dislike]: "/youtubei/v1/like/dislike",
-  [RateAction.removelike]: "/youtubei/v1/like/removelike"
+  [RateAction.LIKE]: "/youtubei/v1/like/like",
+  [RateAction.DISLIKE]: "/youtubei/v1/like/dislike",
+  [RateAction.REMOVELIKE]: "/youtubei/v1/like/removelike"
 };
 
 const NEXT_API_URL = "/youtubei/v1/next";
@@ -18,9 +18,9 @@ const NEXT_API_URL = "/youtubei/v1/next";
 export type RateParamField = "likeParams" | "dislikeParams" | "removeLikeParams";
 
 const RATE_PARAM_FIELD: Record<RateAction, RateParamField> = {
-  [RateAction.like]: "likeParams",
-  [RateAction.dislike]: "dislikeParams",
-  [RateAction.removelike]: "removeLikeParams"
+  [RateAction.LIKE]: "likeParams",
+  [RateAction.DISLIKE]: "dislikeParams",
+  [RateAction.REMOVELIKE]: "removeLikeParams"
 };
 
 interface RateRequestBody {

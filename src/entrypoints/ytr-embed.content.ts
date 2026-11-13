@@ -5,18 +5,18 @@ import { showRateBezel } from "@/lib/ytr-bezel";
 import { RateAction, sendRateRequest } from "@/lib/ytr-messaging";
 
 const ratingForAction: Record<RateAction, Rating | null> = {
-  [RateAction.like]: Rating.Like,
-  [RateAction.dislike]: Rating.Dislike,
-  [RateAction.removelike]: null
+  [RateAction.LIKE]: Rating.LIKE,
+  [RateAction.DISLIKE]: Rating.DISLIKE,
+  [RateAction.REMOVELIKE]: null
 };
 
 const rateActionMap: Record<ShortcutType, RateAction> = {
-  [ShortcutType.like]: RateAction.like,
-  [ShortcutType.dislike]: RateAction.dislike,
-  [ShortcutType.unrate]: RateAction.removelike
+  [ShortcutType.LIKE]: RateAction.LIKE,
+  [ShortcutType.DISLIKE]: RateAction.DISLIKE,
+  [ShortcutType.UNRATE]: RateAction.REMOVELIKE
 };
 
-let gLastRating = Rating.Like;
+let gLastRating = Rating.LIKE;
 
 async function rateIfNeeded(e: KeyboardEvent) {
   const shortcutType = getActionPressed(e, window.ytrLastButtonTriggers);
@@ -42,7 +42,7 @@ async function rateIfNeeded(e: KeyboardEvent) {
 
 async function init() {
   window.ytrLastButtonTriggers = await getStorage({
-    storageKey: StorageKey.buttonTriggers,
+    storageKey: StorageKey.BUTTON_TRIGGERS,
     fallback: initial.buttonTriggers,
     updateWindowKey: "ytrLastButtonTriggers"
   });
@@ -61,7 +61,7 @@ async function init() {
     { capture: true }
   );
 
-  storage.watch<typeof initial.buttonTriggers>(StorageKey.buttonTriggers, buttonTriggers => {
+  storage.watch<typeof initial.buttonTriggers>(StorageKey.BUTTON_TRIGGERS, buttonTriggers => {
     window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;
   });
 }

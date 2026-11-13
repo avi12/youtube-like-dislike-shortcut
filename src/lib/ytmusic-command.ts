@@ -1,11 +1,11 @@
 export const enum PortName {
-  musicShortcut = "ytmusic-shortcut"
+  MUSIC_SHORTCUT = "ytmusic-shortcut"
 }
 
 export enum MusicCommand {
-  like = "ytmusic-like",
-  dislike = "ytmusic-dislike",
-  unrate = "ytmusic-unrate"
+  LIKE = "ytmusic-like",
+  DISLIKE = "ytmusic-dislike",
+  UNRATE = "ytmusic-unrate"
 }
 
 export interface MusicRateMessage {
@@ -17,11 +17,11 @@ export interface MusicFocusMessage {
 }
 
 export const rateForMusicCommand: Record<MusicCommand, boolean | null> = {
-  [MusicCommand.like]: true,
-  [MusicCommand.dislike]: false,
-  [MusicCommand.unrate]: null
+  [MusicCommand.LIKE]: true,
+  [MusicCommand.DISLIKE]: false,
+  [MusicCommand.UNRATE]: null
 };
 
 export function isMusicCommand(value: string): value is MusicCommand {
-  return value === MusicCommand.like || value === MusicCommand.dislike || value === MusicCommand.unrate;
+  return value === MusicCommand.LIKE || value === MusicCommand.DISLIKE || value === MusicCommand.UNRATE;
 }

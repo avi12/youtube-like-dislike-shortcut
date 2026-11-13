@@ -113,7 +113,7 @@ async function pressUnrate() {
   }
 }
 
-const readRating = `(() => {
+const READ_RATING = `(() => {
   const container = document.querySelector("ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation");
   return {
     likePressed: container?.querySelector("like-button-view-model button, yt-button-shape.like button")?.ariaPressed ?? null,
@@ -121,13 +121,13 @@ const readRating = `(() => {
   };
 })()`;
 
-const ratingBefore = await evalIn(watch, readRating);
-const isRatedBefore = ratingBefore.likePressed === "true" || ratingBefore.dislikePressed === "true";
-if (isRatedBefore) {
+const ratingBefore = await evalIn(watch, READ_RATING);
+const IS_RATED_BEFORE = ratingBefore.likePressed === "true" || ratingBefore.dislikePressed === "true";
+if (IS_RATED_BEFORE) {
   console.log("Video was rated, clearing it first:", ratingBefore);
   await pressUnrate();
   await wait(3);
-  console.log("Cleared:", await evalIn(watch, readRating));
+  console.log("Cleared:", await evalIn(watch, READ_RATING));
 }
 
 await watch.send("Page.reload");
@@ -145,14 +145,14 @@ if (!isolatedContext) {
 
 const isolatedContextId = isolatedContext.params.context.id;
 
-const readContentScriptState = `({
+const READ_CONTENT_SCRIPT_STATE = `({
   isAutoLikeEnabled: window.ytrAutoLikeEnabled,
   threshold: window.ytrAutoLikeThreshold,
   isUserInteracted: window.ytrUserInteracted,
   subscriptionDecision: window.ytrSubscriptionDecision ?? null
 })`;
 
-const readPageState = `(() => {
+const READ_PAGE_STATE = `(() => {
   const container = document.querySelector("ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation");
   const elPercentage = document.querySelector("ytr-percentage");
   const video = document.querySelector("video");
@@ -164,7 +164,7 @@ const readPageState = `(() => {
   };
 })()`;
 
-console.log("Content script:", await evalIn(watch, readContentScriptState, isolatedContextId));
+console.log("Content script:", await evalIn(watch, READ_CONTENT_SCRIPT_STATE, isolatedContextId));
 
 await evalIn(
   watch,
@@ -180,7 +180,7 @@ await evalIn(
 let beforeUnrate = null;
 for (let i = 0; i < 60; i++) {
   await wait(0.5);
-  const state = await evalIn(watch, readPageState);
+  const state = await evalIn(watch, READ_PAGE_STATE);
   if (Number.parseFloat(state.percentage ?? "") > 0.4) {
     beforeUnrate = state;
     break;
@@ -189,7 +189,7 @@ for (let i = 0; i < 60; i++) {
 console.log("Counting before un-rate:", beforeUnrate);
 
 if (!beforeUnrate) {
-  console.log("FAIL - the percentage counter never started:", await evalIn(watch, readPageState));
+  console.log("FAIL - the percentage counter never started:", await evalIn(watch, READ_PAGE_STATE));
   process.exit(1);
 }
 
@@ -197,9 +197,9 @@ await pressUnrate();
 console.log("Pressed the un-rate shortcut on an un-rated video");
 
 await wait(SECONDS_AFTER_UNRATE);
-const afterUnrate = await evalIn(watch, readPageState);
+const afterUnrate = await evalIn(watch, READ_PAGE_STATE);
 console.log("After un-rate:", afterUnrate);
-console.log("Content script:", await evalIn(watch, readContentScriptState, isolatedContextId));
+console.log("Content script:", await evalIn(watch, READ_CONTENT_SCRIPT_STATE, isolatedContextId));
 
 const actionsRect = await evalIn(
   watch,
@@ -225,13 +225,13 @@ await evalIn(
 ])`
 );
 
-const isStillPlaying = afterUnrate.currentTime - beforeUnrate.currentTime > 0;
-const isCountingStopped = afterUnrate.percentage === beforeUnrate.percentage;
-const isStillUnrated = afterUnrate.likePressed !== "true" && afterUnrate.dislikePressed !== "true";
+const IS_STILL_PLAYING = afterUnrate.currentTime - beforeUnrate.currentTime > 0;
+const IS_COUNTING_STOPPED = afterUnrate.percentage === beforeUnrate.percentage;
+const IS_STILL_UNRATED = afterUnrate.likePressed !== "true" && afterUnrate.dislikePressed !== "true";
 console.log("\n== VERDICT ==");
 console.log(
-  isStillPlaying && isCountingStopped && isStillUnrated
+  IS_STILL_PLAYING && IS_COUNTING_STOPPED && IS_STILL_UNRATED
     ? "PASS - counting froze and the video was never auto-liked"
-    : `FAIL - kept playing: ${isStillPlaying}, counting stopped: ${isCountingStopped}, still un-rated: ${isStillUnrated}`
+    : `FAIL - kept playing: ${IS_STILL_PLAYING}, counting stopped: ${IS_COUNTING_STOPPED}, still un-rated: ${IS_STILL_UNRATED}`
 );
 process.exit(0);

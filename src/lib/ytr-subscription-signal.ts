@@ -1,6 +1,6 @@
 export enum SubscriptionDecision {
-  claimed = "claimed",
-  released = "released"
+  CLAIMED = "claimed",
+  RELEASED = "released"
 }
 
 const SUBSCRIPTION_DECISION_EVENT = "ytr-subscription-decision";
@@ -14,7 +14,7 @@ declare global {
 function isSubscriptionDecision(
   value: SubscriptionDecision | string | null | undefined
 ): value is SubscriptionDecision {
-  return value === SubscriptionDecision.claimed || value === SubscriptionDecision.released;
+  return value === SubscriptionDecision.CLAIMED || value === SubscriptionDecision.RELEASED;
 }
 
 export function announceSubscriptionDecision(decision: SubscriptionDecision) {

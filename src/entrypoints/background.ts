@@ -27,7 +27,7 @@ export default defineBackground(() => {
   }
 
   browser.runtime.onConnect.addListener(port => {
-    if (port.name !== PortName.musicShortcut) {
+    if (port.name !== PortName.MUSIC_SHORTCUT) {
       return;
     }
 

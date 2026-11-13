@@ -23,14 +23,14 @@ function mergeWithFallback(fallback: StoredObject, stored: StoredObject) {
 }
 
 export enum StorageKey {
-  keyboardShortcuts = "local:keyboardShortcuts",
-  isAutoLike = "sync:isAutoLike",
-  autoLikeThreshold = "sync:autoLikeThreshold",
-  isAutoLikeSubscribedChannels = "sync:isAutoLikeSubscribedChannels",
-  buttonTriggers = "local:buttonTriggers",
-  theme = "local:theme",
-  watchProgress = "local:watchProgress",
-  enabledSurfaces = "sync:enabledSurfaces"
+  KEYBOARD_SHORTCUTS = "local:keyboardShortcuts",
+  IS_AUTO_LIKE = "sync:isAutoLike",
+  AUTO_LIKE_THRESHOLD = "sync:autoLikeThreshold",
+  IS_AUTO_LIKE_SUBSCRIBED_CHANNELS = "sync:isAutoLikeSubscribedChannels",
+  BUTTON_TRIGGERS = "local:buttonTriggers",
+  THEME = "local:theme",
+  WATCH_PROGRESS = "local:watchProgress",
+  ENABLED_SURFACES = "sync:enabledSurfaces"
 }
 
 export async function getStorage<K extends keyof typeof window>({
@@ -57,52 +57,52 @@ export async function getStorage<K extends keyof typeof window>({
   return value;
 }
 
-export enum YOUTUBE_HOST {
-  music = "music.youtube.com"
+export enum YoutubeHost {
+  MUSIC = "music.youtube.com"
 }
 
 export enum SELECTORS {
-  adOverlay = "ytd-player .ytp-ad-player-overlay-layout",
-  liveBadge = "ytd-player .ytp-live-badge, ytd-player .ytp-offline-slate-bar",
-  percentageContainer = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, reel-action-bar-view-model",
-  percentageContainerFullscreen = ".ytp-fullscreen-quick-actions like-button-view-model",
-  toggleButtonsNormalVideo = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
-  toggleButtonsShortsVideo = "reel-action-bar-view-model",
-  toggleButtonsMusicVideo = "ytmusic-player-bar ytmusic-like-button-renderer, ytmusic-miniplayer segmented-like-dislike-button-view-model",
-  timeInfoMusic = ".ytMusicMiniPlayerTimeInfo",
-  adShowingMusic = "#movie_player.ad-showing",
-  progressBarMusic = "ytmusic-player-bar #progress-bar, ytmusic-miniplayer input.ytMusicMiniPlayerProgressBar",
-  trackLinkMusic = "#movie_player a.ytp-title-link",
-  likeButton = "like-button-view-model button, yt-button-shape.like button",
-  dislikeButton = "dislike-button-view-model button, yt-button-shape.dislike button",
-  buttonSubscribe = "ytd-page-manager ytd-subscribe-button-renderer",
-  buttonFollowMusic = "ytmusic-subscribe-button-renderer",
-  title = "title",
-  ytdApp = "ytd-app",
-  channelTrailerPlayer = "ytd-channel-video-player-renderer",
-  moviePlayer = "#movie_player"
+  AD_OVERLAY = "ytd-player .ytp-ad-player-overlay-layout",
+  LIVE_BADGE = "ytd-player .ytp-live-badge, ytd-player .ytp-offline-slate-bar",
+  PERCENTAGE_CONTAINER = "ytd-watch-flexy:not([hidden]) #actions ytd-menu-renderer, reel-action-bar-view-model",
+  PERCENTAGE_CONTAINER_FULLSCREEN = ".ytp-fullscreen-quick-actions like-button-view-model",
+  TOGGLE_BUTTONS_NORMAL_VIDEO = "ytd-watch-flexy:not([hidden]) #top-level-buttons-computed yt-smartimation, ytd-page-manager ytd-segmented-like-dislike-button-renderer yt-smartimation",
+  TOGGLE_BUTTONS_SHORTS_VIDEO = "reel-action-bar-view-model",
+  TOGGLE_BUTTONS_MUSIC_VIDEO = "ytmusic-player-bar ytmusic-like-button-renderer, ytmusic-miniplayer segmented-like-dislike-button-view-model",
+  TIME_INFO_MUSIC = ".ytMusicMiniPlayerTimeInfo",
+  AD_SHOWING_MUSIC = "#movie_player.ad-showing",
+  PROGRESS_BAR_MUSIC = "ytmusic-player-bar #progress-bar, ytmusic-miniplayer input.ytMusicMiniPlayerProgressBar",
+  TRACK_LINK_MUSIC = "#movie_player a.ytp-title-link",
+  LIKE_BUTTON = "like-button-view-model button, yt-button-shape.like button",
+  DISLIKE_BUTTON = "dislike-button-view-model button, yt-button-shape.dislike button",
+  BUTTON_SUBSCRIBE = "ytd-page-manager ytd-subscribe-button-renderer",
+  BUTTON_FOLLOW_MUSIC = "ytmusic-subscribe-button-renderer",
+  TITLE = "title",
+  YTD_APP = "ytd-app",
+  CHANNEL_TRAILER_PLAYER = "ytd-channel-video-player-renderer",
+  MOVIE_PLAYER = "#movie_player"
 }
 
-export enum DOM_ATTRIBUTE {
-  ariaPressed = "aria-pressed",
-  ariaValueMax = "aria-valuemax",
-  max = "max",
-  subscribed = "subscribed"
+export enum DomAttribute {
+  ARIA_PRESSED = "aria-pressed",
+  ARIA_VALUE_MAX = "aria-valuemax",
+  MAX = "max",
+  SUBSCRIBED = "subscribed"
 }
 
-export enum YOUTUBE_EVENT {
-  navigateFinish = "yt-navigate-finish",
-  videoDataChange = "onVideoDataChange"
+export enum YoutubeEvent {
+  NAVIGATE_FINISH = "yt-navigate-finish",
+  VIDEO_DATA_CHANGE = "onVideoDataChange"
 }
 
-export enum URL_PARAM {
-  videoId = "v"
+export enum UrlParam {
+  VIDEO_ID = "v"
 }
 
-export enum YOUTUBE_PATHNAME {
-  watch = "/watch",
-  embed = "/embed/",
-  shorts = "/shorts/"
+export enum YoutubePathname {
+  WATCH = "/watch",
+  EMBED = "/embed/",
+  SHORTS = "/shorts/"
 }
 
 const buttonTriggers: ButtonTriggers = {
@@ -124,16 +124,16 @@ const buttonTriggers: ButtonTriggers = {
 };
 
 export enum Surface {
-  youtube = "youtube",
-  shorts = "shorts",
-  music = "music"
+  YOUTUBE = "youtube",
+  SHORTS = "shorts",
+  MUSIC = "music"
 }
 
 export const initial = {
   enabledSurfaces: {
-    [Surface.youtube]: true,
-    [Surface.shorts]: true,
-    [Surface.music]: true
+    [Surface.YOUTUBE]: true,
+    [Surface.SHORTS]: true,
+    [Surface.MUSIC]: true
   },
   buttonTriggers,
   isAutoLike: false,
@@ -142,11 +142,11 @@ export const initial = {
 };
 
 export function getCurrentSurface() {
-  if (location.hostname === YOUTUBE_HOST.music) {
-    return Surface.music;
+  if (location.hostname === YoutubeHost.MUSIC) {
+    return Surface.MUSIC;
   }
 
-  return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts) ? Surface.shorts : Surface.youtube;
+  return location.pathname.startsWith(YoutubePathname.SHORTS) ? Surface.SHORTS : Surface.YOUTUBE;
 }
 
 const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
@@ -173,7 +173,7 @@ function getIsElementInViewport(elElement: HTMLElement) {
 
 export function getVisibleElement<T extends HTMLElement>(selector: string) {
   const elements = document.querySelectorAll<T>(selector);
-  const isShorts = getCurrentSurface() === Surface.shorts;
+  const isShorts = getCurrentSurface() === Surface.SHORTS;
   return elements.values().find(isShorts ? getIsElementInViewport : getIsElementVisible);
 }
 
@@ -192,29 +192,29 @@ export async function getElementByMutationObserver<T extends HTMLElement>(select
 
 export async function addNavigationListener(addTemporaryBodyListener: () => void) {
   const elTitle =
-    document.documentElement.querySelector(SELECTORS.title) || (await getElementByMutationObserver(SELECTORS.title));
+    document.documentElement.querySelector(SELECTORS.TITLE) || (await getElementByMutationObserver(SELECTORS.TITLE));
   new MutationObserver(addTemporaryBodyListener).observe(elTitle, OBSERVER_OPTIONS);
 }
 
-const MODIFIER_KEY_DISPLAY = {
-  shiftKey: "Shift",
-  ctrlKey: "Ctrl",
-  altKey: "Alt",
-  metaKey: "Meta"
-} as const;
+const MODIFIER_KEY_DISPLAY = [
+  ["shiftKey", "Shift"],
+  ["ctrlKey", "Ctrl"],
+  ["altKey", "Alt"],
+  ["metaKey", "Meta"]
+] as const;
 
 export function keyToModifier(key: string) {
-  return Object.entries(MODIFIER_KEY_DISPLAY).find(([entryKey]) => entryKey === key)?.[1] ?? key;
+  return MODIFIER_KEY_DISPLAY.find(([entryKey]) => entryKey === key)?.[1] ?? key;
 }
 
 export function modifierToKey(modifier: string) {
-  return Object.entries(MODIFIER_KEY_DISPLAY).find(([, display]) => display === modifier)?.[0] ?? modifier;
+  return MODIFIER_KEY_DISPLAY.find(([, display]) => display === modifier)?.[0] ?? modifier;
 }
 
 export const ShortcutType = {
-  like: "like",
-  dislike: "dislike",
-  unrate: "unrate"
+  LIKE: "like",
+  DISLIKE: "dislike",
+  UNRATE: "unrate"
 } as const;
 export type ShortcutType = (typeof ShortcutType)[keyof typeof ShortcutType];
 

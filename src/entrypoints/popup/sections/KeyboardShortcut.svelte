@@ -28,7 +28,7 @@
   // doesn't lose the modifier context. Reset only when recording starts/ends.
   let comboModifiers = $state<string[]>([]);
   let keyComboTemp = $state<string[]>([]);
-  const isMac = navigator.platform.includes("Mac");
+  const IS_MAC = navigator.platform.includes("Mac");
 
   const active = $derived(keys.isRecording && keys.currentlyRecording === type);
   const currentModifiers = $derived(keys.combos[type].filter(isModifier));
@@ -37,7 +37,7 @@
     (keys.isRecording && keys.currentlyRecording === type
       ? keyComboTemp
       : [
-        ...currentModifiers.map(key => key.replace(isMac ? "Ctrl" : "Cmd", isMac ? "Cmd" : "Ctrl")),
+        ...currentModifiers.map(key => key.replace(IS_MAC ? "Ctrl" : "Cmd", IS_MAC ? "Cmd" : "Ctrl")),
         ...currentNonModifiers
       ]
     ).map(keyToModifier)

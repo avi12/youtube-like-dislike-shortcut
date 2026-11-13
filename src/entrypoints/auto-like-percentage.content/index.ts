@@ -3,7 +3,7 @@ import { mount, unmount } from "svelte";
 import { storage } from "#imports";
 import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
-  DOM_ATTRIBUTE,
+  DomAttribute,
   getCurrentSurface,
   getStorage,
   getVisibleElement,
@@ -12,7 +12,7 @@ import {
   SELECTORS,
   StorageKey,
   Surface,
-  YOUTUBE_EVENT
+  YoutubeEvent
 } from "@/lib/utils-initials";
 import {
   clearWatchedPercentage,
@@ -27,8 +27,8 @@ import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
 import { getIsFreshMountAllowed, getIsUnmountRequired, sharedState, watchMountState } from "./states.svelte";
 
 enum CsuiElementName {
-  percentage = "ytr-percentage",
-  percentageFullscreen = "ytr-percentage-fullscreen"
+  PERCENTAGE = "ytr-percentage",
+  PERCENTAGE_FULLSCREEN = "ytr-percentage-fullscreen"
 }
 
 interface UiManager {
@@ -41,15 +41,15 @@ interface UiManager {
 
 const uiManagers: UiManager[] = [
   {
-    name: CsuiElementName.percentage,
-    selector: SELECTORS.percentageContainer,
+    name: CsuiElementName.PERCENTAGE,
+    selector: SELECTORS.PERCENTAGE_CONTAINER,
     append: "first",
     shadowUi: null,
     isMounting: false
   },
   {
-    name: CsuiElementName.percentageFullscreen,
-    selector: SELECTORS.percentageContainerFullscreen,
+    name: CsuiElementName.PERCENTAGE_FULLSCREEN,
+    selector: SELECTORS.PERCENTAGE_CONTAINER_FULLSCREEN,
     append: "before",
     shadowUi: null,
     isMounting: false
@@ -57,11 +57,11 @@ const uiManagers: UiManager[] = [
 ];
 
 function getIsAdPlaying() {
-  return Boolean(document.querySelector(SELECTORS.adOverlay));
+  return Boolean(document.querySelector(SELECTORS.AD_OVERLAY));
 }
 
 function getIsLiveOrPremiere() {
-  return Boolean(getVisibleElement(SELECTORS.liveBadge));
+  return Boolean(getVisibleElement(SELECTORS.LIVE_BADGE));
 }
 
 let ratingWatchObserver: MutationObserver | null = null;
@@ -90,8 +90,8 @@ function watchForInitialRating() {
     }
   });
 
-  const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`;
-  const anyButtonSelector = `:where(${containerSelector}) button[${DOM_ATTRIBUTE.ariaPressed}]`;
+  const containerSelector = `${SELECTORS.TOGGLE_BUTTONS_NORMAL_VIDEO}, ${SELECTORS.TOGGLE_BUTTONS_SHORTS_VIDEO}`;
+  const anyButtonSelector = `:where(${containerSelector}) button[${DomAttribute.ARIA_PRESSED}]`;
 
   function applyState() {
     if (window.ytrUserInteracted) {
@@ -117,7 +117,7 @@ function watchForInitialRating() {
       mutation =>
         mutation.type === "childList" ||
         (mutation.type === "attributes" &&
-          mutation.attributeName === DOM_ATTRIBUTE.ariaPressed &&
+          mutation.attributeName === DomAttribute.ARIA_PRESSED &&
           mutation.target instanceof Element &&
           Boolean(mutation.target.closest(containerSelector)))
     );
@@ -133,11 +133,11 @@ function watchForInitialRating() {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: [DOM_ATTRIBUTE.ariaPressed]
+    attributeFilter: [DomAttribute.ARIA_PRESSED]
   });
 
   navigateFinishController = new AbortController();
-  document.addEventListener(YOUTUBE_EVENT.navigateFinish, applyState, {
+  document.addEventListener(YoutubeEvent.NAVIGATE_FINISH, applyState, {
     once: true,
     signal: navigateFinishController.signal
   });
@@ -154,7 +154,7 @@ export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
-    sharedState.isShorts = getCurrentSurface() === Surface.shorts;
+    sharedState.isShorts = getCurrentSurface() === Surface.SHORTS;
     sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
     sharedState.isAdPlaying = getIsAdPlaying();
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
@@ -167,12 +167,12 @@ export default defineContentScript({
 
     await Promise.all([
       getStorage({
-        storageKey: StorageKey.isAutoLike,
+        storageKey: StorageKey.IS_AUTO_LIKE,
         fallback: initial.isAutoLike,
         updateWindowKey: "ytrAutoLikeEnabled"
       }),
       getStorage({
-        storageKey: StorageKey.autoLikeThreshold,
+        storageKey: StorageKey.AUTO_LIKE_THRESHOLD,
         fallback: initial.autoLikeThreshold,
         updateWindowKey: "ytrAutoLikeThreshold"
       })
@@ -238,7 +238,7 @@ export default defineContentScript({
 
       sharedState.lastHref = location.href;
       sharedState.hasMountedForCurrentNav = false;
-      sharedState.isShorts = getCurrentSurface() === Surface.shorts;
+      sharedState.isShorts = getCurrentSurface() === Surface.SHORTS;
       void refreshIsSurfaceEnabled();
       sharedState.isLiveOrPremiere = getIsLiveOrPremiere();
       sharedState.subscriptionDecision = undefined;
@@ -265,7 +265,7 @@ export default defineContentScript({
       syncUi();
     }).observe(document, OBSERVER_OPTIONS);
 
-    storage.watch<typeof initial.isAutoLike>(StorageKey.isAutoLike, isAutoLikeUpdated => {
+    storage.watch<typeof initial.isAutoLike>(StorageKey.IS_AUTO_LIKE, isAutoLikeUpdated => {
       window.ytrAutoLikeEnabled = isAutoLikeUpdated ?? initial.isAutoLike;
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
@@ -355,7 +355,7 @@ export default defineContentScript({
       }
 
       const isInsideRateButtons = Boolean(
-        elTarget.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
+        elTarget.closest(`${SELECTORS.TOGGLE_BUTTONS_NORMAL_VIDEO}, ${SELECTORS.TOGGLE_BUTTONS_SHORTS_VIDEO}`)
       );
       if (!isInsideRateButtons) {
         return;
