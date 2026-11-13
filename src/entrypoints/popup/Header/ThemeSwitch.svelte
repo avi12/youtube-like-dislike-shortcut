@@ -93,12 +93,13 @@
         border-radius var(--md-spring-spatial),
         background-color var(--md-spring-effects);
 
-      &:hover:not(.selected) {
+      &:hover {
         background-color: var(--md-surface-container-high);
       }
     }
 
-    & button.selected {
+    & .selected,
+    & .selected:hover {
       border-radius: var(--md-shape-full);
       background-color: var(--md-primary-container);
     }

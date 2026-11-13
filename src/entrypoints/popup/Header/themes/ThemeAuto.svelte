@@ -25,8 +25,8 @@
     & path,
     & circle {
       transition:
-        fill 0.4s ease-in-out,
-        stroke 0.4s ease-in-out;
+        fill 400ms ease-in-out,
+        stroke 400ms ease-in-out;
     }
 
     & path {
@@ -34,7 +34,7 @@
     }
 
     &.checked {
-      & path[mask] {
+      & [mask] {
         fill: var(--theme-switcher-button-color-active);
         stroke: var(--theme-switcher-button-color-active);
       }

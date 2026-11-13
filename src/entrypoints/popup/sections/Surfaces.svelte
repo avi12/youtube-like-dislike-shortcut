@@ -39,7 +39,8 @@
   }
 
   h3 {
-    margin: 0 0 8px;
+    margin: 0;
+    margin-bottom: 8px;
     color: var(--md-on-surface-variant);
     font-weight: 500;
     font-size: 0.875rem;

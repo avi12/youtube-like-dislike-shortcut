@@ -77,17 +77,17 @@
     & path {
       stroke: var(--theme-switcher-button-color-inactive);
       transition:
-        fill 0.4s ease-in-out,
-        stroke 0.4s ease-in-out;
+        fill 400ms ease-in-out,
+        stroke 400ms ease-in-out;
     }
 
     &.checked {
       & path {
         stroke: var(--theme-switcher-button-color-active);
+      }
 
-        &.sun-fill {
-          fill: var(--theme-switcher-button-color-active);
-        }
+      & .sun-fill {
+        fill: var(--theme-switcher-button-color-active);
       }
     }
   }

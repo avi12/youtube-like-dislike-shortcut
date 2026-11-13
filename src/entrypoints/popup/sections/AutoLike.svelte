@@ -50,7 +50,8 @@
     display: flex;
     align-items: center;
     min-block-size: 32px;
-    margin: 0 0 8px;
+    margin: 0;
+    margin-bottom: 8px;
     font-weight: 500;
     font-size: 1rem;
     letter-spacing: 0;

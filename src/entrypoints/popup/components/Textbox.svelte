@@ -47,11 +47,13 @@
     align-items: center;
   }
 
-  input[type="number"] {
+  [type="number"] {
     box-sizing: border-box;
     width: 5.5rem;
     min-height: 40px;
-    padding: 8px 32px 8px 16px;
+    padding: 8px;
+    padding-right: 32px;
+    padding-left: 16px;
     border: none;
     border-radius: var(--md-shape-small);
     background-color: transparent;
