@@ -42,9 +42,9 @@ function parseBrowserArg() {
   const iBrowser = process.argv.findIndex(arg => arg === "--browser" || arg === "-b");
   const candidate = iBrowser >= 0 ? process.argv[iBrowser + 1] : undefined;
   const allowed: SupportedBrowser[] = ["chrome", "edge", "firefox", "opera"];
-  const isSupported = candidate && allowed.includes(candidate as SupportedBrowser);
-  if (isSupported) {
-    return candidate as SupportedBrowser;
+  const supported = allowed.find(browser => browser === candidate);
+  if (supported) {
+    return supported;
   }
 
   return "edge";
