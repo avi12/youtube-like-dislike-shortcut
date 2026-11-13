@@ -4,7 +4,7 @@
   import ThemeAuto from "@/entrypoints/popup/Header/themes/ThemeAuto.svelte";
   import ThemeDark from "@/entrypoints/popup/Header/themes/ThemeDark.svelte";
   import ThemeLight from "@/entrypoints/popup/Header/themes/ThemeLight.svelte";
-  import { ThemeMode, theme } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
+  import { theme, ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
   import { StorageKey } from "@/lib/utils-initials";
 
   const CSS_CLASS_QUICK_TRANSITION = "quick-transition";
@@ -56,13 +56,13 @@
 </script>
 
 <article class="themes">
-  <button aria-label="auto theme" aria-pressed={theme.selected === ThemeMode.auto} class:selected={theme.selected === ThemeMode.auto} onclick={() => (theme.selected = ThemeMode.auto)}>
+  <button class:selected={theme.selected === ThemeMode.auto} aria-label="auto theme" aria-pressed={theme.selected === ThemeMode.auto} onclick={() => (theme.selected = ThemeMode.auto)}>
     <ThemeAuto checked={theme.selected === ThemeMode.auto} />
   </button>
-  <button aria-label="light theme" aria-pressed={theme.selected === ThemeMode.light} class:selected={theme.selected === ThemeMode.light} onclick={() => (theme.selected = ThemeMode.light)}>
+  <button class:selected={theme.selected === ThemeMode.light} aria-label="light theme" aria-pressed={theme.selected === ThemeMode.light} onclick={() => (theme.selected = ThemeMode.light)}>
     <ThemeLight checked={theme.selected === ThemeMode.light} />
   </button>
-  <button aria-label="dark theme" aria-pressed={theme.selected === ThemeMode.dark} class:selected={theme.selected === ThemeMode.dark} onclick={() => (theme.selected = ThemeMode.dark)}>
+  <button class:selected={theme.selected === ThemeMode.dark} aria-label="dark theme" aria-pressed={theme.selected === ThemeMode.dark} onclick={() => (theme.selected = ThemeMode.dark)}>
     <ThemeDark checked={theme.selected === ThemeMode.dark} />
   </button>
 </article>

@@ -52,6 +52,7 @@ export async function getStorage<K extends keyof typeof window>({
   if (isMergeableObject) {
     Object.assign(value, mergeWithFallback(fallback, value));
   }
+
   window[updateWindowKey] = value;
   return value;
 }
@@ -129,7 +130,11 @@ export enum Surface {
 }
 
 export const initial = {
-  enabledSurfaces: { [Surface.youtube]: true, [Surface.shorts]: true, [Surface.music]: true },
+  enabledSurfaces: {
+    [Surface.youtube]: true,
+    [Surface.shorts]: true,
+    [Surface.music]: true
+  },
   buttonTriggers,
   isAutoLike: false,
   isAutoLikeSubscribedChannels: false,
@@ -140,6 +145,7 @@ export function getCurrentSurface() {
   if (location.hostname === YOUTUBE_HOST.music) {
     return Surface.music;
   }
+
   return location.pathname.startsWith(YOUTUBE_PATHNAME.shorts) ? Surface.shorts : Surface.youtube;
 }
 
@@ -233,6 +239,7 @@ function isComboPressed({
   if (!isPrimaryPressed) {
     return false;
   }
+
   return modifiers.every(modifier => event[modifier]);
 }
 
@@ -245,13 +252,21 @@ function getSecondaryKeyFromPrimary({ modifiers, primary }: { modifiers: Modifie
 export function getActionPressed(event: KeyboardEvent, buttonTriggers: ButtonTriggers) {
   for (const actionName of Object.values(ShortcutType)) {
     const { primary, modifiers, secondary } = buttonTriggers[actionName];
-    const isComboMatch = isComboPressed({ modifiers, primary, event });
+    const isComboMatch = isComboPressed({
+      modifiers,
+      primary,
+      event
+    });
     if (isComboMatch) {
       return actionName;
     }
+
     const isSecondaryEnabled = secondary;
     if (isSecondaryEnabled) {
-      const secondaryKey = getSecondaryKeyFromPrimary({ primary, modifiers });
+      const secondaryKey = getSecondaryKeyFromPrimary({
+        primary,
+        modifiers
+      });
       const isSecondaryMatch = secondaryKey === event.code;
       if (isSecondaryMatch) {
         return actionName;

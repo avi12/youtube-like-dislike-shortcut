@@ -16,9 +16,11 @@ export default defineBackground(() => {
       if (isFocused) {
         continue;
       }
+
       if (backgroundedPort) {
         return null;
       }
+
       backgroundedPort = port;
     }
     return backgroundedPort;
@@ -28,6 +30,7 @@ export default defineBackground(() => {
     if (port.name !== PortName.musicShortcut) {
       return;
     }
+
     musicPortFocus.set(port, false);
 
     function handleFocusUpdate(message: MusicFocusMessage) {
@@ -44,6 +47,7 @@ export default defineBackground(() => {
     if (!isRateRequest(message) || sender.tab?.id === undefined || sender.frameId === undefined) {
       return;
     }
+
     return browser.tabs.sendMessage(sender.tab.id, message, { frameId: sender.frameId });
   });
 
@@ -51,10 +55,12 @@ export default defineBackground(() => {
     if (!isMusicCommand(command)) {
       return;
     }
+
     const backgroundedPort = findSingleBackgroundedPort();
     if (!backgroundedPort) {
       return;
     }
+
     const message: MusicRateMessage = { rate: rateForMusicCommand[command] };
     backgroundedPort.postMessage(message);
   });

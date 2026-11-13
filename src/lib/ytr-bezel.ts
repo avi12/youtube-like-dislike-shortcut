@@ -30,6 +30,7 @@ export function showRateBezel(rating: Rating, isRated: boolean) {
   if (!elPlayer) {
     return;
   }
+
   const elHost = getBezelHost();
   elHost.querySelector(`.${FALLBACK_BEZEL_CLASS}`)?.remove();
   const { top, left, width, height } = elPlayer.getBoundingClientRect();

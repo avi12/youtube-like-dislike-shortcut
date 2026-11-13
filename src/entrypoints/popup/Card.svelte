@@ -41,7 +41,7 @@
   <KeyboardShortcut type={ShortcutType.like}>Like</KeyboardShortcut>
   <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
   <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
-  <AutoLike {enabledSurfaces} {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
+  <AutoLike {autoLikeThreshold} {enabledSurfaces} {isAutoLike} {isAutoLikeSubscribedChannels} />
 </main>
 
 <style>

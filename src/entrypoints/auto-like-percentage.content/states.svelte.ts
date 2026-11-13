@@ -40,15 +40,19 @@ export function getIsUnmountRequired() {
   if (!sharedState.isAutoLikeEnabled || !sharedState.isSurfaceEnabled) {
     return true;
   }
+
   if (sharedState.isShorts || sharedState.isLiveOrPremiere) {
     return true;
   }
+
   if (sharedState.subscriptionDecision === SubscriptionDecision.claimed) {
     return true;
   }
+
   if (sharedState.isCurrentlyRated && !sharedState.isUserInteracted) {
     return true;
   }
+
   return sharedState.isAdInitiallyPlaying && sharedState.isAdPlaying;
 }
 
@@ -56,12 +60,15 @@ export function getIsFreshMountAllowed() {
   if (getIsUnmountRequired()) {
     return false;
   }
+
   if (!sharedState.isRatingResolved) {
     return false;
   }
+
   if (sharedState.isRatedInitially || sharedState.isCurrentlyRated) {
     return false;
   }
+
   return !sharedState.isUserInteracted;
 }
 

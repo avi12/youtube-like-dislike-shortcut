@@ -56,6 +56,7 @@ export async function loadWatchedPercentage() {
   if (!videoId) {
     return 0;
   }
+
   const progress = await readProgress();
   return progress[videoId]?.percentage ?? 0;
 }
@@ -66,8 +67,15 @@ export async function saveWatchedPercentage(percentage: number) {
   if (!videoId || !isSaveDue) {
     return;
   }
+
   lastSaveTime = Date.now();
-  await updateProgress(progress => ({ ...progress, [videoId]: { percentage, updatedAt: Date.now() } }));
+  await updateProgress(progress => ({
+    ...progress,
+    [videoId]: {
+      percentage,
+      updatedAt: Date.now()
+    }
+  }));
 }
 
 export async function clearWatchedPercentage() {
@@ -75,6 +83,7 @@ export async function clearWatchedPercentage() {
   if (!videoId) {
     return;
   }
+
   await updateProgress(progress =>
     Object.fromEntries(Object.entries(progress).filter(([storedVideoId]) => storedVideoId !== videoId))
   );

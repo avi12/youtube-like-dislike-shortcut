@@ -62,10 +62,12 @@
     if (key.startsWith("Control")) {
       return "ctrlKey";
     }
+
     const modifierCode = key.replace(REGEX_MODIFIERS, modifierToKey);
     if (isModifier(modifierCode)) {
       return modifierCode;
     }
+
     return code;
   }
 
@@ -91,21 +93,26 @@
       if (!isRecordingThisType) {
         return;
       }
+
       e.preventDefault();
       error = "";
       const key = processKey(e);
       if (pressedKeys.has(key)) {
         return;
       }
+
       pressedKeys.add(key);
+
       if (isModifier(key)) {
         if (comboModifiers.includes(key)) {
           // Windows fake Shift re-injection after a Shift+NumpadDigit event -
           // the modifier was already tracked, so skip updating keyComboTemp.
           return;
         }
+
         comboModifiers = [...comboModifiers, key].sort();
       }
+
       keyComboTemp = keyCombo;
     }
 
@@ -113,6 +120,7 @@
       if (!isRecordingThisType) {
         return;
       }
+
       const key = processKey(e);
 
       // If a non-modifier key's keydown was intercepted by the browser (e.g. Shift+Insert
@@ -136,12 +144,18 @@
       }
 
       comboModifiers = [];
-      keys.combos = { ...keys.combos, [type]: keyComboTemp };
+      keys.combos = {
+         ...keys.combos,
+         [type]: keyComboTemp 
+      };
       keys.isRecording = false;
       keys.currentlyRecording = null;
       const isSecondaryShortcutExists = displayedKeyComboList.join(" + ") in defaultAdditionalShortcuts;
       if (isSecondaryShortcutExists) {
-        keys.combosSecondary = { ...keys.combosSecondary, [type]: true };
+        keys.combosSecondary = {
+           ...keys.combosSecondary,
+           [type]: true 
+        };
       }
     };
 
@@ -176,8 +190,8 @@
       <div class="error" in:fade>{error}</div>
     {:else if isShowingAlternateShortcut}
       <Checkbox
-        bind:checked={keys.combosSecondary[type]}
-        disabled={keys.isRecording && keys.currentlyRecording !== type}>
+        disabled={keys.isRecording && keys.currentlyRecording !== type}
+        bind:checked={keys.combosSecondary[type]}>
         Also use {alternateShortcutName}
       </Checkbox>
     {/if}

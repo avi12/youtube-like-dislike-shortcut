@@ -25,13 +25,16 @@ function getVideoId() {
   if (fromPlayer) {
     return fromPlayer;
   }
+
   const [, embedVideoId] = location.pathname.match(/^\/embed\/([^/?]+)/) ?? [];
   if (embedVideoId) {
     return embedVideoId;
   }
+
   if (location.pathname === YOUTUBE_PATHNAME.watch) {
     return "";
   }
+
   const elTrailer = document.querySelector(SELECTORS.channelTrailerPlayer);
   const data = elTrailer && "data" in elTrailer ? elTrailer.data : undefined;
   return data && typeof data === "object" && "videoId" in data && data.videoId ? String(data.videoId) : "";
@@ -46,6 +49,7 @@ function getRateContext(): RateContext | null {
   if (!videoId || clientNameNumber === undefined || !clientVersion) {
     return null;
   }
+
   const { hl, gl } = existingClient ?? {};
   return {
     videoId,
@@ -55,8 +59,12 @@ function getRateContext(): RateContext | null {
       client: {
         clientName: existingClient?.clientName ?? "WEB",
         clientVersion,
-        ...(hl && { hl }),
-        ...(gl && { gl })
+        ...(hl && {
+          hl
+        }),
+        ...(gl && {
+          gl
+        })
       }
     },
     delegatedSessionId: ytcfg?.get(YTCFG_KEY.delegatedSessionId) ?? "",
@@ -69,10 +77,13 @@ function getContextForRate(action: RateAction) {
   if (!context) {
     return null;
   }
+
   const isEmbed = location.pathname.startsWith(YOUTUBE_PATHNAME.embed);
   return {
     context,
-    ...(!isEmbed && { params: findRateParamInInnertube(window.ytInitialData, paramFieldForAction[action]) })
+    ...(!isEmbed && {
+      params: findRateParamInInnertube(window.ytInitialData, paramFieldForAction[action])
+    })
   };
 }
 
@@ -96,6 +107,7 @@ async function watchTrackVideoId() {
     if (isSameTrack) {
       return;
     }
+
     lastVideoId = videoId;
     ytrMessenger.sendMessage(YtrMessage.trackVideoIdChanged, videoId).catch(() => {});
   }

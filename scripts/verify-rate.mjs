@@ -12,8 +12,17 @@ function client(url, name) {
         send: (method, params = {}) =>
           new Promise((res, rej) => {
             const id = nextId++;
-            pending.set(id, { res, rej });
-            ws.send(JSON.stringify({ id, method, params }));
+            pending.set(id, {
+              res,
+              rej
+            });
+            ws.send(
+              JSON.stringify({
+                id,
+                method,
+                params
+              })
+            );
           }),
         on: h => subs.push(h),
         name
@@ -25,13 +34,16 @@ function client(url, name) {
       if (msg.id && pending.has(msg.id)) {
         const { res, rej } = pending.get(msg.id);
         pending.delete(msg.id);
+
         if (msg.error) {
           rej(msg.error);
         } else {
           res(msg.result);
         }
+
         return;
       }
+
       for (const h of subs) {
         h(msg);
       }
@@ -39,10 +51,15 @@ function client(url, name) {
   });
 }
 async function evalIn(t, expr) {
-  const r = await t.send("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true });
+  const r = await t.send("Runtime.evaluate", {
+    expression: expr,
+    returnByValue: true,
+    awaitPromise: true
+  });
   if (r.exceptionDetails) {
     throw new Error(r.exceptionDetails.text);
   }
+
   return r.result?.value;
 }
 async function listTargets() {
@@ -54,11 +71,15 @@ function wsUrl(t) {
 const formatArgs = a =>
   (a ?? [])
     .map(x => {
-      if (x.value !== undefined) return JSON.stringify(x.value);
+      if (x.value !== undefined) {
+        return JSON.stringify(x.value);
+      }
+
       if (x.preview?.properties) {
         const props = x.preview.properties.map(p => `${p.name}:${p.value ?? p.type}`).join(",");
         return `{${props}}`;
       }
+
       return x.description ?? "";
     })
     .join(" ");
@@ -67,6 +88,7 @@ const attachLog = (c, label) =>
     if (m.method === "Runtime.consoleAPICalled") {
       console.log(`[${label}:${m.params.type}] ${formatArgs(m.params.args)}`);
     }
+
     if (m.method === "Runtime.exceptionThrown") {
       console.log(`[${label}:EXCEPTION] ${m.params.exceptionDetails.text}`);
     }
@@ -81,7 +103,10 @@ const browserClient = await client(
 await browserClient.send("Target.setDiscoverTargets", { discover: true });
 const attachedSet = new Set();
 async function tryAttach(target, label) {
-  if (attachedSet.has(target.id)) return;
+  if (attachedSet.has(target.id)) {
+    return;
+  }
+
   attachedSet.add(target.id);
   console.log(`[${label}] attaching`, target.id, target.url);
   try {
@@ -95,7 +120,10 @@ async function tryAttach(target, label) {
 async function discoverAndAttach() {
   const ts = await listTargets();
   for (const t of ts) {
-    if (attachedSet.has(t.id)) continue;
+    if (attachedSet.has(t.id)) {
+      continue;
+    }
+
     if (t.type === "service_worker" && t.url?.includes("/background.js") && !t.url.includes("eimadpb")) {
       await tryAttach(t, "sw");
     } else if (t.url?.includes("/offscreen.html")) {
@@ -130,6 +158,7 @@ if (!host) {
   await new Promise(r => setTimeout(r, 500));
   host = (await listTargets()).find(t => t.id === created.targetId);
 }
+
 console.log("Reusing tab:", host.id, host.url);
 const watch = await client(wsUrl(host), "watch");
 await watch.send("Runtime.enable");
@@ -168,6 +197,7 @@ if (!embedT) {
   console.log("No embed iframe");
   process.exit(1);
 }
+
 const embed = await client(wsUrl(embedT), "embed");
 await embed.send("Runtime.enable");
 attachLog(embed, "embed");

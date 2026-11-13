@@ -41,10 +41,12 @@ function getTrackVideoId() {
   if (playerVideoId) {
     return playerVideoId;
   }
+
   const elTrackLink = document.querySelector(SELECTORS.trackLinkMusic);
   if (!(elTrackLink instanceof HTMLAnchorElement)) {
     return "";
   }
+
   return new URLSearchParams(elTrackLink.search).get(URL_PARAM.videoId) ?? "";
 }
 
@@ -76,11 +78,14 @@ function watchForInitialRating() {
     if (isUserInteracted) {
       sharedState.isUserInteracted = true;
     }
+
     const isRated = Boolean(getRatedButton());
     sharedState.isCurrentlyRated = isRated;
+
     if (!sharedState.isUserInteracted) {
       sharedState.isRatedInitially = isRated;
     }
+
     sharedState.isRatingResolved = true;
   }
 
@@ -97,6 +102,7 @@ function watchForInitialRating() {
     if (!isRelevant || !isButtonPresent) {
       return;
     }
+
     applyState();
   });
 
@@ -118,13 +124,17 @@ function watchForInitialRating() {
         applyState();
       }
     },
-    { capture: true, signal: trackSettleController.signal }
+    {
+      capture: true,
+      signal: trackSettleController.signal
+    }
   );
 
   const isButtonPresentInitially = Boolean(document.querySelector(anyButtonSelector));
   if (isInitialRatingCheckPending && isButtonPresentInitially) {
     applyState();
   }
+
   isInitialRatingCheckPending = false;
 }
 
@@ -167,10 +177,12 @@ export default defineContentScript({
       if (isMountSkipped) {
         return;
       }
+
       const elContainer = document.querySelector<HTMLElement>(SELECTORS.toggleButtonsMusicVideo);
       if (!elContainer) {
         return;
       }
+
       const isTimeInfoBeforeButtons = Boolean(
         elContainer.parentElement?.previousElementSibling?.matches(SELECTORS.timeInfoMusic)
       );
@@ -213,11 +225,13 @@ export default defineContentScript({
       if (isAdPlaying) {
         return;
       }
+
       const trackVideoId = getTrackVideoId();
       const isSameTrack = !trackVideoId || trackVideoId === lastTrackVideoId;
       if (isSameTrack) {
         return;
       }
+
       lastTrackVideoId = trackVideoId;
       resetForNewTrack();
     }
@@ -234,6 +248,7 @@ export default defineContentScript({
         unmountUi();
         return;
       }
+
       if (sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed()) {
         sharedState.hasMountedForCurrentNav = true;
         void mountUi();
@@ -277,7 +292,6 @@ export default defineContentScript({
 
         const { currentTime } = elTarget;
         const duration = getTrackDuration();
-
         if (getIsAdPlaying()) {
           sharedState.lastTimeUpdate = currentTime;
           return;
@@ -302,6 +316,7 @@ export default defineContentScript({
             await rateVideo(true);
           }
         }
+
         sharedState.lastTimeUpdate = currentTime;
       },
       { capture: true }
@@ -313,10 +328,12 @@ export default defineContentScript({
       if (!isTargetElement) {
         return;
       }
+
       const isInsideRateButtons = Boolean(elTarget.closest(SELECTORS.toggleButtonsMusicVideo));
       if (!isInsideRateButtons) {
         return;
       }
+
       sharedState.isUserInteracted = true;
       window.ytrUserInteracted = true;
     }

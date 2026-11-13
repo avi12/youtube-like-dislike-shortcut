@@ -17,8 +17,8 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { homedir, platform } from "node:os";
-import { resolve, join } from "node:path";
+import { platform } from "node:os";
+import { join, resolve } from "node:path";
 
 import chokidar from "chokidar";
 import webExtRun from "web-ext-run";
@@ -40,6 +40,7 @@ function parseBrowserArg(): SupportedBrowser {
   if (candidate && allowed.includes(candidate as SupportedBrowser)) {
     return candidate as SupportedBrowser;
   }
+
   return "edge";
 }
 
@@ -69,6 +70,7 @@ function buildExtension() {
   if (IS_FIREFOX) {
     args.push("--mv3");
   }
+
   const result = spawnSync(WXT_BIN, args, {
     cwd: PROJECT_ROOT,
     stdio: "inherit",
@@ -80,17 +82,24 @@ function buildExtension() {
   }
 }
 
-type CdpTarget = {
+interface CdpTarget {
   type?: string;
   url: string;
   webSocketDebuggerUrl?: string;
   parentId?: string;
-};
+}
 
 async function sendCdpMessage(websocketUrl: string, method: string, params: Record<string, unknown> = {}) {
   const websocket = new WebSocket(websocketUrl);
   await new Promise<void>(resolveAck => {
-    websocket.onopen = () => websocket.send(JSON.stringify({ id: 1, method, params }));
+    websocket.onopen = () =>
+      websocket.send(
+        JSON.stringify({
+          id: 1,
+          method,
+          params
+        })
+      );
     websocket.onmessage = e => {
       const data: { id?: number } = JSON.parse(String(e.data));
       if (data.id === 1) {
@@ -163,7 +172,9 @@ async function main() {
         sourceDir: OUTPUT_DIR,
         startUrl: [START_URL],
         keepProfileChanges: useExistingProfile,
-        ...(useExistingProfile && { firefoxProfile: PROFILE_DIR }),
+        ...(useExistingProfile && {
+          firefoxProfile: PROFILE_DIR
+        }),
         args: ["--marionette", "--remote-debugging-port=9230"],
         noReload: true,
         noInput: true
@@ -173,8 +184,12 @@ async function main() {
         sourceDir: OUTPUT_DIR,
         startUrl: [START_URL],
         keepProfileChanges: useExistingProfile,
-        ...(useExistingProfile && { chromiumProfile: PROFILE_DIR }),
-        ...(chromiumBinary && { chromiumBinary }),
+        ...(useExistingProfile && {
+          chromiumProfile: PROFILE_DIR
+        }),
+        ...(chromiumBinary && {
+          chromiumBinary
+        }),
         args: chromiumArgs,
         noReload: true,
         noInput: true
@@ -201,6 +216,7 @@ async function main() {
     if (isRebuilding) {
       return;
     }
+
     isRebuilding = true;
     try {
       while (pendingChange !== null) {
@@ -210,9 +226,11 @@ async function main() {
         console.log("Rebuilding...");
         try {
           buildExtension();
+
           if (!IS_FIREFOX) {
             await runner.reloadAllExtensions().catch(() => undefined);
           }
+
           await reloadYouTubeTabs(CDP_PORT);
           console.log(`Reloaded at ${new Date().toLocaleTimeString()}`);
         } catch (error) {
@@ -226,9 +244,11 @@ async function main() {
 
   function scheduleRebuild(filePath: string) {
     pendingChange = filePath;
+
     if (debounceTimer !== null) {
       clearTimeout(debounceTimer);
     }
+
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
       void drainPending();
@@ -243,6 +263,7 @@ async function main() {
     if (isExiting) {
       return;
     }
+
     isExiting = true;
     try {
       await watcher.close();

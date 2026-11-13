@@ -5,46 +5,100 @@ import { buildSapisidAuthorization } from "@/lib/ytr-sapisid";
 async function rateVideoOnPage(action: RateAction) {
   const result = await ytrMessenger.sendMessage(YtrMessage.getRateContext, action).catch(() => null);
   if (!result?.context || !result.params) {
-    return { success: false, error: "No video context" };
+    return {
+      success: false,
+      error: "No video context"
+    };
   }
+
   const { context, params } = result;
   const Authorization = await buildSapisidAuthorization();
   if (!Authorization) {
-    return { success: false, error: "No SAPISID cookie" };
+    return {
+      success: false,
+      error: "No SAPISID cookie"
+    };
   }
+
   try {
-    const isOk = await executeRateRequest({ action, context, Authorization, params });
+    const isOk = await executeRateRequest({
+      action,
+      context,
+      Authorization,
+      params
+    });
     if (!isOk) {
-      return { success: false, error: "Rate request failed" };
+      return {
+        success: false,
+        error: "Rate request failed"
+      };
     }
-    return { success: true, videoId: context.videoId };
+
+    return {
+      success: true,
+      videoId: context.videoId
+    };
   } catch {
-    return { success: false, error: "Rate request threw" };
+    return {
+      success: false,
+      error: "Rate request threw"
+    };
   }
 }
 
 async function rateInEmbed(action: RateAction) {
   const result = await ytrMessenger.sendMessage(YtrMessage.getRateContext, action).catch(() => null);
   if (!result?.context) {
-    return { success: false, error: "No embed context" };
+    return {
+      success: false,
+      error: "No embed context"
+    };
   }
+
   const { context } = result;
   const Authorization = await buildSapisidAuthorization();
   if (!Authorization) {
-    return { success: false, error: "No SAPISID cookie" };
+    return {
+      success: false,
+      error: "No SAPISID cookie"
+    };
   }
+
   try {
-    const params = await fetchRateParamsFromNext({ action, context, Authorization });
+    const params = await fetchRateParamsFromNext({
+      action,
+      context,
+      Authorization
+    });
     if (!params) {
-      return { success: false, error: "No rate params from /next" };
+      return {
+        success: false,
+        error: "No rate params from /next"
+      };
     }
-    const isOk = await executeRateRequest({ action, context, Authorization, params });
+
+    const isOk = await executeRateRequest({
+      action,
+      context,
+      Authorization,
+      params
+    });
     if (!isOk) {
-      return { success: false, error: "Rate request failed" };
+      return {
+        success: false,
+        error: "Rate request failed"
+      };
     }
-    return { success: true, videoId: context.videoId };
+
+    return {
+      success: true,
+      videoId: context.videoId
+    };
   } catch {
-    return { success: false, error: "Rate request threw" };
+    return {
+      success: false,
+      error: "Rate request threw"
+    };
   }
 }
 

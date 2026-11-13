@@ -33,10 +33,10 @@ export interface RateContext {
   sessionIndex: string;
 }
 
-type YtrProtocol = {
+interface YtrProtocol {
   [YtrMessage.getRateContext]: (action: RateAction) => RateContextResult | null;
   [YtrMessage.trackVideoIdChanged]: (videoId: string) => void;
-};
+}
 
 export const ytrMessenger = defineCustomEventMessaging<YtrProtocol>({ namespace: "ytr" });
 

@@ -82,20 +82,25 @@ async function handleUserSubscribed() {
   if (!isUserSubscribeClickPending) {
     return;
   }
+
   const isFollowing = getIsFollowing();
   if (!isFollowing) {
     isUserSubscribeClickPending = false;
     return;
   }
+
   isUserSubscribeClickPending = false;
+
   if (isNavigationHandled) {
     return;
   }
+
   const elAlreadyRated = getRatedButton();
   if (elAlreadyRated) {
     isNavigationHandled = true;
     return;
   }
+
   isNavigationHandled = true;
   await rateVideo(true);
 }
@@ -105,10 +110,12 @@ function markUserSubscribeClick(e: Event) {
   if (!(elTarget instanceof Element)) {
     return;
   }
+
   const isInsideFollowButton = Boolean(elTarget.closest(getFollowSelector()));
   if (!isInsideFollowButton) {
     return;
   }
+
   isUserSubscribeClickPending = true;
 }
 
@@ -143,6 +150,7 @@ async function addTemporaryBodyListener() {
       observer.disconnect();
       return;
     }
+
     const isLikedAfterMutation = await autoLikeIfSubscribed();
     if (isLikedAfterMutation) {
       observer.disconnect();
@@ -154,10 +162,12 @@ function addStorageListener() {
   storage.watch<boolean>(StorageKey.isAutoLikeSubscribedChannels, async isAutoLike => {
     const isAutoLikeSet = isAutoLike !== null;
     isAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
+
     if (!isAutoLikeSubscribedChannels) {
       announceSubscriptionDecision(SubscriptionDecision.released);
       return;
     }
+
     await autoLikeIfSubscribed();
   });
 }

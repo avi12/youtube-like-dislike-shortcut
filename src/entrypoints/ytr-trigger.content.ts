@@ -36,7 +36,6 @@ async function init() {
     async e => {
       const { activeElement } = document;
       const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
-
       if (isFocusedOnInput) {
         return;
       }

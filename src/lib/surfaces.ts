@@ -4,7 +4,10 @@ import { getCurrentSurface, initial, StorageKey, type Surface } from "@/lib/util
 export type EnabledSurfaces = Record<Surface, boolean>;
 
 export function resolveEnabledSurfaces(stored: Partial<EnabledSurfaces> | null) {
-  return { ...initial.enabledSurfaces, ...stored };
+  return {
+    ...initial.enabledSurfaces,
+    ...stored
+  };
 }
 
 export async function getEnabledSurfaces() {

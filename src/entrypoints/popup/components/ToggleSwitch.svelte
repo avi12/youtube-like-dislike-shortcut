@@ -13,7 +13,7 @@
 </script>
 
 <label class="toggle-switch">
-  <input bind:checked {disabled} {onchange} role="switch" type="checkbox" />
+  <input {disabled} {onchange} role="switch" type="checkbox" bind:checked />
   {@render children?.()}
 </label>
 

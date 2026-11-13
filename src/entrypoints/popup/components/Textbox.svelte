@@ -22,7 +22,6 @@
   <section class="text-wrapper">
     <input
       aria-label="Auto-like threshold in percent"
-      bind:value
       disabled={disabled || !isAutoLike}
       onkeydown={e => {
         const number = value;
@@ -34,7 +33,8 @@
           e.preventDefault();
         }
       }}
-      type="number" />
+      type="number"
+      bind:value />
   </section>
 </div>
 

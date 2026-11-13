@@ -34,11 +34,11 @@
   <div class="content">
     <div class="auto-like-container">
       <ToggleSwitch disabled={keys.isRecording} bind:checked={isAutoLike}>After watched</ToggleSwitch>
-      <Textbox {isAutoLike} disabled={keys.isRecording} bind:value={autoLikeThreshold} />
+      <Textbox disabled={keys.isRecording} {isAutoLike} bind:value={autoLikeThreshold} />
     </div>
     <ToggleSwitch disabled={keys.isRecording} bind:checked={isAutoLikeSubscribedChannels}>Auto-like in subscribed channels</ToggleSwitch>
   </div>
-  <Surfaces {enabledSurfaces} disabled={!isAutoLike && !isAutoLikeSubscribedChannels} />
+  <Surfaces disabled={!isAutoLike && !isAutoLikeSubscribedChannels} {enabledSurfaces} />
 </section>
 
 <style>

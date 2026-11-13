@@ -42,13 +42,16 @@ function stubCssWhileImportingEntrypoints(): Plugin {
     enforce: "pre",
     applyToEnvironment: environment => environment.name === ENTRYPOINT_IMPORTER_ENVIRONMENT,
     resolveId: {
-      filter: { id: /\.css(?:\?|$)/ },
+      filter: {
+        id: /\.css(?:\?|$)/
+      },
       handler: () => STUBBED_CSS_ID
     },
     load(moduleId) {
       if (moduleId !== STUBBED_CSS_ID) {
         return;
       }
+
       return 'export default "";';
     }
   };
@@ -76,7 +79,9 @@ export default defineConfig({
       }
     },
     author: browser === "opera" || browser === "firefox" ? packageJson.author : { email },
-    ...(browser !== "firefox" && { offline_enabled: true }),
+    ...(browser !== "firefox" && {
+      offline_enabled: true
+    }),
     ...(browser === "firefox" && {
       browser_specific_settings: {
         gecko: {

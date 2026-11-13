@@ -18,7 +18,10 @@ function getShortsRateButtons() {
   const elKnownLike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.likeButton) ?? undefined;
   const elKnownDislike = elActionBar.querySelector<HTMLButtonElement>(SELECTORS.dislikeButton) ?? undefined;
   if (elKnownLike || elKnownDislike) {
-    return { elLike: elKnownLike, elDislike: elKnownDislike };
+    return {
+      elLike: elKnownLike,
+      elDislike: elKnownDislike
+    };
   }
 
   const elToggleButtons = elActionBar.querySelectorAll<HTMLButtonElement>(`button[${DOM_ATTRIBUTE.ariaPressed}]`);
@@ -26,6 +29,7 @@ function getShortsRateButtons() {
   if (!isLikeDislikePair) {
     return {};
   }
+
   return {
     elLike: elToggleButtons.item(0),
     elDislike: elToggleButtons.item(1)
@@ -36,11 +40,13 @@ export function getRateButtons() {
   if (getCurrentSurface() === Surface.shorts) {
     return getShortsRateButtons();
   }
+
   const containerSelector = `${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsMusicVideo}`;
   const elButtonsRate = document.querySelector<HTMLElement>(containerSelector);
   if (elButtonsRate === null) {
     return {};
   }
+
   return {
     elLike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.likeButton) ?? undefined,
     elDislike: elButtonsRate.querySelector<HTMLButtonElement>(SELECTORS.dislikeButton) ?? undefined
@@ -52,6 +58,7 @@ function showIndicator(isRated: boolean) {
   if (isShortsOrMusic) {
     return;
   }
+
   showRateBezel(gLastRating, isRated);
 }
 
@@ -60,9 +67,11 @@ export function getRatedButton() {
   if (elLike && getIsActive(elLike)) {
     return elLike;
   }
+
   if (elDislike && getIsActive(elDislike)) {
     return elDislike;
   }
+
   return null;
 }
 
@@ -80,9 +89,11 @@ function getRateActionForFlag(isLike: boolean | null) {
   if (isLike === true) {
     return RateAction.like;
   }
+
   if (isLike === false) {
     return RateAction.dislike;
   }
+
   return RateAction.removelike;
 }
 
@@ -92,10 +103,12 @@ async function rateVideoViaApi(isLike: boolean | null) {
   if (!success) {
     return;
   }
+
   const isRatingSet = isLike !== null;
   if (isRatingSet) {
     gLastRating = isLike ? Rating.Like : Rating.Dislike;
   }
+
   showIndicator(isRatingSet);
 }
 
@@ -112,13 +125,16 @@ export async function rateVideo(isLike: boolean | null) {
       await rateVideoViaApi(true);
       return;
     }
+
     window.ytrUserInteracted = true;
     gLastRating = Rating.Like;
     showIndicator(true);
+
     if (!getIsActive(elLike)) {
       elLike.click();
       elLike.blur();
     }
+
     return;
   }
 
@@ -128,13 +144,16 @@ export async function rateVideo(isLike: boolean | null) {
       await rateVideoViaApi(false);
       return;
     }
+
     window.ytrUserInteracted = true;
     gLastRating = Rating.Dislike;
     showIndicator(true);
+
     if (!getIsActive(elDislike)) {
       elDislike.click();
       elDislike.blur();
     }
+
     return;
   }
 

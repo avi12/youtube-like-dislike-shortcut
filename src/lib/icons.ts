@@ -42,12 +42,15 @@ export function createIconElement({ viewBox, pathData, fill, stroke }: IconDefin
   elSvg.setAttribute("focusable", "false");
   const elPath = document.createElementNS(SVG_NAMESPACE, "path");
   elPath.setAttribute("d", pathData);
+
   if (fill) {
     elPath.setAttribute("fill", fill);
   }
+
   if (stroke) {
     elPath.setAttribute("stroke", stroke);
   }
+
   elSvg.append(elPath);
   return elSvg;
 }

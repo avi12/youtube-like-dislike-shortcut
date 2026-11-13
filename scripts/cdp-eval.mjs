@@ -14,8 +14,17 @@ function client(url) {
         send: (method, params = {}) =>
           new Promise((res, rej) => {
             const id = nextId++;
-            pending.set(id, { res, rej });
-            ws.send(JSON.stringify({ id, method, params }));
+            pending.set(id, {
+              res,
+              rej
+            });
+            ws.send(
+              JSON.stringify({
+                id,
+                method,
+                params
+              })
+            );
           }),
         events
       })
@@ -27,15 +36,19 @@ function client(url) {
         events.push(message);
         return;
       }
+
       if (!pending.has(message.id)) {
         return;
       }
+
       const { res, rej } = pending.get(message.id);
       pending.delete(message.id);
+
       if (message.error) {
         rej(new Error(JSON.stringify(message.error)));
         return;
       }
+
       res(message.result);
     });
   });
@@ -68,7 +81,11 @@ for (const context of isolatedContexts) {
       awaitPromise: true,
       contextId: context.id
     })
-    .catch(error => ({ exceptionDetails: { text: error.message } }));
+    .catch(error => ({
+      exceptionDetails: {
+        text: error.message
+      }
+    }));
   console.log(`Result[${context.id}]:`, JSON.stringify(result.result?.value ?? result.exceptionDetails?.text));
 }
 process.exit(0);

@@ -36,6 +36,7 @@ export function onSubscriptionDecision(callback: (decision: SubscriptionDecision
     if (!(e instanceof CustomEvent)) {
       return;
     }
+
     const { detail } = e;
     const decision = isSubscriptionDecision(detail) ? detail : undefined;
     callback(decision);

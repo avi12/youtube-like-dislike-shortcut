@@ -11,17 +11,17 @@ export const enum Rating {
   Dislike = "dislike"
 }
 
-type ButtonTrigger = {
+interface ButtonTrigger {
   primary: string[];
   modifiers: Modifier[];
   secondary: boolean;
-};
+}
 
-export type ButtonTriggers = {
+export interface ButtonTriggers {
   like: ButtonTrigger;
   dislike: ButtonTrigger;
   unrate: ButtonTrigger;
-};
+}
 
 /**
  * Keys recognised by YouTube's `ytcfg.get(...)` configuration store on the embed
@@ -101,7 +101,9 @@ export interface ToggleButtonViewModelContainer {
 
 interface SegmentedLikeDislikeButton {
   likeButtonViewModel?: { likeButtonViewModel?: ToggleButtonViewModelContainer };
-  dislikeButtonViewModel?: { dislikeButtonViewModel?: ToggleButtonViewModelContainer };
+  dislikeButtonViewModel?: {
+    dislikeButtonViewModel?: ToggleButtonViewModelContainer;
+  };
 }
 
 interface QuickActionButton {

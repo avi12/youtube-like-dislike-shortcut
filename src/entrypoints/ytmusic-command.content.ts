@@ -11,6 +11,7 @@ function sendFocusState() {
   if (!activePort) {
     return;
   }
+
   const message: MusicFocusMessage = { isFocused: document.hasFocus() };
   activePort.postMessage(message);
 }

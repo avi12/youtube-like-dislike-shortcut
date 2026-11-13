@@ -14,7 +14,7 @@
 </script>
 
 <div class="checkbox-container" transition:fade={{ duration: 200 }}>
-  <input bind:checked class="visually-hidden" {disabled} id="checkbox-{id}" type="checkbox" />
+  <input id="checkbox-{id}" class="visually-hidden" {disabled} type="checkbox" bind:checked />
   <label for="checkbox-{id}">
     <span class="checkbox-custom"></span>
     {@render children?.()}
@@ -51,7 +51,7 @@
         height: 5px;
         border-bottom: 2px solid var(--md-on-primary);
         border-left: 2px solid var(--md-on-primary);
-        opacity: 0%;
+        opacity: 0;
         transition:
           opacity var(--md-spring-effects),
           scale var(--md-spring-spatial);
@@ -66,7 +66,7 @@
       box-shadow: none;
 
       &::after {
-        opacity: 100%;
+        opacity: 1;
         scale: 1;
       }
     }

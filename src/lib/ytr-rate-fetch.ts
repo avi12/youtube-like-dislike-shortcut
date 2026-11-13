@@ -42,8 +42,12 @@ function buildHeaders({ Authorization, context }: { Authorization: string; conte
     "X-YouTube-Client-Name": String(clientNameNumber),
     "X-YouTube-Client-Version": clientVersion,
     "X-Origin": "https://www.youtube.com",
-    ...(sessionIndex && { "X-Goog-AuthUser": sessionIndex }),
-    ...(delegatedSessionId && { "X-Goog-PageId": delegatedSessionId })
+    ...(sessionIndex && {
+      "X-Goog-AuthUser": sessionIndex
+    }),
+    ...(delegatedSessionId && {
+      "X-Goog-PageId": delegatedSessionId
+    })
   };
 }
 
@@ -55,6 +59,7 @@ function pickParamFromButtonContainer(container: ButtonViewModelContainer | unde
     if (direct) {
       return direct;
     }
+
     const nested =
       innertubeCommand?.modalEndpoint?.modal?.modalWithTitleAndButtonRenderer?.button?.buttonRenderer
         ?.navigationEndpoint?.signInEndpoint?.nextEndpoint?.likeEndpoint?.[field];
@@ -73,13 +78,11 @@ function pickParamFromToggle(container: ToggleButtonViewModelContainer | undefin
   );
 }
 
-export function findRateParamInInnertube(
-  root: YtInitialData | InnertubeNextResponse | undefined,
-  field: RateParamField
-) {
+export function findRateParamInInnertube(root: YtInitialData | undefined, field: RateParamField) {
   if (!root) {
     return undefined;
   }
+
   const { contents: rootContents, playerOverlays } = root;
   const { contents = [] } = rootContents?.twoColumnWatchNextResults?.results?.results ?? {};
   for (const content of contents) {
@@ -90,6 +93,7 @@ export function findRateParamInInnertube(
       if (fromLike) {
         return fromLike;
       }
+
       const fromDislike = pickParamFromToggle(dislikeButtonViewModel?.dislikeButtonViewModel, field);
       if (fromDislike) {
         return fromDislike;
@@ -104,6 +108,7 @@ export function findRateParamInInnertube(
     if (fromLike) {
       return fromLike;
     }
+
     const fromDislike = pickParamFromToggle(dislikeButtonViewModel, field);
     if (fromDislike) {
       return fromDislike;
@@ -124,7 +129,10 @@ export async function fetchRateParamsFromNext({
   const { innertubeContext, videoId } = context;
   const response = await fetch(`${NEXT_API_URL}?prettyPrint=false`, {
     method: "POST",
-    headers: buildHeaders({ Authorization, context }),
+    headers: buildHeaders({
+      Authorization,
+      context
+    }),
     body: JSON.stringify({
       context: innertubeContext,
       videoId
@@ -134,9 +142,13 @@ export async function fetchRateParamsFromNext({
     console.debug("[ytr-fetch] /next failed", response.status);
     return undefined;
   }
+
   const parsed: InnertubeNextResponse | null = await response.json().catch(() => null);
   const param = findRateParamInInnertube(parsed ?? undefined, RATE_PARAM_FIELD[action]);
-  console.debug("[ytr-fetch] /next", { action, hasParam: Boolean(param) });
+  console.debug("[ytr-fetch] /next", {
+    action,
+    hasParam: Boolean(param)
+  });
   return param;
 }
 
@@ -154,11 +166,18 @@ export async function executeRateRequest({
   const { innertubeContext, videoId } = context;
   const response = await fetch(`${LIKE_API_URLS[action]}?prettyPrint=false`, {
     method: "POST",
-    headers: buildHeaders({ Authorization, context }),
+    headers: buildHeaders({
+      Authorization,
+      context
+    }),
     body: JSON.stringify({
       context: innertubeContext,
-      target: { videoId },
-      ...(params && { params })
+      target: {
+        videoId
+      },
+      ...(params && {
+        params
+      })
     } satisfies RateRequestBody)
   });
   return response.ok;

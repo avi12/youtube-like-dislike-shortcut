@@ -18,8 +18,17 @@ function client(url) {
         send: (method, params = {}) =>
           new Promise((res, rej) => {
             const id = nextId++;
-            pending.set(id, { res, rej });
-            ws.send(JSON.stringify({ id, method, params }));
+            pending.set(id, {
+              res,
+              rej
+            });
+            ws.send(
+              JSON.stringify({
+                id,
+                method,
+                params
+              })
+            );
           }),
         events
       })
@@ -31,15 +40,19 @@ function client(url) {
         events.push(message);
         return;
       }
+
       if (!pending.has(message.id)) {
         return;
       }
+
       const { res, rej } = pending.get(message.id);
       pending.delete(message.id);
+
       if (message.error) {
         rej(new Error(JSON.stringify(message.error)));
         return;
       }
+
       res(message.result);
     });
   });
@@ -54,11 +67,14 @@ async function evalIn(target, expression, contextId) {
     expression,
     returnByValue: true,
     awaitPromise: true,
-    ...(contextId && { contextId })
+    ...(contextId && {
+      contextId
+    })
   });
   if (result.exceptionDetails) {
     throw new Error(result.exceptionDetails.text);
   }
+
   return result.result?.value;
 }
 
@@ -68,7 +84,10 @@ const serviceWorkerTarget = targets.find(
 );
 const watchTarget = targets.find(target => target.type === "page" && target.url?.includes("youtube.com/watch"));
 if (!serviceWorkerTarget || !watchTarget) {
-  console.log("Missing target", { serviceWorker: Boolean(serviceWorkerTarget), watch: Boolean(watchTarget) });
+  console.log("Missing target", {
+    serviceWorker: Boolean(serviceWorkerTarget),
+    watch: Boolean(watchTarget)
+  });
   process.exit(1);
 }
 
@@ -123,6 +142,7 @@ if (!isolatedContext) {
   console.log("Could not find the content script world");
   process.exit(1);
 }
+
 const isolatedContextId = isolatedContext.params.context.id;
 
 const readContentScriptState = `({
@@ -167,6 +187,7 @@ for (let i = 0; i < 60; i++) {
   }
 }
 console.log("Counting before un-rate:", beforeUnrate);
+
 if (!beforeUnrate) {
   console.log("FAIL - the percentage counter never started:", await evalIn(watch, readPageState));
   process.exit(1);

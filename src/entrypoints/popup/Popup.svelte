@@ -15,4 +15,4 @@
 </script>
 
 <Header {selectedTheme} />
-<Card {enabledSurfaces} {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
+<Card {autoLikeThreshold} {enabledSurfaces} {isAutoLike} {isAutoLikeSubscribedChannels} />

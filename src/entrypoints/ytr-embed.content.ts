@@ -23,6 +23,7 @@ async function rateIfNeeded(e: KeyboardEvent) {
   if (!shortcutType) {
     return;
   }
+
   e.stopPropagation();
   e.preventDefault();
   const action = rateActionMap[shortcutType];
@@ -30,10 +31,12 @@ async function rateIfNeeded(e: KeyboardEvent) {
   if (!result?.success) {
     return;
   }
+
   const rating = ratingForAction[action];
   if (rating) {
     gLastRating = rating;
   }
+
   showRateBezel(gLastRating, rating !== null);
 }
 
@@ -52,6 +55,7 @@ async function init() {
       if (isFocusedOnInput) {
         return;
       }
+
       void rateIfNeeded(e);
     },
     { capture: true }

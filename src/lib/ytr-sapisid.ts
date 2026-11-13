@@ -25,6 +25,7 @@ export async function buildSapisidAuthorization() {
   if (!sapisid) {
     return "";
   }
+
   const timestampSeconds = Math.floor(Date.now() / MILLISECONDS_PER_SECOND);
   const text = `${timestampSeconds} ${sapisid} https://www.youtube.com`;
   const buffer = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(text));

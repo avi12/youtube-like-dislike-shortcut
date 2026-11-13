@@ -97,12 +97,16 @@ function watchForInitialRating() {
     if (window.ytrUserInteracted) {
       sharedState.isUserInteracted = true;
     }
+
     const isRated = Boolean(getRatedButton());
     sharedState.isCurrentlyRated = isRated;
+
     if (!sharedState.isUserInteracted) {
       sharedState.isRatedInitially = isRated;
     }
+
     sharedState.isRatingResolved = true;
+
     if (isRated || sharedState.isUserInteracted) {
       void clearWatchedPercentage();
     }
@@ -121,6 +125,7 @@ function watchForInitialRating() {
     if (!isRelevant || !isButtonPresent) {
       return;
     }
+
     applyState();
   });
 
@@ -141,6 +146,7 @@ function watchForInitialRating() {
   if (isInitialRatingCheckPending && isButtonPresentInitially) {
     applyState();
   }
+
   isInitialRatingCheckPending = false;
 }
 
@@ -185,10 +191,12 @@ export default defineContentScript({
       if (isSkipped) {
         return;
       }
+
       const elAnchor = document.querySelector(manager.selector);
       if (!elAnchor) {
         return;
       }
+
       manager.isMounting = true;
       manager.shadowUi = await createShadowRootUi(ctx, {
         name: manager.name,
@@ -227,6 +235,7 @@ export default defineContentScript({
       if (location.href === sharedState.lastHref) {
         return;
       }
+
       sharedState.lastHref = location.href;
       sharedState.hasMountedForCurrentNav = false;
       sharedState.isShorts = getCurrentSurface() === Surface.shorts;
@@ -242,6 +251,7 @@ export default defineContentScript({
         unmountUi();
         return;
       }
+
       if (sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed()) {
         sharedState.hasMountedForCurrentNav = true;
         void mountUi();
@@ -283,6 +293,7 @@ export default defineContentScript({
           sharedState.percentageWatched = 0;
           sharedState.isAdInitiallyPlaying = false;
         }
+
         const isImmediatePostNavigationAd = !isAdInitiallyPlaying && isAdPlaying && sharedState.percentageWatched === 0;
         if (isImmediatePostNavigationAd) {
           sharedState.isAdInitiallyPlaying = true;
@@ -294,11 +305,13 @@ export default defineContentScript({
         if (!isTargetVideo) {
           return;
         }
+
         const { duration, currentTime } = elTarget;
         if (isAdPlaying) {
           sharedState.lastTimeUpdate = currentTime;
           return;
         }
+
         if (sharedState.isLiveOrPremiere) {
           sharedState.lastTimeUpdate = currentTime;
           return;
@@ -308,6 +321,7 @@ export default defineContentScript({
         if (!isLastTimeUpdateSet) {
           sharedState.lastTimeUpdate = currentTime;
         }
+
         const previousTimeUpdate = sharedState.lastTimeUpdate;
         const watchedSeconds = getWatchedSeconds(previousTimeUpdate, currentTime, elTarget.playbackRate);
         const isDurationUsable = Boolean(duration) && duration !== Infinity;
@@ -327,6 +341,7 @@ export default defineContentScript({
             await clearWatchedPercentage();
           }
         }
+
         sharedState.lastTimeUpdate = currentTime;
       },
       { capture: true }
@@ -338,12 +353,14 @@ export default defineContentScript({
       if (!isTargetElement) {
         return;
       }
+
       const isInsideRateButtons = Boolean(
         elTarget.closest(`${SELECTORS.toggleButtonsNormalVideo}, ${SELECTORS.toggleButtonsShortsVideo}`)
       );
       if (!isInsideRateButtons) {
         return;
       }
+
       sharedState.isUserInteracted = true;
       window.ytrUserInteracted = true;
       void clearWatchedPercentage();

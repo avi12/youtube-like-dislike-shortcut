@@ -17,8 +17,17 @@ function client(url) {
         send: (method, params = {}) =>
           new Promise((res, rej) => {
             const id = nextId++;
-            pending.set(id, { res, rej });
-            ws.send(JSON.stringify({ id, method, params }));
+            pending.set(id, {
+              res,
+              rej
+            });
+            ws.send(
+              JSON.stringify({
+                id,
+                method,
+                params
+              })
+            );
           })
       })
     );
@@ -28,12 +37,15 @@ function client(url) {
       if (!message.id || !pending.has(message.id)) {
         return;
       }
+
       const { res, rej } = pending.get(message.id);
       pending.delete(message.id);
+
       if (message.error) {
         rej(new Error(JSON.stringify(message.error)));
         return;
       }
+
       res(message.result);
     });
   });
@@ -104,7 +116,12 @@ if (!musicTarget) {
 
 const page = await client(wsUrl(musicTarget));
 await page.send("Runtime.enable");
-const evaluate = expression => page.send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
+const evaluate = expression =>
+  page.send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true
+  });
 const installed = await evaluate(INSTALL);
 console.log("Install:", installed.result?.value ?? installed.exceptionDetails?.text);
 
