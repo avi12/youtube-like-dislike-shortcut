@@ -14,13 +14,13 @@ function mergeWithFallback({ fallback, stored }: { fallback: StoredObject; store
   const result: StoredObject = { ...fallback };
   for (const [key, storedEntry] of Object.entries(stored)) {
     const fallbackEntry = fallback[key];
-    result[key] =
-      isPlainObject(fallbackEntry) && isPlainObject(storedEntry)
-        ? mergeWithFallback({
-            fallback: fallbackEntry,
-            stored: storedEntry
-          })
-        : storedEntry;
+    const isMergeable = isPlainObject(fallbackEntry) && isPlainObject(storedEntry);
+    result[key] = isMergeable
+      ? mergeWithFallback({
+          fallback: fallbackEntry,
+          stored: storedEntry
+        })
+      : storedEntry;
   }
   return result;
 }

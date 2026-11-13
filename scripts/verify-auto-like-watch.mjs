@@ -53,7 +53,8 @@ function clickVisible(selector) {
 async function waitForButtons() {
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const { like, dislike } = await readRating();
-    if (like.length > 0 && dislike.length > 0 && like[0] !== null) {
+    const hasRatings = like.length > 0 && dislike.length > 0 && like[0] !== null;
+    if (hasRatings) {
       return;
     }
 
@@ -99,6 +100,21 @@ async function setInitialRating(id) {
     }
 
     await sleep(TWO_AND_A_HALF_SECONDS_MS);
+  }
+}
+
+async function clickAt(point) {
+  for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
+    await browser.send(
+      "Input.dispatchMouseEvent",
+      {
+        type,
+        ...point,
+        button: "left",
+        clickCount: 1
+      },
+      browser.sessionId
+    );
   }
 }
 
@@ -174,18 +190,7 @@ try {
         return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
       })()`
       );
-      for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
-        await browser.send(
-          "Input.dispatchMouseEvent",
-          {
-            type,
-            ...point,
-            button: "left",
-            clickCount: 1
-          },
-          browser.sessionId
-        );
-      }
+      await clickAt(point);
       console.log("USER CLICKED DISLIKE");
     }
 

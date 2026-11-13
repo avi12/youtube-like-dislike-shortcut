@@ -25,8 +25,7 @@ function getIsFollowing() {
 
 function getFollowSelector() {
   const { hostname } = location;
-  const { BUTTON_FOLLOW_MUSIC, BUTTON_SUBSCRIBE } = SELECTORS;
-  return hostname === YoutubeHost.MUSIC ? BUTTON_FOLLOW_MUSIC : BUTTON_SUBSCRIBE;
+  return hostname === YoutubeHost.MUSIC ? SELECTORS.BUTTON_FOLLOW_MUSIC : SELECTORS.BUTTON_SUBSCRIBE;
 }
 
 let lastUrl: string | undefined;

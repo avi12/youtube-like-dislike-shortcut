@@ -254,7 +254,8 @@ export default defineContentScript({
         return;
       }
 
-      if (sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed()) {
+      const isMountAllowed = sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed();
+      if (isMountAllowed) {
         sharedState.hasMountedForCurrentNav = true;
         void mountUi();
       }
@@ -331,7 +332,8 @@ export default defineContentScript({
           playbackRate: elTarget.playbackRate
         });
         const isDurationUsable = Boolean(duration) && duration !== Infinity;
-        if (watchedSeconds > 0 && isDurationUsable) {
+        const hasProgress = watchedSeconds > 0 && isDurationUsable;
+        if (hasProgress) {
           sharedState.percentageWatched += (watchedSeconds / duration) * PERCENT;
           void saveWatchedPercentage(sharedState.percentageWatched);
           const isAutoLikeTriggered =

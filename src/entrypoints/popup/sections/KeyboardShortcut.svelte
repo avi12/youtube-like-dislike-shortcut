@@ -34,7 +34,7 @@
   const currentModifiers = $derived(keys.combos[type].filter(isModifier));
   const currentNonModifiers = $derived(keys.combos[type].filter(key => !isModifier(key)));
   const displayedKeyComboList = $derived(
-    (keys.isRecording && keys.currentlyRecording === type
+    (active
       ? keyComboTemp
       : [
         ...currentModifiers.map(key => key.replace(IS_MAC ? "Ctrl" : "Cmd", IS_MAC ? "Cmd" : "Ctrl")),

@@ -251,7 +251,8 @@ export default defineContentScript({
         return;
       }
 
-      if (sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed()) {
+      const isMountAllowed = sharedState.hasMountedForCurrentNav || getIsFreshMountAllowed();
+      if (isMountAllowed) {
         sharedState.hasMountedForCurrentNav = true;
         void mountUi();
       }
@@ -309,7 +310,8 @@ export default defineContentScript({
           currentTime,
           playbackRate: elTarget.playbackRate
         });
-        if (watchedSeconds > 0 && Boolean(duration)) {
+        const hasProgress = watchedSeconds > 0 && Boolean(duration);
+        if (hasProgress) {
           sharedState.percentageWatched += (watchedSeconds / duration) * PERCENT;
           const isAutoLikeTriggered =
             window.ytrAutoLikeEnabled &&

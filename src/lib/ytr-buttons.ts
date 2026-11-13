@@ -67,11 +67,13 @@ function showIndicator(isRated: boolean) {
 
 export function getRatedButton() {
   const { elLike, elDislike } = getRateButtons();
-  if (elLike && getIsActive(elLike)) {
+  const isLikeActive = elLike && getIsActive(elLike);
+  if (isLikeActive) {
     return elLike;
   }
 
-  if (elDislike && getIsActive(elDislike)) {
+  const isDislikeActive = elDislike && getIsActive(elDislike);
+  if (isDislikeActive) {
     return elDislike;
   }
 

@@ -15,7 +15,12 @@ function parseGitignoreAsExcludes() {
 }
 
 const url = packageJson.repository;
-const [, author, email] = packageJson.author.match(/(.+) <(.+)>/)!;
+const authorMatch = packageJson.author.match(/(.+) <(.+)>/);
+if (!authorMatch) {
+  throw new Error("package.json author must read 'Name <email>'");
+}
+
+const [, author, email] = authorMatch;
 
 const sharedPermissions: Browser.runtime.ManifestPermission[] = ["storage"];
 
@@ -36,7 +41,7 @@ const STUBBED_CSS_ID = "\0stubbed-css";
 
 // WXT imports every entrypoint in a bare "inline" Vite environment to read its options, and Vite's CSS
 // plugin crashes there on any stylesheet the entrypoint pulls in. Its options never depend on styles
-function stubCssWhileImportingEntrypoints(): Plugin {
+function stubCssWhileImportingEntrypoints() {
   return {
     name: "stub-css-while-importing-entrypoints",
     enforce: "pre",
@@ -54,7 +59,7 @@ function stubCssWhileImportingEntrypoints(): Plugin {
 
       return 'export default "";';
     }
-  };
+  } satisfies Plugin;
 }
 
 // See https://wxt.dev/api/config.html

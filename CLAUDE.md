@@ -21,7 +21,8 @@ If there is a single use function in Svelte, inline it.
 Minimize indentations.  
 Don't automatically store stuff in the storage, instead, First, rely on fallback value and only rely on storage if the user has explicitly set it.  
 don't use em dash, use regular hyphen.  
-After each modification, lint the project with ESLint and Stylelint and svelte-check and fallow.
+After each modification, run `pnpm lint` (`avi12-lint`: oxfmt, stylelint, ESLint for Svelte templates, oxlint, tsrs; the shared setup is `avi12/lint-config` v0.4.7, so fix the code, never the rules), `pnpm svelte:check` and `pnpm exec fallow audit --base HEAD`. `pnpm lint:fix` applies the fixers.
+Exemptions live in config with a reason, never as a disable comment: a `house/positional-parameters` override for `scripts/headless-chrome.mjs` (its `send(method, params, sessionId)` mirrors the DevTools Protocol session API) and for `src/entrypoints/auto-like-in-subscription.content.ts` (a `MutationObserver` callback takes `(records, observer)`), and a stylelint override for `CsuiAutoLikePercent.svelte` (its `:host` rules need `!important` to beat the page's own CSS on the host element, and `:host(ytr-percentage-music[...])` names the host's tag).
 Let TypeScript infer return types instead of annotating them explicitly.
 Extract @attach arrow functions in Svelte templates to named functions in the script block.
 Avoid adding `window.` prefixes, unless it will increase the readability, in which case it is allowed.  

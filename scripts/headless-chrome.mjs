@@ -42,10 +42,17 @@ export async function launchMutedHeadlessChrome({
     buffered = messages.pop();
     for (const text of messages) {
       const message = JSON.parse(text);
-      if (message.id && pending.has(message.id)) {
+      const isPendingReply = message.id && pending.has(message.id);
+      if (isPendingReply) {
         const { resolve, reject } = pending.get(message.id);
         pending.delete(message.id);
-        message.error ? reject(new Error(JSON.stringify(message.error))) : resolve(message.result);
+
+        if (message.error) {
+          reject(new Error(JSON.stringify(message.error)));
+        } else {
+          resolve(message.result);
+        }
+
         continue;
       }
 

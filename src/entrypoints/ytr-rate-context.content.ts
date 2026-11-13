@@ -37,10 +37,10 @@ function getVideoId() {
 
   const elTrailer = document.querySelector(SELECTORS.CHANNEL_TRAILER_PLAYER);
   const data = elTrailer && "data" in elTrailer ? elTrailer.data : undefined;
-  return data && typeof data === "object" && "videoId" in data && data.videoId ? String(data.videoId) : "";
+  return data && typeof data === "object" && "videoId" in data && typeof data.videoId === "string" ? data.videoId : "";
 }
 
-function getRateContext(): RateContext | null {
+function getRateContext() {
   const { ytcfg } = window;
   const videoId = getVideoId();
   const clientNameNumber = ytcfg?.get(YtcfgKey.CLIENT_NAME);
@@ -69,7 +69,7 @@ function getRateContext(): RateContext | null {
     },
     delegatedSessionId: ytcfg?.get(YtcfgKey.DELEGATED_SESSION_ID) ?? "",
     sessionIndex: ytcfg?.get(YtcfgKey.SESSION_INDEX) ?? ""
-  };
+  } satisfies RateContext;
 }
 
 function getContextForRate(action: RateAction) {

@@ -33,11 +33,17 @@ const BUILD_TIMEOUT_MS = 120_000;
 const STABILITY_THRESHOLD_MS = 150;
 const POLL_INTERVAL_MS = 50;
 
-function parseBrowserArg(): SupportedBrowser {
+const PROFILE_ENV_PREFIXES: Record<string, string> = {
+  edge: "EDGE",
+  firefox: "FIREFOX"
+};
+
+function parseBrowserArg() {
   const iBrowser = process.argv.findIndex(arg => arg === "--browser" || arg === "-b");
   const candidate = iBrowser >= 0 ? process.argv[iBrowser + 1] : undefined;
   const allowed: SupportedBrowser[] = ["chrome", "edge", "firefox", "opera"];
-  if (candidate && allowed.includes(candidate as SupportedBrowser)) {
+  const isSupported = candidate && allowed.includes(candidate as SupportedBrowser);
+  if (isSupported) {
     return candidate as SupportedBrowser;
   }
 
@@ -120,10 +126,11 @@ async function sendCdpMessage({
   });
 }
 
-async function fetchCdpTargets(port: number): Promise<CdpTarget[]> {
+async function fetchCdpTargets(port: number) {
   try {
     const response = await fetch(`http://localhost:${port}/json`);
-    return await response.json();
+    const targets: CdpTarget[] = await response.json();
+    return targets;
   } catch {
     return [];
   }
@@ -153,7 +160,7 @@ async function main() {
   process.chdir(PROJECT_ROOT);
 
   if (IS_PROFILE_WANTED) {
-    process.env[`${BROWSER === "edge" ? "EDGE" : BROWSER === "firefox" ? "FIREFOX" : "CHROME"}_WITH_PROFILE`] = "1";
+    process.env[`${PROFILE_ENV_PREFIXES[BROWSER] ?? "CHROME"}_WITH_PROFILE`] = "1";
   }
 
   console.log(`Building extension for ${BROWSER} (prod mode)...`);
@@ -226,6 +233,23 @@ async function main() {
   let pendingChange: string | null = null;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+  async function rebuild(filePath: string) {
+    console.log(`\nChange detected: ${filePath}`);
+    console.log("Rebuilding...");
+    try {
+      buildExtension();
+
+      if (!IS_FIREFOX) {
+        await runner.reloadAllExtensions().catch(() => undefined);
+      }
+
+      await reloadYouTubeTabs(CDP_PORT);
+      console.log(`Reloaded at ${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      console.error("Rebuild failed:", error);
+    }
+  }
+
   async function drainPending() {
     if (isRebuilding) {
       return;
@@ -236,20 +260,7 @@ async function main() {
       while (pendingChange !== null) {
         const filePath = pendingChange;
         pendingChange = null;
-        console.log(`\nChange detected: ${filePath}`);
-        console.log("Rebuilding...");
-        try {
-          buildExtension();
-
-          if (!IS_FIREFOX) {
-            await runner.reloadAllExtensions().catch(() => undefined);
-          }
-
-          await reloadYouTubeTabs(CDP_PORT);
-          console.log(`Reloaded at ${new Date().toLocaleTimeString()}`);
-        } catch (error) {
-          console.error("Rebuild failed:", error);
-        }
+        await rebuild(filePath);
       }
     } finally {
       isRebuilding = false;
@@ -293,7 +304,7 @@ async function main() {
   }
 
   for (const signal of ["SIGINT", "SIGTERM"] as const) {
-    process.on(signal, () => void exit());
+    process.on(signal, exit);
   }
 
   runner.registerCleanup(() => {

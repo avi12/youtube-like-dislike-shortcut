@@ -35,7 +35,8 @@ function client({ url, name }) {
     socket.addEventListener("error", event => reject(event));
     socket.addEventListener("message", event => {
       const msg = JSON.parse(event.data);
-      if (msg.id && pending.has(msg.id)) {
+      const isPendingReply = msg.id && pending.has(msg.id);
+      if (isPendingReply) {
         const { res, rej } = pending.get(msg.id);
         pending.delete(msg.id);
 
@@ -90,7 +91,7 @@ function formatArgs(argument) {
     })
     .join(" ");
 }
-function attachLog(connection, label) {
+function attachLog({ connection, label }) {
   return connection.on(message => {
     if (message.method === "Runtime.consoleAPICalled") {
       console.log(`[${label}:${message.params.type}] ${formatArgs(message.params.args)}`);
@@ -123,7 +124,10 @@ async function tryAttach({ target, label }) {
       name: label
     });
     await connection.send("Runtime.enable");
-    attachLog(connection, label);
+    attachLog({
+      connection,
+      label
+    });
   } catch (err) {
     console.log(`[${label}] attach failed`, err?.message ?? err);
   }
@@ -135,7 +139,9 @@ async function discoverAndAttach() {
       continue;
     }
 
-    if (target.type === "service_worker" && target.url?.includes("/background.js") && !target.url.includes("eimadpb")) {
+    const isBackgroundWorker =
+      target.type === "service_worker" && target.url?.includes("/background.js") && !target.url.includes("eimadpb");
+    if (isBackgroundWorker) {
       await tryAttach({
         target,
         label: "sw"
@@ -190,7 +196,10 @@ const watch = await client({
 });
 await watch.send("Runtime.enable");
 await watch.send("Page.enable");
-attachLog(watch, "watch");
+attachLog({
+  connection: watch,
+  label: "watch"
+});
 
 // Baseline
 console.log("\n== Baseline ==");
@@ -237,7 +246,10 @@ const embed = await client({
   name: "embed"
 });
 await embed.send("Runtime.enable");
-attachLog(embed, "embed");
+attachLog({
+  connection: embed,
+  label: "embed"
+});
 await embed.send("Runtime.evaluate", {
   expression: `document.dispatchEvent(new KeyboardEvent("keydown",{key:"+",code:"Equal",shiftKey:true,bubbles:true,cancelable:true}))`
 });

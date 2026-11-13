@@ -6,7 +6,12 @@
       "error",
       {
         "presets": ["webextension-manifest", "webextension-messages", "hook-names"],
-        "allowedNames": [{ "reason": "The HTTP header is spelled this way", "names": ["Authorization"] }]
+        "allowedNames": [
+          {
+            "reason": "The HTTP header is spelled this way",
+            "names": ["Authorization"]
+          }
+        ]
       }
     ]
   },
@@ -18,5 +23,13 @@
     "build/**",
     "user-profiles/**",
     "keys/**"
+  ],
+  "overrides": [
+    {
+      "files": ["scripts/headless-chrome.mjs", "src/entrypoints/auto-like-in-subscription.content.ts"],
+      "rules": {
+        "house/positional-parameters": "off"
+      }
+    }
   ]
 }

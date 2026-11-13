@@ -35,7 +35,8 @@ function client(url) {
     socket.addEventListener("error", error => reject(error));
     socket.addEventListener("message", event => {
       const message = JSON.parse(event.data);
-      if (!message.id || !pending.has(message.id)) {
+      const isUnknownReply = !message.id || !pending.has(message.id);
+      if (isUnknownReply) {
         return;
       }
 

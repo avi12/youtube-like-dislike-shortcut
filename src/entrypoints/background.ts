@@ -44,7 +44,11 @@ export default defineBackground(() => {
   });
 
   browser.runtime.onMessage.addListener((message: unknown, sender) => {
-    if (!isRateRequest(message) || sender.tab?.id === undefined || sender.frameId === undefined) {
+    if (!isRateRequest(message)) {
+      return;
+    }
+
+    if (sender.tab?.id === undefined || sender.frameId === undefined) {
       return;
     }
 

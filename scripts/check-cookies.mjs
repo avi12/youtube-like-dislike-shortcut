@@ -7,7 +7,7 @@ if (!anyPage) {
 
 const socket = new WebSocket(anyPage.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"));
 await new Promise(resolve => socket.addEventListener("open", () => resolve()));
-function send(id, method, params) {
+function send({ id, method, params }) {
   socket.send(
     JSON.stringify({
       id,
@@ -26,9 +26,15 @@ function send(id, method, params) {
     socket.addEventListener("message", onMsg);
   });
 }
-const cookies = await send(1, "Network.getAllCookies", {});
+const cookies = await send({
+  id: 1,
+  method: "Network.getAllCookies",
+  params: {}
+});
 const ytCookies = cookies.cookies.filter(cookie => cookie.domain.includes("youtube.com"));
-const sortedYt = [...new Set(ytCookies.map(cookie => `${cookie.domain}|${cookie.name}`))].sort();
+const sortedYt = [...new Set(ytCookies.map(cookie => `${cookie.domain}|${cookie.name}`))].sort(
+  (left, right) => Number(left > right) - Number(left < right)
+);
 console.log("All .youtube.com cookies:");
 for (const cookie of sortedYt) {
   console.log(" ", cookie);

@@ -1,6 +1,7 @@
 const MIN_PERCENTAGE = 0.4;
 const POLL_INTERVAL_SECONDS = 0.5;
 const MAX_POLLS = 60;
+const ONE_SECOND_MS = 1000;
 const SHIFT_MODIFIER = 8;
 const SHORT_WAIT_SECONDS = 3;
 const LONG_WAIT_SECONDS = 8;
@@ -72,7 +73,7 @@ async function listTargets() {
   return (await fetch(`${CDP_ORIGIN}/json`)).json();
 }
 function wait(seconds) {
-  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+  return new Promise(resolve => setTimeout(resolve, seconds * ONE_SECOND_MS));
 }
 
 async function evalIn({ target, expression, contextId }) {
