@@ -145,16 +145,16 @@
 
       comboModifiers = [];
       keys.combos = {
-         ...keys.combos,
-         [type]: keyComboTemp 
+        ...keys.combos,
+        [type]: keyComboTemp 
       };
       keys.isRecording = false;
       keys.currentlyRecording = null;
       const isSecondaryShortcutExists = displayedKeyComboList.join(" + ") in defaultAdditionalShortcuts;
       if (isSecondaryShortcutExists) {
         keys.combosSecondary = {
-           ...keys.combosSecondary,
-           [type]: true 
+          ...keys.combosSecondary,
+          [type]: true 
         };
       }
     };

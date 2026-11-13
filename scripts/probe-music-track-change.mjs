@@ -1,3 +1,4 @@
+const ONE_SECOND_MS = 1000;
 // Probes what actually changes on a YouTube Music track transition.
 // YT Music advances the queue seamlessly inside one MediaSource, so the <video>
 // element's currentSrc/currentTime/duration do NOT reset and no media events fire.
@@ -127,7 +128,7 @@ console.log("Install:", installed.result?.value ?? installed.exceptionDetails?.t
 
 const deadline = Date.now() + DURATION_SECONDS * 1000;
 while (Date.now() < deadline) {
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, ONE_SECOND_MS));
   const drained = await evaluate(DRAIN);
   for (const entry of JSON.parse(drained.result?.value ?? "[]")) {
     console.log(JSON.stringify(entry));

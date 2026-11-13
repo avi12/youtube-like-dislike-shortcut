@@ -26,6 +26,8 @@ import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subsc
 import CsuiAutoLikePercent from "./CsuiAutoLikePercent.svelte";
 import { getIsFreshMountAllowed, getIsUnmountRequired, sharedState, watchMountState } from "./states.svelte";
 
+const PERCENT = 100;
+
 enum CsuiElementName {
   PERCENTAGE = "ytr-percentage",
   PERCENTAGE_FULLSCREEN = "ytr-percentage-fullscreen"
@@ -326,7 +328,7 @@ export default defineContentScript({
         const watchedSeconds = getWatchedSeconds(previousTimeUpdate, currentTime, elTarget.playbackRate);
         const isDurationUsable = Boolean(duration) && duration !== Infinity;
         if (watchedSeconds > 0 && isDurationUsable) {
-          sharedState.percentageWatched += (watchedSeconds / duration) * 100;
+          sharedState.percentageWatched += (watchedSeconds / duration) * PERCENT;
           void saveWatchedPercentage(sharedState.percentageWatched);
           const isAutoLikeTriggered =
             window.ytrAutoLikeEnabled &&

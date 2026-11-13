@@ -1,3 +1,4 @@
+const POLL_INTERVAL_MS = 500;
 // Evaluates an expression inside the content script world of the open YouTube tab.
 // Usage: node scripts/cdp-eval.mjs "window.ytrAutoLikeEnabled" [url-substring]
 const CDP_ORIGIN = "http://localhost:9225";
@@ -59,7 +60,7 @@ const targets = await (await fetch(`${CDP_ORIGIN}/json`)).json();
 const watchTarget = targets.find(target => target.type === "page" && target.url?.includes(URL_FILTER));
 const watch = await client(wsUrl(watchTarget));
 await watch.send("Runtime.enable");
-await new Promise(resolve => setTimeout(resolve, 500));
+await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
 
 const contexts = watch.events
   .filter(event => event.method === "Runtime.executionContextCreated")

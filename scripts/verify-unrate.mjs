@@ -1,3 +1,10 @@
+const MIN_PERCENTAGE = 0.4;
+const POLL_INTERVAL_SECONDS = 0.5;
+const MAX_POLLS = 60;
+const SHIFT_MODIFIER = 8;
+const SHORT_WAIT_SECONDS = 3;
+const LONG_WAIT_SECONDS = 8;
+const DIGIT_ZERO_KEY_CODE = 48;
 // Verifies that the un-rate shortcut stops the auto-liker on an un-rated video.
 // Run the dev server first, then: node scripts/verify-unrate.mjs
 const CDP_ORIGIN = "http://localhost:9225";
@@ -104,11 +111,11 @@ async function pressUnrate() {
   for (const type of ["rawKeyDown", "keyUp"]) {
     await watch.send("Input.dispatchKeyEvent", {
       type,
-      modifiers: 8,
+      modifiers: SHIFT_MODIFIER,
       code: "Digit0",
       key: ")",
-      windowsVirtualKeyCode: 48,
-      nativeVirtualKeyCode: 48
+      windowsVirtualKeyCode: DIGIT_ZERO_KEY_CODE,
+      nativeVirtualKeyCode: DIGIT_ZERO_KEY_CODE
     });
   }
 }
@@ -126,12 +133,12 @@ const IS_RATED_BEFORE = ratingBefore.likePressed === "true" || ratingBefore.disl
 if (IS_RATED_BEFORE) {
   console.log("Video was rated, clearing it first:", ratingBefore);
   await pressUnrate();
-  await wait(3);
+  await wait(SHORT_WAIT_SECONDS);
   console.log("Cleared:", await evalIn(watch, READ_RATING));
 }
 
 await watch.send("Page.reload");
-await wait(8);
+await wait(LONG_WAIT_SECONDS);
 
 const isolatedContext = watch.events.findLast(
   event =>
@@ -178,10 +185,10 @@ await evalIn(
 );
 
 let beforeUnrate = null;
-for (let i = 0; i < 60; i++) {
-  await wait(0.5);
+for (let i = 0; i < MAX_POLLS; i++) {
+  await wait(POLL_INTERVAL_SECONDS);
   const state = await evalIn(watch, READ_PAGE_STATE);
-  if (Number.parseFloat(state.percentage ?? "") > 0.4) {
+  if (Number.parseFloat(state.percentage ?? "") > MIN_PERCENTAGE) {
     beforeUnrate = state;
     break;
   }

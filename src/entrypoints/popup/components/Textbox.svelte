@@ -1,11 +1,14 @@
 <script lang="ts">
+  const MAX_PERCENTAGE = 99;
+  const DEFAULT_PERCENTAGE = 60;
+
   interface Props {
     isAutoLike: boolean;
     value?: number;
     disabled: boolean;
   }
 
-  let { isAutoLike, value = $bindable(60), disabled }: Props = $props();
+  let { isAutoLike, value = $bindable(DEFAULT_PERCENTAGE), disabled }: Props = $props();
 
   $effect(() => {
     const isBelowMin = value < 1;
@@ -13,7 +16,7 @@
     if (isBelowMin) {
       value = 1;
     } else if (isAboveMax) {
-      value = 99;
+      value = MAX_PERCENTAGE;
     }
   });
 </script>

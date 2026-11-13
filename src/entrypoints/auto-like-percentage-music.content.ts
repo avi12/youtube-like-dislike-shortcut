@@ -24,6 +24,8 @@ import {
   watchMountState
 } from "./auto-like-percentage.content/states.svelte";
 
+const PERCENT = 100;
+
 let ratingWatchObserver: MutationObserver | null = null;
 let trackSettleController: AbortController | null = null;
 let isInitialRatingCheckPending = true;
@@ -304,7 +306,7 @@ export default defineContentScript({
 
         const watchedSeconds = getWatchedSeconds(sharedState.lastTimeUpdate, currentTime, elTarget.playbackRate);
         if (watchedSeconds > 0 && Boolean(duration)) {
-          sharedState.percentageWatched += (watchedSeconds / duration) * 100;
+          sharedState.percentageWatched += (watchedSeconds / duration) * PERCENT;
           const isAutoLikeTriggered =
             window.ytrAutoLikeEnabled &&
             sharedState.isSurfaceEnabled &&

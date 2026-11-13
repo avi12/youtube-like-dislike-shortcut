@@ -1,3 +1,7 @@
+const POLL_INTERVAL_MS = 500;
+const MAX_POLLS = 60;
+const TWENTY_FIVE_SECONDS_MS = 25000;
+const SIX_SECONDS_MS = 6000;
 // Reuses the existing edge://newtab tab — no new window pops up.
 const VIDEO_ID = "e7gFaim6vLs";
 
@@ -161,7 +165,7 @@ if (!host) {
     background: true
   });
   console.log("Created tab:", created.targetId);
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   host = (await listTargets()).find(target => target.id === created.targetId);
 }
 
@@ -175,8 +179,8 @@ attachLog(watch, "watch");
 console.log("\n== Baseline ==");
 await watch.send("Page.navigate", { url: `https://www.youtube.com/watch?v=${VIDEO_ID}&t=${Date.now()}` });
 let baseline = null;
-for (let i = 0; i < 60 && !baseline; i++) {
-  await new Promise(resolve => setTimeout(resolve, 500));
+for (let i = 0; i < MAX_POLLS && !baseline; i++) {
+  await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   try {
     baseline = await evalIn(
       watch,
@@ -195,7 +199,7 @@ if (hostPage) {
   const hostClient = await client(wsUrl(hostPage), "host");
   await hostClient.send("Page.enable");
   await hostClient.send("Page.reload");
-  await new Promise(resolve => setTimeout(resolve, 6000));
+  await new Promise(resolve => setTimeout(resolve, SIX_SECONDS_MS));
 }
 
 // Trigger
@@ -217,15 +221,15 @@ await embed.send("Runtime.evaluate", {
 
 // Wait for rate flow (longer than the bridge timeout)
 console.log("Waiting 25s for rate flow + logs...");
-await new Promise(resolve => setTimeout(resolve, 25000));
+await new Promise(resolve => setTimeout(resolve, TWENTY_FIVE_SECONDS_MS));
 clearInterval(discoverInterval);
 
 // Re-read
 console.log("\n== After (fresh navigation) ==");
 await watch.send("Page.navigate", { url: `https://www.youtube.com/watch?v=${VIDEO_ID}&t=${Date.now()}` });
 let after = null;
-for (let i = 0; i < 60 && !after; i++) {
-  await new Promise(resolve => setTimeout(resolve, 500));
+for (let i = 0; i < MAX_POLLS && !after; i++) {
+  await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   try {
     after = await evalIn(
       watch,

@@ -1,5 +1,16 @@
 import { launchMutedHeadlessChrome, SIGNED_IN_TEST_PROFILE, sleep } from "./headless-chrome.mjs";
 
+const ONE_SECOND_MS = 1000;
+const DEFAULT_WATCH_SECONDS = 16;
+const HIGH_AUTO_LIKE_THRESHOLD = 40;
+const LOW_AUTO_LIKE_THRESHOLD = 5;
+const POLL_INTERVAL_MS = 500;
+const MAX_ATTEMPTS = 30;
+const TWO_AND_A_HALF_SECONDS_MS = 2500;
+const MAX_RETRIES = 3;
+const FOUR_SECONDS_MS = 4000;
+const THREE_SECONDS_MS = 3000;
+
 const [
   extensionPath,
   profilePath = SIGNED_IN_TEST_PROFILE,
@@ -38,22 +49,22 @@ const clickVisible = selector =>
   );
 
 async function waitForButtons() {
-  for (let attempt = 0; attempt < 30; attempt++) {
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const { like, dislike } = await readRating();
     if (like.length > 0 && dislike.length > 0 && like[0] !== null) {
       return;
     }
 
-    await sleep(1000);
+    await sleep(ONE_SECOND_MS);
   }
   throw new Error("buttons never appeared");
 }
 
 async function navigate(id) {
   await browser.send("Page.navigate", { url: `https://www.youtube.com/watch?v=${id}` }, browser.sessionId);
-  await sleep(3000);
+  await sleep(THREE_SECONDS_MS);
   await waitForButtons();
-  await sleep(4000);
+  await sleep(FOUR_SECONDS_MS);
 }
 
 async function setInitialRating(id) {
@@ -63,7 +74,7 @@ async function setInitialRating(id) {
     like: "like-button-view-model button",
     dislike: "dislike-button-view-model button"
   }[initialRating];
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     const { like, dislike } = await readRating();
     const isLiked = like[0] === "true";
     const isDisliked = dislike[0] === "true";
@@ -85,7 +96,7 @@ async function setInitialRating(id) {
       await clickVisible(target);
     }
 
-    await sleep(2500);
+    await sleep(TWO_AND_A_HALF_SECONDS_MS);
   }
 }
 
@@ -93,8 +104,8 @@ try {
   await browser.send("Page.navigate", { url: "https://www.youtube.com/robots.txt" }, browser.sessionId);
   await browser.send("Page.navigate", { url: "https://www.youtube.com/" }, browser.sessionId);
   let worker;
-  for (let attempt = 0; attempt < 30 && !worker; attempt++) {
-    await sleep(500);
+  for (let attempt = 0; attempt < MAX_ATTEMPTS && !worker; attempt++) {
+    await sleep(POLL_INTERVAL_MS);
     const { targetInfos } = await browser.send("Target.getTargets");
     worker = targetInfos.find(
       target =>
@@ -128,7 +139,7 @@ try {
   );
   await setStorage({
     isAutoLike: true,
-    autoLikeThreshold: midWatchAction === "none" ? 5 : 40
+    autoLikeThreshold: midWatchAction === "none" ? LOW_AUTO_LIKE_THRESHOLD : HIGH_AUTO_LIKE_THRESHOLD
   });
 
   if (navigationMode === "spa") {
@@ -143,8 +154,8 @@ try {
     await navigate(videoId);
   }
 
-  for (let second = 0; second < Number(process.env.WATCH_SECONDS ?? 16); second++) {
-    await sleep(1000);
+  for (let second = 0; second < Number(process.env.WATCH_SECONDS ?? DEFAULT_WATCH_SECONDS); second++) {
+    await sleep(ONE_SECOND_MS);
 
     if (process.env.PLAYBACK_RATE) {
       await browser.evaluate(
