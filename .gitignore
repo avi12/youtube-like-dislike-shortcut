@@ -33,3 +33,6 @@ opera.env
 *.sw?
 user-profiles/
 .claude/settings.local.json
+
+# Lint cache
+.verify/

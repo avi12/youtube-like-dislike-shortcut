@@ -1,5 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "$schema": "./node_modules/fallow/schema.json",
+  "extends": ["./node_modules/fallow-config-avi12/fallow.json"],
   "entry": [
     "wxt.config.ts",
     "web-ext.config.ts",
@@ -11,22 +12,22 @@
     "src/entrypoints/auto-like-in-subscription.content.ts",
     "src/entrypoints/auto-like-percentage-music.content/index.ts"
   ],
-  "ignorePatterns": [
-    "tests/**",
-    "scripts/**"
-  ],
+  "ignorePatterns": ["tests/**", "scripts/**"],
   "ignoreDependencies": [
     "#imports",
-    "@stylistic/stylelint-plugin",
     "@sveltejs/vite-plugin-svelte",
     "@wxt-dev/module-svelte",
+    "avi12-lint",
     "chokidar",
     "crx3",
+    "eslint-config-avi12",
+    "fallow-config-avi12",
+    "oxfmt-config-avi12",
+    "oxlint-config-avi12",
+    "oxlint-plugin-naming",
     "postcss-html",
+    "stylelint-config-avi12",
     "web-ext-run"
   ],
-  "rules": {
-    "unused-enum-members": "off",
-    "unresolved-imports": "off"
-  }
+  "rules": { "unused-enum-members": "off", "unresolved-imports": "off" }
 }
