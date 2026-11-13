@@ -100,8 +100,8 @@ async function sendCdpMessage(websocketUrl: string, method: string, params: Reco
           params
         })
       );
-    websocket.onmessage = e => {
-      const data: { id?: number } = JSON.parse(String(e.data));
+    websocket.onmessage = event => {
+      const data: { id?: number } = JSON.parse(String(event.data));
       if (data.id === 1) {
         websocket.close();
         resolveAck();

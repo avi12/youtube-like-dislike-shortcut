@@ -105,8 +105,8 @@ async function handleUserSubscribed() {
   await rateVideo(true);
 }
 
-function markUserSubscribeClick(e: Event) {
-  const { target: elTarget } = e;
+function markUserSubscribeClick(event: Event) {
+  const { target: elTarget } = event;
   if (!(elTarget instanceof Element)) {
     return;
   }

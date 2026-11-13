@@ -18,14 +18,14 @@ const rateActionMap: Record<ShortcutType, RateAction> = {
 
 let gLastRating = Rating.LIKE;
 
-async function rateIfNeeded(e: KeyboardEvent) {
-  const shortcutType = getActionPressed(e, window.ytrLastButtonTriggers);
+async function rateIfNeeded(event: KeyboardEvent) {
+  const shortcutType = getActionPressed(event, window.ytrLastButtonTriggers);
   if (!shortcutType) {
     return;
   }
 
-  e.stopPropagation();
-  e.preventDefault();
+  event.stopPropagation();
+  event.preventDefault();
   const action = rateActionMap[shortcutType];
   const result = await sendRateRequest(action).catch(() => null);
   if (!result?.success) {
@@ -49,14 +49,14 @@ async function init() {
 
   document.addEventListener(
     "keydown",
-    e => {
+    event => {
       const { activeElement } = document;
       const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
       if (isFocusedOnInput) {
         return;
       }
 
-      void rateIfNeeded(e);
+      void rateIfNeeded(event);
     },
     { capture: true }
   );

@@ -89,14 +89,14 @@
   }
 
   $effect(() => {
-    function handleKeydown(e: KeyboardEvent) {
+    function handleKeydown(event: KeyboardEvent) {
       if (!isRecordingThisType) {
         return;
       }
 
-      e.preventDefault();
+      event.preventDefault();
       error = "";
-      const key = processKey(e);
+      const key = processKey(event);
       if (pressedKeys.has(key)) {
         return;
       }
@@ -116,12 +116,12 @@
       keyComboTemp = keyCombo;
     }
 
-    function handleKeyup(e: KeyboardEvent) {
+    function handleKeyup(event: KeyboardEvent) {
       if (!isRecordingThisType) {
         return;
       }
 
-      const key = processKey(e);
+      const key = processKey(event);
 
       // If a non-modifier key's keydown was intercepted by the browser (e.g. Shift+Insert
       // treated as paste), recover using the modifiers tracked so far this session.

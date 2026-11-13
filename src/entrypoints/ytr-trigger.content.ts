@@ -2,23 +2,23 @@ import { storage } from "#imports";
 import { getActionPressed, getStorage, initial, ShortcutType, StorageKey } from "@/lib/utils-initials";
 import { rateVideo } from "@/lib/ytr-buttons";
 
-async function rateIfNeeded(e: KeyboardEvent) {
-  switch (getActionPressed(e, window.ytrLastButtonTriggers)) {
+async function rateIfNeeded(event: KeyboardEvent) {
+  switch (getActionPressed(event, window.ytrLastButtonTriggers)) {
     case ShortcutType.LIKE:
-      e.stopPropagation();
-      e.preventDefault();
+      event.stopPropagation();
+      event.preventDefault();
       await rateVideo(true);
       break;
 
     case ShortcutType.DISLIKE:
-      e.stopPropagation();
-      e.preventDefault();
+      event.stopPropagation();
+      event.preventDefault();
       await rateVideo(false);
       break;
 
     case ShortcutType.UNRATE:
-      e.stopPropagation();
-      e.preventDefault();
+      event.stopPropagation();
+      event.preventDefault();
       await rateVideo(null);
       break;
   }
@@ -33,14 +33,14 @@ async function init() {
 
   document.addEventListener(
     "keydown",
-    async e => {
+    async event => {
       const { activeElement } = document;
       const isFocusedOnInput = activeElement?.matches("input, [contenteditable='true']") ?? false;
       if (isFocusedOnInput) {
         return;
       }
 
-      await rateIfNeeded(e);
+      await rateIfNeeded(event);
     },
     { capture: true }
   );

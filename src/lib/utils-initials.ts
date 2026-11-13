@@ -33,18 +33,18 @@ export enum StorageKey {
   ENABLED_SURFACES = "sync:enabledSurfaces"
 }
 
-export async function getStorage<K extends keyof typeof window>({
+export async function getStorage<Key extends keyof typeof window>({
   storageKey,
   fallback,
   updateWindowKey
 }: {
   storageKey: StorageKey;
-  fallback: (typeof window)[K];
-  updateWindowKey: K;
+  fallback: (typeof window)[Key];
+  updateWindowKey: Key;
 }) {
-  let value: (typeof window)[K];
+  let value: (typeof window)[Key];
   try {
-    value = await storage.getItem<(typeof window)[K]>(storageKey, { fallback });
+    value = await storage.getItem<(typeof window)[Key]>(storageKey, { fallback });
   } catch {
     value = fallback;
   }

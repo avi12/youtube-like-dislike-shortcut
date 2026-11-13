@@ -1,14 +1,14 @@
 const targets = await (await fetch("http://localhost:9225/json")).json();
-const anyPage = targets.find(t => t.type === "page" && t.webSocketDebuggerUrl);
+const anyPage = targets.find(target => target.type === "page" && target.webSocketDebuggerUrl);
 if (!anyPage) {
   console.log("No page target");
   process.exit(1);
 }
 
-const ws = new WebSocket(anyPage.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"));
-await new Promise(r => ws.addEventListener("open", () => r()));
+const socket = new WebSocket(anyPage.webSocketDebuggerUrl.replace(/^wss?:\/\/[^/]+/, "ws://localhost:9225"));
+await new Promise(resolve => socket.addEventListener("open", () => resolve()));
 const send = (id, method, params) => {
-  ws.send(
+  socket.send(
     JSON.stringify({
       id,
       method,
@@ -16,23 +16,23 @@ const send = (id, method, params) => {
     })
   );
   return new Promise(resolve => {
-    const onMsg = e => {
-      const m = JSON.parse(e.data);
-      if (m.id === id) {
-        ws.removeEventListener("message", onMsg);
-        resolve(m.result);
+    const onMsg = event => {
+      const message = JSON.parse(event.data);
+      if (message.id === id) {
+        socket.removeEventListener("message", onMsg);
+        resolve(message.result);
       }
     };
-    ws.addEventListener("message", onMsg);
+    socket.addEventListener("message", onMsg);
   });
 };
 const cookies = await send(1, "Network.getAllCookies", {});
-const ytCookies = cookies.cookies.filter(c => c.domain.includes("youtube.com"));
-const sortedYt = [...new Set(ytCookies.map(c => `${c.domain}|${c.name}`))].sort();
+const ytCookies = cookies.cookies.filter(cookie => cookie.domain.includes("youtube.com"));
+const sortedYt = [...new Set(ytCookies.map(cookie => `${cookie.domain}|${cookie.name}`))].sort();
 console.log("All .youtube.com cookies:");
-for (const c of sortedYt) {
-  console.log(" ", c);
+for (const cookie of sortedYt) {
+  console.log(" ", cookie);
 }
-const HAS_SAPISID = sortedYt.some(c => /SAPISID|3PAPISID/.test(c));
+const HAS_SAPISID = sortedYt.some(cookie => /SAPISID|3PAPISID/.test(cookie));
 console.log("\nSAPISID present on youtube.com?", HAS_SAPISID);
 process.exit(0);

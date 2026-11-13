@@ -119,8 +119,8 @@ function watchForInitialRating() {
   trackSettleController = new AbortController();
   document.addEventListener(
     "loadedmetadata",
-    e => {
-      if (e.target instanceof HTMLVideoElement) {
+    event => {
+      if (event.target instanceof HTMLVideoElement) {
         applyState();
       }
     },
@@ -269,7 +269,7 @@ export default defineContentScript({
 
     document.addEventListener(
       "timeupdate",
-      async e => {
+      async event => {
         handleIfTrackChanged();
 
         const isUserInteractedGlobal = window.ytrUserInteracted;
@@ -284,7 +284,7 @@ export default defineContentScript({
           return;
         }
 
-        const { target: elTarget } = e;
+        const { target: elTarget } = event;
         const isTargetVideo = elTarget instanceof HTMLVideoElement;
         if (!isTargetVideo) {
           return;
@@ -322,8 +322,8 @@ export default defineContentScript({
       { capture: true }
     );
 
-    function markUserInteractedIfRateButton(e: Event) {
-      const { target: elTarget } = e;
+    function markUserInteractedIfRateButton(event: Event) {
+      const { target: elTarget } = event;
       const isTargetElement = elTarget instanceof HTMLElement;
       if (!isTargetElement) {
         return;

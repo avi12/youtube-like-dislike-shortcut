@@ -272,7 +272,7 @@ export default defineContentScript({
 
     document.addEventListener(
       "timeupdate",
-      async e => {
+      async event => {
         handleIfNavigated();
 
         if (window.ytrUserInteracted) {
@@ -300,7 +300,7 @@ export default defineContentScript({
           sharedState.percentageWatched = 0;
         }
 
-        const { target: elTarget } = e;
+        const { target: elTarget } = event;
         const isTargetVideo = elTarget instanceof HTMLVideoElement;
         if (!isTargetVideo) {
           return;
@@ -347,8 +347,8 @@ export default defineContentScript({
       { capture: true }
     );
 
-    function markUserInteractedIfRateButton(e: Event) {
-      const { target: elTarget } = e;
+    function markUserInteractedIfRateButton(event: Event) {
+      const { target: elTarget } = event;
       const isTargetElement = elTarget instanceof HTMLElement;
       if (!isTargetElement) {
         return;

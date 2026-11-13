@@ -32,12 +32,12 @@ export function getSubscriptionDecision() {
 }
 
 export function onSubscriptionDecision(callback: (decision: SubscriptionDecision | undefined) => void) {
-  const handler = (e: Event) => {
-    if (!(e instanceof CustomEvent)) {
+  const handler = (event: Event) => {
+    if (!(event instanceof CustomEvent)) {
       return;
     }
 
-    const { detail } = e;
+    const { detail } = event;
     const decision = isSubscriptionDecision(detail) ? detail : undefined;
     callback(decision);
   };

@@ -9,11 +9,11 @@ const SCREENSHOT_PATH = process.argv[2] ?? "unrate-frozen-counter.png";
 
 function client(url) {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(url);
+    const socket = new WebSocket(url);
     let nextId = 1;
     const pending = new Map();
     const events = [];
-    ws.addEventListener("open", () =>
+    socket.addEventListener("open", () =>
       resolve({
         send: (method, params = {}) =>
           new Promise((res, rej) => {
@@ -22,7 +22,7 @@ function client(url) {
               res,
               rej
             });
-            ws.send(
+            socket.send(
               JSON.stringify({
                 id,
                 method,
@@ -33,8 +33,8 @@ function client(url) {
         events
       })
     );
-    ws.addEventListener("error", error => reject(error));
-    ws.addEventListener("message", event => {
+    socket.addEventListener("error", error => reject(error));
+    socket.addEventListener("message", event => {
       const message = JSON.parse(event.data);
       if (!message.id) {
         events.push(message);
