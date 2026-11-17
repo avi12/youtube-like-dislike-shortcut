@@ -17,6 +17,7 @@
     "#imports",
     "@sveltejs/vite-plugin-svelte",
     "@wxt-dev/module-svelte",
+    "svelte-check",
     "avi12-lint",
     "chokidar",
     "crx3",
