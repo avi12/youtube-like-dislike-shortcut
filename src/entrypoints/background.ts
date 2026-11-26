@@ -1,6 +1,6 @@
 import {
   isMusicCommand,
-  type MusicFocusMessage,
+  isMusicFocusMessage,
   type MusicRateMessage,
   PortName,
   rateForMusicCommand
@@ -33,7 +33,11 @@ export default defineBackground(() => {
 
     musicPortFocus.set(port, false);
 
-    function handleFocusUpdate(message: MusicFocusMessage) {
+    function handleFocusUpdate(message: unknown) {
+      if (!isMusicFocusMessage(message)) {
+        return;
+      }
+
       musicPortFocus.set(port, message.isFocused);
     }
 

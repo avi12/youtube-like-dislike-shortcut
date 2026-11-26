@@ -1,9 +1,13 @@
-import { type MusicFocusMessage, type MusicRateMessage, PortName } from "@/lib/ytmusic-command";
+import { isMusicRateMessage, type MusicFocusMessage, PortName } from "@/lib/ytmusic-command";
 import { rateVideo } from "@/lib/ytr-buttons";
 
 let activePort: Browser.runtime.Port | null = null;
 
-function handleRateMessage(message: MusicRateMessage) {
+function handleRateMessage(message: unknown) {
+  if (!isMusicRateMessage(message)) {
+    return;
+  }
+
   void rateVideo(message.rate);
 }
 
