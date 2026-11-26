@@ -1,0 +1,28 @@
+[install]
+# One day, in seconds
+minimumReleaseAge = 86400
+minimumReleaseAgeExcludes = [
+  "concurrently",
+  "typescript-eslint",
+  "@typescript-eslint/eslint-plugin",
+  "@typescript-eslint/parser",
+  "@typescript-eslint/project-service",
+  "@typescript-eslint/scope-manager",
+  "@typescript-eslint/tsconfig-utils",
+  "@typescript-eslint/type-utils",
+  "@typescript-eslint/types",
+  "@typescript-eslint/typescript-estree",
+  "@typescript-eslint/utils",
+  "@typescript-eslint/visitor-keys",
+  "fallow",
+  "@fallow-cli/darwin-arm64",
+  "@fallow-cli/darwin-x64",
+  "@fallow-cli/linux-arm64-gnu",
+  "@fallow-cli/linux-arm64-musl",
+  "@fallow-cli/linux-x64-gnu",
+  "@fallow-cli/linux-x64-musl",
+  "@fallow-cli/win32-arm64-msvc",
+  "@fallow-cli/win32-x64-msvc",
+  "@types/chrome",
+  "@types/node"
+]

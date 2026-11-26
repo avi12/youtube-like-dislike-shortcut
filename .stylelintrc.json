@@ -1,5 +1,5 @@
 {
-  "extends": ["stylelint-config-avi12"],
+  "extends": ["lint-config/stylelint"],
   "ignoreFiles": [".claude/**", "build/**", "user-profiles/**", ".output/**"],
   "overrides": [
     {
