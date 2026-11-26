@@ -1,8 +1,8 @@
 <script lang="ts">
   import Card from "./Card.svelte";
   import Header from "./Header/Header.svelte";
-  import { type ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
-  import { type EnabledSurfaces } from "@/lib/surfaces";
+  import { type ThemeMode } from "@/lib/theme-mode";
+  import { type EnabledSurfaces } from "@/lib/settings";
 
   interface Props {
     selectedTheme: ThemeMode;

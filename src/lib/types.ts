@@ -1,26 +1,8 @@
 import { type initial } from "@/lib/utils-initials";
 
-/**
- * Boolean modifier-key properties on a KeyboardEvent.
- * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#modifier_keys
- */
-export type Modifier = "shiftKey" | "ctrlKey" | "altKey" | "metaKey";
-
 export const enum Rating {
   LIKE = "like",
   DISLIKE = "dislike"
-}
-
-interface ButtonTrigger {
-  primary: string[];
-  modifiers: Modifier[];
-  secondary: boolean;
-}
-
-export interface ButtonTriggers {
-  like: ButtonTrigger;
-  dislike: ButtonTrigger;
-  unrate: ButtonTrigger;
 }
 
 /**

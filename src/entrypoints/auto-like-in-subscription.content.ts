@@ -1,6 +1,5 @@
-import { storage } from "#imports";
 import { isElement } from "@/lib/dom-guards";
-import { getEnabledSurfaces, watchEnabledSurfaces } from "@/lib/surfaces";
+import { settings } from "@/lib/settings";
 import {
   addNavigationListener,
   DomAttribute,
@@ -9,7 +8,6 @@ import {
   initial,
   OBSERVER_OPTIONS,
   SELECTORS,
-  StorageKey,
   YoutubeHost
 } from "@/lib/utils-initials";
 import { getIsInLibrary, getIsSubscribed, getRateButtons, getRatedButton, rateVideo } from "@/lib/ytr-buttons";
@@ -159,9 +157,8 @@ async function addTemporaryBodyListener() {
 }
 
 function addStorageListener() {
-  storage.watch<boolean>(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, async isAutoLike => {
-    const isAutoLikeSet = isAutoLike !== null;
-    isAutoLikeSubscribedChannels = isAutoLikeSet ? isAutoLike : initial.isAutoLikeSubscribedChannels;
+  settings.isAutoLikeSubscribedChannels.watch(async isAutoLike => {
+    isAutoLikeSubscribedChannels = isAutoLike;
 
     if (!isAutoLikeSubscribedChannels) {
       announceSubscriptionDecision(SubscriptionDecision.RELEASED);
@@ -189,16 +186,14 @@ export default defineContentScript({
     document.addEventListener("click", markUserSubscribeClick, { capture: true });
     document.addEventListener("keydown", markUserSubscribeClick, { capture: true });
 
-    isAutoLikeSubscribedChannels = await storage.getItem<boolean>(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, {
-      fallback: initial.isAutoLikeSubscribedChannels
-    });
+    isAutoLikeSubscribedChannels = await settings.isAutoLikeSubscribedChannels.read();
 
     if (!isAutoLikeSubscribedChannels) {
       announceSubscriptionDecision(SubscriptionDecision.RELEASED);
     }
 
-    enabledSurfaces = await getEnabledSurfaces();
-    watchEnabledSurfaces(updatedSurfaces => {
+    enabledSurfaces = await settings.enabledSurfaces.read();
+    settings.enabledSurfaces.watch(updatedSurfaces => {
       enabledSurfaces = updatedSurfaces;
     });
     addStorageListener();

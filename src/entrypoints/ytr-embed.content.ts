@@ -1,6 +1,6 @@
-import { storage } from "#imports";
+import { settings } from "@/lib/settings";
 import { Rating } from "@/lib/types";
-import { getActionPressed, getStorage, initial, ShortcutType, StorageKey } from "@/lib/utils-initials";
+import { getActionPressed, ShortcutType } from "@/lib/utils-initials";
 import { showRateBezel } from "@/lib/ytr-bezel";
 import { RateAction, sendRateRequest } from "@/lib/ytr-messaging";
 
@@ -47,11 +47,7 @@ async function rateIfNeeded(event: KeyboardEvent) {
 }
 
 async function init() {
-  window.ytrLastButtonTriggers = await getStorage({
-    storageKey: StorageKey.BUTTON_TRIGGERS,
-    fallback: initial.buttonTriggers,
-    updateWindowKey: "ytrLastButtonTriggers"
-  });
+  window.ytrLastButtonTriggers = await settings.buttonTriggers.read();
 
   document.addEventListener(
     "keydown",
@@ -67,8 +63,8 @@ async function init() {
     { capture: true }
   );
 
-  storage.watch<typeof initial.buttonTriggers>(StorageKey.BUTTON_TRIGGERS, buttonTriggers => {
-    window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;
+  settings.buttonTriggers.watch(buttonTriggers => {
+    window.ytrLastButtonTriggers = buttonTriggers;
   });
 }
 

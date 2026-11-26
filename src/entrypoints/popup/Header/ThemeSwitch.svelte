@@ -1,11 +1,11 @@
 <script lang="ts">
   import { untrack } from "svelte";
-  import { storage } from "#imports";
   import ThemeAuto from "@/entrypoints/popup/Header/themes/ThemeAuto.svelte";
   import ThemeDark from "@/entrypoints/popup/Header/themes/ThemeDark.svelte";
   import ThemeLight from "@/entrypoints/popup/Header/themes/ThemeLight.svelte";
-  import { theme, ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
-  import { StorageKey } from "@/lib/utils-initials";
+  import { theme } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
+  import { settings } from "@/lib/settings";
+  import { ThemeMode } from "@/lib/theme-mode";
 
   const CSS_CLASS_QUICK_TRANSITION = "quick-transition";
 
@@ -36,7 +36,7 @@
 
   $effect(() => {
     setTheme(theme.selected);
-    storage.setItem(StorageKey.THEME, theme.selected);
+    settings.theme.write(theme.selected);
     document.documentElement.dataset.theme = theme.current;
 
     const isAutoTheme = theme.selected === ThemeMode.AUTO;

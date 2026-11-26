@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { storage } from "#imports";
   import Textbox from "@/entrypoints/popup/components/Textbox.svelte";
   import ToggleSwitch from "@/entrypoints/popup/components/ToggleSwitch.svelte";
   import Surfaces from "@/entrypoints/popup/sections/Surfaces.svelte";
   import { keys } from "@/entrypoints/popup/sections/keyboard.svelte.js";
-  import { type EnabledSurfaces } from "@/lib/surfaces";
-  import { StorageKey } from "@/lib/utils-initials";
+  import { type EnabledSurfaces, settings } from "@/lib/settings";
 
   interface Props {
     enabledSurfaces: EnabledSurfaces;
@@ -17,15 +15,15 @@
   let { enabledSurfaces, isAutoLike = $bindable(), autoLikeThreshold = $bindable(), isAutoLikeSubscribedChannels = $bindable() }: Props = $props();
 
   $effect(() => {
-    storage.setItem(StorageKey.IS_AUTO_LIKE, isAutoLike);
+    settings.isAutoLike.write(isAutoLike);
   });
 
   $effect(() => {
-    storage.setItem(StorageKey.AUTO_LIKE_THRESHOLD, autoLikeThreshold);
+    settings.autoLikeThreshold.write(autoLikeThreshold);
   });
 
   $effect(() => {
-    storage.setItem(StorageKey.IS_AUTO_LIKE_SUBSCRIBED_CHANNELS, isAutoLikeSubscribedChannels);
+    settings.isAutoLikeSubscribedChannels.write(isAutoLikeSubscribedChannels);
   });
 </script>
 

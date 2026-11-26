@@ -1,8 +1,4 @@
-export enum ThemeMode {
-  LIGHT = "light",
-  DARK = "dark",
-  AUTO = "auto"
-}
+import { ThemeMode } from "@/lib/theme-mode";
 
 export const theme = $state<{
   selected: ThemeMode;

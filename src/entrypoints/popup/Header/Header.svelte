@@ -1,6 +1,6 @@
 <script lang="ts">
   import ThemeSwitch from "@/entrypoints/popup/Header/ThemeSwitch.svelte";
-  import { type ThemeMode } from "@/entrypoints/popup/Header/themes/theme.svelte.js";
+  import { type ThemeMode } from "@/lib/theme-mode";
 
   interface Props {
     selectedTheme: ThemeMode;

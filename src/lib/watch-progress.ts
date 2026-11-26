@@ -1,18 +1,11 @@
-import { storage } from "#imports";
-import { StorageKey, UrlParam } from "@/lib/utils-initials";
+import { settings, type WatchProgress } from "@/lib/settings";
+import { UrlParam } from "@/lib/utils-initials";
 
 const MAXIMUM_REAL_SECONDS_BETWEEN_TIME_UPDATES = 1;
 const RETENTION_DAYS = 7;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAXIMUM_STORED_VIDEOS = 100;
 const MINIMUM_MILLISECONDS_BETWEEN_SAVES = 5000;
-
-interface WatchProgressEntry {
-  percentage: number;
-  updatedAt: number;
-}
-
-type WatchProgress = Record<string, WatchProgressEntry>;
 
 let lastSaveTime = 0;
 let pendingWrite = Promise.resolve();
@@ -47,14 +40,13 @@ function pruneProgress(progress: WatchProgress) {
 }
 
 async function readProgress() {
-  const stored = await storage.getItem<WatchProgress>(StorageKey.WATCH_PROGRESS);
-  return pruneProgress(stored ?? {});
+  return pruneProgress(await settings.watchProgress.read());
 }
 
 function updateProgress(update: (progress: WatchProgress) => WatchProgress) {
   pendingWrite = pendingWrite.then(async () => {
     const updated = update(await readProgress());
-    await storage.setItem(StorageKey.WATCH_PROGRESS, updated);
+    await settings.watchProgress.write(updated);
   });
   return pendingWrite;
 }

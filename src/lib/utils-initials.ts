@@ -1,29 +1,4 @@
-import { type ButtonTriggers, type Modifier } from "@/lib/types";
-
-type StoredPrimitive = string | number | boolean | null;
-type StoredValue = StoredPrimitive | StoredValue[] | StoredObject;
-interface StoredObject {
-  [key: string]: StoredValue;
-}
-
-function isPlainObject(value: StoredValue | undefined): value is StoredObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function mergeWithFallback({ fallback, stored }: { fallback: StoredObject; stored: StoredObject }) {
-  const result: StoredObject = { ...fallback };
-  for (const [key, storedEntry] of Object.entries(stored)) {
-    const fallbackEntry = fallback[key];
-    const isMergeable = isPlainObject(fallbackEntry) && isPlainObject(storedEntry);
-    result[key] = isMergeable
-      ? mergeWithFallback({
-          fallback: fallbackEntry,
-          stored: storedEntry
-        })
-      : storedEntry;
-  }
-  return result;
-}
+import { type ButtonTriggers, type Modifier, MODIFIER_KEYS } from "@/lib/button-triggers";
 
 export enum StorageKey {
   KEYBOARD_SHORTCUTS = "local:keyboardShortcuts",
@@ -34,36 +9,6 @@ export enum StorageKey {
   THEME = "local:theme",
   WATCH_PROGRESS = "local:watchProgress",
   ENABLED_SURFACES = "sync:enabledSurfaces"
-}
-
-export async function getStorage<Key extends keyof typeof window>({
-  storageKey,
-  fallback,
-  updateWindowKey
-}: {
-  storageKey: StorageKey;
-  fallback: (typeof window)[Key];
-  updateWindowKey: Key;
-}) {
-  let value: (typeof window)[Key];
-  try {
-    value = await storage.getItem<(typeof window)[Key]>(storageKey, { fallback });
-  } catch {
-    value = fallback;
-  }
-  const isMergeableObject = isPlainObject(value) && isPlainObject(fallback);
-  if (isMergeableObject) {
-    Object.assign(
-      value,
-      mergeWithFallback({
-        fallback,
-        stored: value
-      })
-    );
-  }
-
-  window[updateWindowKey] = value;
-  return value;
 }
 
 export enum YoutubeHost {
@@ -158,7 +103,6 @@ export function getCurrentSurface() {
   return location.pathname.startsWith(YoutubePathname.SHORTS) ? Surface.SHORTS : Surface.YOUTUBE;
 }
 
-const MODIFIER_KEYS = ["shiftKey", "ctrlKey", "altKey", "metaKey"] as const;
 export const MODIFIER_KEYCODES = ["Control", "Shift", "Alt", "Meta"] as const;
 
 export function isModifier(key: string): key is (typeof MODIFIER_KEYS)[number] {

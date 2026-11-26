@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { storage } from "#imports";
   import ToggleSwitch from "@/entrypoints/popup/components/ToggleSwitch.svelte";
   import { keys } from "@/entrypoints/popup/sections/keyboard.svelte.js";
-  import { type EnabledSurfaces } from "@/lib/surfaces";
-  import { StorageKey, Surface } from "@/lib/utils-initials";
+  import { type EnabledSurfaces, settings } from "@/lib/settings";
+  import { Surface } from "@/lib/utils-initials";
 
   interface Props {
     enabledSurfaces: EnabledSurfaces;
@@ -25,7 +24,7 @@
     {#each Object.values(Surface) as surface (surface)}
       <ToggleSwitch
         disabled={keys.isRecording || disabled}
-        onchange={e => storage.setItem(StorageKey.ENABLED_SURFACES, { ...enabledSurfaces, [surface]: e.currentTarget.checked })}
+        onchange={e => settings.enabledSurfaces.write({ ...enabledSurfaces, [surface]: e.currentTarget.checked })}
         bind:checked={enabledSurfaces[surface]}>
         {surfaceLabels[surface]}
       </ToggleSwitch>

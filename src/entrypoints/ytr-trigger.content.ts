@@ -1,5 +1,5 @@
-import { storage } from "#imports";
-import { getActionPressed, getStorage, initial, ShortcutType, StorageKey } from "@/lib/utils-initials";
+import { settings } from "@/lib/settings";
+import { getActionPressed, ShortcutType } from "@/lib/utils-initials";
 import { rateVideo } from "@/lib/ytr-buttons";
 
 async function rateIfNeeded(event: KeyboardEvent) {
@@ -30,11 +30,7 @@ async function rateIfNeeded(event: KeyboardEvent) {
 }
 
 async function init() {
-  window.ytrLastButtonTriggers = await getStorage({
-    storageKey: StorageKey.BUTTON_TRIGGERS,
-    fallback: initial.buttonTriggers,
-    updateWindowKey: "ytrLastButtonTriggers"
-  });
+  window.ytrLastButtonTriggers = await settings.buttonTriggers.read();
 
   document.addEventListener(
     "keydown",
@@ -50,8 +46,8 @@ async function init() {
     { capture: true }
   );
 
-  storage.watch<typeof initial.buttonTriggers>(StorageKey.BUTTON_TRIGGERS, buttonTriggers => {
-    window.ytrLastButtonTriggers = buttonTriggers || initial.buttonTriggers;
+  settings.buttonTriggers.watch(buttonTriggers => {
+    window.ytrLastButtonTriggers = buttonTriggers;
   });
 }
 

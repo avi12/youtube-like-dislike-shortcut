@@ -1,17 +1,9 @@
 import { mount, unmount } from "svelte";
 
-import { storage } from "#imports";
 import { isAnchorElement, isElement, isHtmlElement, isVideoElement } from "@/lib/dom-guards";
+import { settings } from "@/lib/settings";
 import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
-import {
-  DomAttribute,
-  getStorage,
-  initial,
-  OBSERVER_OPTIONS,
-  SELECTORS,
-  StorageKey,
-  UrlParam
-} from "@/lib/utils-initials";
+import { DomAttribute, OBSERVER_OPTIONS, SELECTORS, UrlParam } from "@/lib/utils-initials";
 import { getWatchedSeconds } from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
@@ -150,17 +142,9 @@ export default defineContentScript({
     });
     sharedState.subscriptionDecision = getSubscriptionDecision();
 
-    await Promise.all([
-      getStorage({
-        storageKey: StorageKey.IS_AUTO_LIKE,
-        fallback: initial.isAutoLike,
-        updateWindowKey: "ytrAutoLikeEnabled"
-      }),
-      getStorage({
-        storageKey: StorageKey.AUTO_LIKE_THRESHOLD,
-        fallback: initial.autoLikeThreshold,
-        updateWindowKey: "ytrAutoLikeThreshold"
-      })
+    [window.ytrAutoLikeEnabled, window.ytrAutoLikeThreshold] = await Promise.all([
+      settings.isAutoLike.read(),
+      settings.autoLikeThreshold.read()
     ]);
     sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     sharedState.isSurfaceEnabled = await getIsCurrentSurfaceEnabled();
@@ -266,8 +250,8 @@ export default defineContentScript({
       syncUi();
     }).observe(document, OBSERVER_OPTIONS);
 
-    storage.watch<typeof initial.isAutoLike>(StorageKey.IS_AUTO_LIKE, isAutoLikeUpdated => {
-      window.ytrAutoLikeEnabled = isAutoLikeUpdated ?? initial.isAutoLike;
+    settings.isAutoLike.watch(isAutoLikeUpdated => {
+      window.ytrAutoLikeEnabled = isAutoLikeUpdated;
       sharedState.isAutoLikeEnabled = window.ytrAutoLikeEnabled;
     });
 

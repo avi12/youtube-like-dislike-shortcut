@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { storage } from "#imports";
   import AutoLike from "@/entrypoints/popup/sections/AutoLike.svelte";
   import KeyboardShortcut from "@/entrypoints/popup/sections/KeyboardShortcut.svelte";
   import { keys, ShortcutType } from "@/entrypoints/popup/sections/keyboard.svelte.js";
-  import { type EnabledSurfaces } from "@/lib/surfaces";
-  import { type ButtonTriggers } from "@/lib/types";
-  import { isModifier, StorageKey } from "@/lib/utils-initials";
+  import { type EnabledSurfaces, settings } from "@/lib/settings";
+  import { isModifier } from "@/lib/utils-initials";
 
   interface Props {
     enabledSurfaces: EnabledSurfaces;
@@ -17,7 +15,7 @@
 
   $effect(() => {
     const { like, dislike, unrate } = keys.combos;
-    storage.setItem<ButtonTriggers>(StorageKey.BUTTON_TRIGGERS, {
+    settings.buttonTriggers.write({
       like: {
         primary: like.filter(key => !isModifier(key)),
         modifiers: like.filter(isModifier),

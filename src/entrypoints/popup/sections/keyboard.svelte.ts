@@ -1,4 +1,4 @@
-import { type ButtonTriggers } from "@/lib/types";
+import { type ButtonTriggers } from "@/lib/button-triggers";
 import { defaultAdditionalShortcuts, ShortcutType } from "@/lib/utils-initials";
 
 export { defaultAdditionalShortcuts, ShortcutType };

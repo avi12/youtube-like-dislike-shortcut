@@ -1,32 +1,13 @@
-import { storage } from "#imports";
-import { getCurrentSurface, initial, StorageKey, type Surface } from "@/lib/utils-initials";
-
-export type EnabledSurfaces = Record<Surface, boolean>;
-
-export function resolveEnabledSurfaces(stored: Partial<EnabledSurfaces> | null) {
-  return {
-    ...initial.enabledSurfaces,
-    ...stored
-  };
-}
-
-export async function getEnabledSurfaces() {
-  return resolveEnabledSurfaces(await storage.getItem<Partial<EnabledSurfaces>>(StorageKey.ENABLED_SURFACES));
-}
+import { settings } from "@/lib/settings";
+import { getCurrentSurface } from "@/lib/utils-initials";
 
 export async function getIsCurrentSurfaceEnabled() {
-  const enabledSurfaces = await getEnabledSurfaces();
+  const enabledSurfaces = await settings.enabledSurfaces.read();
   return enabledSurfaces[getCurrentSurface()];
 }
 
-export function watchEnabledSurfaces(onChange: (enabledSurfaces: EnabledSurfaces) => void) {
-  return storage.watch<Partial<EnabledSurfaces>>(StorageKey.ENABLED_SURFACES, stored => {
-    onChange(resolveEnabledSurfaces(stored));
-  });
-}
-
 export function watchIsCurrentSurfaceEnabled(onChange: (isEnabled: boolean) => void) {
-  return watchEnabledSurfaces(enabledSurfaces => {
+  return settings.enabledSurfaces.watch(enabledSurfaces => {
     onChange(enabledSurfaces[getCurrentSurface()]);
   });
 }
