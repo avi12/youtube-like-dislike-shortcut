@@ -17,7 +17,7 @@ pub(super) const MODE_DEVELOPMENT: &str = "development";
 #[serde(rename_all = "camelCase")]
 pub(super) struct WorkerJob<'job> {
     pub(super) project_root: &'job str,
-    pub(super) src_prefix: &'job str,
+    pub(super) source_prefix: &'job str,
     pub(super) runtime_global: &'static str,
     pub(super) mode: &'static str,
     pub(super) browser: DevBrowser,
@@ -66,7 +66,7 @@ pub(super) struct TransformResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::hmr::compile::protocol::*;
 
     #[test]
     fn a_request_line_parses() {

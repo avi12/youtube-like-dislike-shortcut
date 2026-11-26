@@ -8,7 +8,7 @@ use tracing::field::{Field, Visit};
 use tracing::{Event, Level, Subscriber};
 use tracing_subscriber::layer::{Context, Layer, SubscriberExt};
 
-use super::error::{LauncherError, Result};
+use crate::dev::launcher::error::{LauncherError, Result};
 
 const MILLISECONDS_PER_TENTH: u64 = 100;
 const TENTHS_PER_SECOND: u64 = 10;
@@ -25,7 +25,8 @@ pub(super) fn format_elapsed(elapsed_milliseconds: u64) -> String {
     let tenths =
         elapsed_milliseconds.saturating_add(HALF_TENTH_MILLISECONDS) / MILLISECONDS_PER_TENTH;
     let (seconds, fraction) = (tenths / TENTHS_PER_SECOND, tenths % TENTHS_PER_SECOND);
-    if fraction == 0 {
+    let is_whole_second = fraction == 0;
+    if is_whole_second {
         return format!("{seconds}s");
     }
     format!("{seconds}.{fraction}s")
@@ -38,7 +39,8 @@ struct MessageVisitor {
 
 impl Visit for MessageVisitor {
     fn record_debug(&mut self, field: &Field, value: &dyn Debug) {
-        if field.name() == MESSAGE_FIELD {
+        let is_message = field.name() == MESSAGE_FIELD;
+        if is_message {
             // Writing into a String cannot fail
             let _ = write!(self.text, "{value:?}");
         }
@@ -58,7 +60,8 @@ impl<S: Subscriber> Layer<S> for PrintLayer {
         let mut visitor = MessageVisitor::default();
         event.record(&mut visitor);
         let level = *event.metadata().level();
-        if level <= Level::WARN {
+        let is_problem = level <= Level::WARN;
+        if is_problem {
             log_event(&format!("{level} {visitor}"));
             return;
         }
@@ -74,7 +77,7 @@ pub(super) fn install_log_layer() -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::launcher::log::*;
 
     #[test]
     fn elapsed_time_keeps_one_decimal() {

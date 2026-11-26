@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 use clap::{Args, ValueEnum};
 use serde::Serialize;
 
-use super::error::{OutputError, Result};
 use crate::firefox::MARIONETTE_DEFAULT_PORT;
+use crate::output::error::{OutputError, Result};
 
 /// Chromium's debug port, which the `DevTools` MCP servers connect to.
 const DEFAULT_CDP_PORT: u16 = 9225;
@@ -112,8 +112,8 @@ pub(crate) struct OptionArgs {
     #[arg(long, short, value_enum, default_value_t)]
     browser: DevBrowser,
     /// Keep a persistent profile, seeded from your own browser profile on its first run
-    #[arg(long)]
-    with_profile: bool,
+    #[arg(long = "with-profile")]
+    is_profile_requested: bool,
     /// Remote debugging port (Chromium's `DevTools` port, or Firefox's remote agent port)
     #[arg(long, env = "DEV_SERVER_CDP_PORT", value_parser = clap::value_parser!(u16).range(1..))]
     cdp_port: Option<u16>,
@@ -121,17 +121,17 @@ pub(crate) struct OptionArgs {
     #[arg(long, env = "DEV_SERVER_MARIONETTE_PORT", value_parser = clap::value_parser!(u16).range(1..))]
     marionette_port: Option<u16>,
     /// The dev browser's profile directory
-    #[arg(long, env = "DEV_SERVER_PROFILE_DIR")]
-    profile_dir: Option<PathBuf>,
+    #[arg(long = "profile-dir", env = "DEV_SERVER_PROFILE_DIR")]
+    profile_directory: Option<PathBuf>,
     /// WXT's outDir
-    #[arg(long, env = "DEV_SERVER_OUT_DIR")]
-    out_dir: Option<PathBuf>,
+    #[arg(long = "out-dir", env = "DEV_SERVER_OUT_DIR")]
+    out_directory: Option<PathBuf>,
     /// The page the browser opens
     #[arg(long, env = "DEV_SERVER_START_URL")]
     start_url: Option<String>,
     /// Keep test browsers silent
-    #[arg(long, env = "DEV_SERVER_MUTE_AUDIO")]
-    mute_audio: bool,
+    #[arg(long = "mute-audio", env = "DEV_SERVER_MUTE_AUDIO")]
+    is_mute_requested: bool,
 }
 
 /// The options after flags, environment and defaults are merged.
@@ -144,8 +144,8 @@ pub(crate) struct DevOptions {
     pub(crate) is_audio_muted: bool,
     pub(crate) cdp_port: u16,
     pub(crate) marionette_port: u16,
-    pub(crate) profile_dir: PathBuf,
-    pub(crate) out_dir: PathBuf,
+    pub(crate) profile_directory: PathBuf,
+    pub(crate) out_directory: PathBuf,
     pub(crate) start_url: String,
     pub(crate) lang: String,
 }
@@ -157,13 +157,13 @@ impl DevOptions {
     }
 
     /// Where WXT writes this browser's build, matching the config's `outDirTemplate`.
-    pub(crate) fn output_dir(&self) -> PathBuf {
+    pub(crate) fn output_directory(&self) -> PathBuf {
         let folder = format!("{}-mv{MANIFEST_VERSION}-{BUILD_MODE}", self.browser.name());
-        self.out_dir.join(folder)
+        self.out_directory.join(folder)
     }
 }
 
-fn default_profile_dir(project_root: &Path, browser: DevBrowser, is_kept: bool) -> PathBuf {
+fn default_profile_directory(project_root: &Path, browser: DevBrowser, is_kept: bool) -> PathBuf {
     let project = project_root
         .file_name()
         .map_or_else(String::new, |name| name.to_string_lossy().into_owned());
@@ -183,8 +183,8 @@ fn default_profile_dir(project_root: &Path, browser: DevBrowser, is_kept: bool) 
 pub(crate) fn resolve_options(args: &OptionArgs, host: &HostEnvironment) -> Result<DevOptions> {
     let project_root = std::path::absolute(&args.project_root)
         .map_err(OutputError::with_path(&args.project_root))?;
-    let profile_dir = args.profile_dir.as_ref().map_or_else(
-        || default_profile_dir(&project_root, args.browser, args.with_profile),
+    let profile_directory = args.profile_directory.as_ref().map_or_else(
+        || default_profile_directory(&project_root, args.browser, args.is_profile_requested),
         |directory| project_root.join(directory),
     );
     let default_port = if args.browser.is_firefox() {
@@ -192,20 +192,20 @@ pub(crate) fn resolve_options(args: &OptionArgs, host: &HostEnvironment) -> Resu
     } else {
         DEFAULT_CDP_PORT
     };
-    let out_dir = project_root.join(
-        args.out_dir
+    let out_directory = project_root.join(
+        args.out_directory
             .as_deref()
             .unwrap_or_else(|| Path::new(DEFAULT_OUT_DIR)),
     );
     Ok(DevOptions {
         browser: args.browser,
-        is_profile_kept: args.with_profile,
-        is_profile_directory_named: args.profile_dir.is_some(),
-        is_audio_muted: args.mute_audio,
+        is_profile_kept: args.is_profile_requested,
+        is_profile_directory_named: args.profile_directory.is_some(),
+        is_audio_muted: args.is_mute_requested,
         cdp_port: args.cdp_port.unwrap_or(default_port),
         marionette_port: args.marionette_port.unwrap_or(MARIONETTE_DEFAULT_PORT),
-        profile_dir,
-        out_dir,
+        profile_directory,
+        out_directory,
         start_url: args
             .start_url
             .clone()
@@ -219,7 +219,7 @@ pub(crate) fn resolve_options(args: &OptionArgs, host: &HostEnvironment) -> Resu
 pub(crate) mod tests {
     use clap::Parser;
 
-    use super::*;
+    use crate::output::options::*;
 
     #[derive(Debug, Parser)]
     struct Wrapper {
@@ -253,9 +253,9 @@ pub(crate) mod tests {
         assert_eq!(options.browser, DevBrowser::Edge);
         assert_eq!(options.cdp_port, DEFAULT_CDP_PORT);
         assert!(options
-            .profile_dir
+            .profile_directory
             .ends_with("work/extension-profiles/edge-temporary"));
-        assert!(options.output_dir().ends_with("build/edge-mv3-prod"));
+        assert!(options.output_directory().ends_with("build/edge-mv3-prod"));
         Ok(())
     }
 
@@ -264,8 +264,12 @@ pub(crate) mod tests {
         let options = resolve(&["-b", "firefox", "--with-profile", "--cdp-port", "9300"])?;
         assert_eq!(options.cdp_port, 9300);
         assert_eq!(options.marionette_port, MARIONETTE_DEFAULT_PORT);
-        assert!(options.profile_dir.ends_with("extension-profiles/firefox"));
-        assert!(options.output_dir().ends_with("build/firefox-mv3-prod"));
+        assert!(options
+            .profile_directory
+            .ends_with("extension-profiles/firefox"));
+        assert!(options
+            .output_directory()
+            .ends_with("build/firefox-mv3-prod"));
         Ok(())
     }
 

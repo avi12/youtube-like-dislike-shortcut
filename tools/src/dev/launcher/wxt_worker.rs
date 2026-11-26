@@ -12,7 +12,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, Lines};
 use tokio::process::{Child, ChildStdin, ChildStdout, Command};
 use tokio::sync::Mutex;
 
-use super::error::{LauncherError, Result};
+use crate::dev::launcher::error::{LauncherError, Result};
 
 const WORKER_SOURCE: &str = include_str!("../../../assets/dev/wxt-build-worker.mjs");
 const WORKER_FILE: &str = "wxt-build-worker.mjs";
@@ -30,7 +30,8 @@ pub(super) struct WxtBuildRequest<'request> {
     pub(super) browser: &'static str,
     pub(super) mode: &'static str,
     pub(super) manifest_version: u8,
-    pub(super) out_dir: &'request Path,
+    #[serde(rename = "outDir")]
+    pub(super) out_directory: &'request Path,
 }
 
 #[derive(Deserialize)]
@@ -134,7 +135,9 @@ pub(super) async fn run_wxt_build(request: &WxtBuildRequest<'_>) -> Result<()> {
         _ => spawn(request.root).await?,
     };
     let outcome = converse(&mut worker, request).await;
-    if outcome.as_ref().is_ok() || matches!(outcome, Err(LauncherError::Invalid(_))) {
+    let is_worker_still_usable =
+        outcome.as_ref().is_ok() || matches!(outcome, Err(LauncherError::Invalid(_)));
+    if is_worker_still_usable {
         *slot = Some(worker);
     }
     outcome

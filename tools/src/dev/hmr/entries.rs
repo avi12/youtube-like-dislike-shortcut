@@ -6,7 +6,7 @@ use std::path::Path;
 
 use regex::Regex;
 
-use super::error::{HmrError, Result};
+use crate::dev::hmr::error::{HmrError, Result};
 use crate::output::manifest::{ContentScriptWorld, ExtensionManifest};
 
 const ENTRYPOINTS_DIR: &str = "src/entrypoints";
@@ -108,9 +108,9 @@ fn content_entries(project_root: &Path, manifest: &ExtensionManifest) -> Result<
     Ok(entries)
 }
 
-fn page_entries(project_root: &Path, output_dir: &Path) -> Result<Vec<Entrypoint>> {
-    let listing = fs::read_dir(output_dir).map_err(|source| HmrError::Read {
-        path: output_dir.to_owned(),
+fn page_entries(project_root: &Path, output_directory: &Path) -> Result<Vec<Entrypoint>> {
+    let listing = fs::read_dir(output_directory).map_err(|source| HmrError::Read {
+        path: output_directory.to_owned(),
         source,
     })?;
     let mut entries = Vec::new();
@@ -130,11 +130,11 @@ fn page_entries(project_root: &Path, output_dir: &Path) -> Result<Vec<Entrypoint
     Ok(entries)
 }
 
-/// Every entrypoint of the build in `output_dir`.
-pub(crate) fn discover(project_root: &Path, output_dir: &Path) -> Result<Vec<Entrypoint>> {
-    let manifest = ExtensionManifest::read(output_dir)?;
+/// Every entrypoint of the build in `output_directory`.
+pub(crate) fn discover(project_root: &Path, output_directory: &Path) -> Result<Vec<Entrypoint>> {
+    let manifest = ExtensionManifest::read(output_directory)?;
     let mut entries = content_entries(project_root, &manifest)?;
-    entries.extend(page_entries(project_root, output_dir)?);
+    entries.extend(page_entries(project_root, output_directory)?);
     if let Some(built_file) = manifest.background_files()?.into_iter().next() {
         entries.push(Entrypoint {
             name: BACKGROUND_NAME.to_owned(),
@@ -148,7 +148,7 @@ pub(crate) fn discover(project_root: &Path, output_dir: &Path) -> Result<Vec<Ent
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::hmr::entries::*;
 
     fn write(root: &Path, file: &str, content: &str) -> Result<()> {
         let path = root.join(file);

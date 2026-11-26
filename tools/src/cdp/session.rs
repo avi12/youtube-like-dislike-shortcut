@@ -11,7 +11,7 @@ use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
 
-use super::error::{CdpError, Result};
+use crate::cdp::error::{CdpError, Result};
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const REPLY_TIMEOUT: Duration = Duration::from_secs(30);
@@ -82,11 +82,11 @@ impl Session {
     pub(crate) async fn call<P: Serialize + Sync>(
         &mut self,
         method: Method,
-        params: &P,
+        parameters: &P,
     ) -> Result<Value> {
         let id = self.next_id;
         self.next_id += 1;
-        let payload = encode_command(id, method, params)?;
+        let payload = encode_command(id, method, parameters)?;
         self.socket.send(Message::text(payload)).await?;
         timeout(REPLY_TIMEOUT, self.reply_to(id, method))
             .await
@@ -96,7 +96,8 @@ impl Session {
     async fn reply_to(&mut self, id: u64, method: Method) -> Result<Value> {
         loop {
             let frame = self.read_frame().await?;
-            if frame.id != Some(id) {
+            let is_other_frame = frame.id != Some(id);
+            if is_other_frame {
                 continue;
             }
             if let Some(error) = frame.error {
@@ -118,8 +119,8 @@ impl Session {
 
     /// `Runtime.evaluate` (awaiting a promise, by value).
     pub(crate) async fn evaluate(&mut self, expression: &str) -> Result<Value> {
-        let params = EvaluateParams::awaited(expression);
-        let reply = self.call(Method::RuntimeEvaluate, &params).await?;
+        let parameters = EvaluateParams::awaited(expression);
+        let reply = self.call(Method::RuntimeEvaluate, &parameters).await?;
         serde_json::from_value::<EvaluateReply>(reply)?.into_value()
     }
 }
@@ -128,7 +129,7 @@ impl Session {
 mod tests {
     use serde_json::json;
 
-    use super::*;
+    use crate::cdp::session::*;
 
     #[test]
     fn a_thrown_exception_is_an_error_with_its_description() -> Result<()> {

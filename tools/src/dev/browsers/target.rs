@@ -3,7 +3,7 @@
 use std::future::Future;
 use std::pin::Pin;
 
-use super::error::Result;
+use crate::dev::browsers::error::Result;
 use crate::output::reload::{ExtensionReloadPlan, PageRefreshPlan};
 
 /// A boxed future, so a target can sit behind `dyn ReloadTarget`.

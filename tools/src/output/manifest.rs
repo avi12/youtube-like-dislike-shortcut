@@ -8,7 +8,7 @@ pub(crate) use dev_hot::changes::MANIFEST_FILE_NAME as MANIFEST_FILE;
 use serde::Deserialize;
 use serde_json::{Map, Value};
 
-use super::error::{OutputError, Result};
+use crate::output::error::{OutputError, Result};
 
 const ALL_URLS_PATTERN: &str = "<all_urls>";
 const ANY_HOST: &str = "*";
@@ -79,14 +79,14 @@ impl Default for ExtensionManifest {
 }
 
 impl ExtensionManifest {
-    pub(crate) fn read(output_dir: &Path) -> Result<Self> {
-        let path = output_dir.join(MANIFEST_FILE);
+    pub(crate) fn read(output_directory: &Path) -> Result<Self> {
+        let path = output_directory.join(MANIFEST_FILE);
         let text = fs::read_to_string(&path).map_err(OutputError::with_path(&path))?;
         Ok(Self(serde_json::from_str(&text)?))
     }
 
-    pub(crate) fn write(&self, output_dir: &Path) -> Result<()> {
-        let path = output_dir.join(MANIFEST_FILE);
+    pub(crate) fn write(&self, output_directory: &Path) -> Result<()> {
+        let path = output_directory.join(MANIFEST_FILE);
         let text = serde_json::to_string_pretty(&self.0)?;
         fs::write(&path, text).map_err(OutputError::with_path(&path))
     }
@@ -172,7 +172,8 @@ fn glob_matches(glob: &str, text: &str) -> bool {
 }
 
 fn is_host_matching(pattern_host: &str, host: &str) -> bool {
-    if pattern_host == ANY_HOST {
+    let is_any_host = pattern_host == ANY_HOST;
+    if is_any_host {
         return true;
     }
     let Some(domain) = pattern_host.strip_prefix(ANY_SUBDOMAIN_PREFIX) else {
@@ -182,7 +183,8 @@ fn is_host_matching(pattern_host: &str, host: &str) -> bool {
 }
 
 fn is_scheme_matching(pattern_scheme: &str, scheme: &str) -> bool {
-    if pattern_scheme == "*" {
+    let is_any_web_scheme = pattern_scheme == "*";
+    if is_any_web_scheme {
         return ANY_WEB_SCHEMES.contains(&scheme);
     }
     pattern_scheme == scheme
@@ -198,7 +200,8 @@ fn split_url(text: &str) -> Option<(&str, &str, &str)> {
 
 /// Chrome's match pattern semantics, as far as a tab URL needs them.
 pub(crate) fn matches_url_pattern(url: &str, pattern: &str) -> bool {
-    if pattern == ALL_URLS_PATTERN {
+    let is_every_url = pattern == ALL_URLS_PATTERN;
+    if is_every_url {
         return true;
     }
     let Some((scheme, host, path)) = split_url(pattern) else {
@@ -217,7 +220,7 @@ pub(crate) fn matches_url_pattern(url: &str, pattern: &str) -> bool {
 mod tests {
     use serde_json::json;
 
-    use super::*;
+    use crate::output::manifest::*;
 
     #[test]
     fn subdomain_wildcard_matches_bare_and_nested_hosts() {

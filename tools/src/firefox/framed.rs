@@ -10,7 +10,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 
-use super::{FirefoxError, Result};
+use crate::firefox::{FirefoxError, Result};
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const READ_CHUNK_BYTES: usize = 8192;

@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 
 mod processes;
 
-use super::error::{OutputError, Result};
-use super::options::{DevBrowser, DevOptions, HostEnvironment, OsPlatform};
+use crate::output::error::{OutputError, Result};
+use crate::output::options::{DevBrowser, DevOptions, HostEnvironment, OsPlatform};
 
 const SEEDED_SENTINEL: &str = ".seeded";
 /// The profile folder a kept Chromium profile runs on.
@@ -37,7 +37,7 @@ fn copy_file(source: &Path, destination: &Path) -> Result<()> {
 }
 
 /// The user data directory of the installed browser a Chromium profile is seeded from.
-fn chromium_user_data_dir(browser: DevBrowser, host: &HostEnvironment) -> PathBuf {
+fn chromium_user_data_directory(browser: DevBrowser, host: &HostEnvironment) -> PathBuf {
     let mac = host.home.join("Library/Application Support");
     let linux = host.home.join(".config");
     match (browser, host.platform) {
@@ -57,7 +57,7 @@ fn chromium_user_data_dir(browser: DevBrowser, host: &HostEnvironment) -> PathBu
     }
 }
 
-fn firefox_data_dir(host: &HostEnvironment) -> PathBuf {
+fn firefox_data_directory(host: &HostEnvironment) -> PathBuf {
     match host.platform {
         OsPlatform::Windows => host.app_data.join("Mozilla").join("Firefox"),
         OsPlatform::MacOs => host.home.join("Library/Application Support/Firefox"),
@@ -101,7 +101,7 @@ fn is_profile_header(line: &str) -> bool {
 }
 
 /// The `[Install...] Default=` profile Firefox actually launches, else the `Default=1` profile.
-fn default_profile_path(ini: &str, data_dir: &Path) -> Option<PathBuf> {
+fn default_profile_path(ini: &str, data_directory: &Path) -> Option<PathBuf> {
     let mut is_install_section = false;
     let mut profiles: Vec<IniProfile> = Vec::new();
     for line in ini.lines().map(str::trim) {
@@ -113,7 +113,7 @@ fn default_profile_path(ini: &str, data_dir: &Path) -> Option<PathBuf> {
             continue;
         }
         if let Some(value) = line.strip_prefix("Default=").filter(|_| is_install_section) {
-            return Some(data_dir.join(value.trim()));
+            return Some(data_directory.join(value.trim()));
         }
         let Some(profile) = profiles.last_mut().filter(|_| !is_install_section) else {
             continue;
@@ -128,16 +128,17 @@ fn default_profile_path(ini: &str, data_dir: &Path) -> Option<PathBuf> {
     let default = profiles.into_iter().find(|profile| profile.is_default)?;
     let path = PathBuf::from(default.path?);
     Some(if default.is_relative {
-        data_dir.join(path)
+        data_directory.join(path)
     } else {
         path
     })
 }
 
 /// Copies the user's Firefox session files.
-fn seed_firefox_profile(data_dir: &Path, profile: &Path) -> Result<()> {
-    let ini = fs::read_to_string(data_dir.join(PROFILES_INI)).unwrap_or_default();
-    let Some(source) = default_profile_path(&ini, data_dir).filter(|path| path.exists()) else {
+fn seed_firefox_profile(data_directory: &Path, profile: &Path) -> Result<()> {
+    let ini = fs::read_to_string(data_directory.join(PROFILES_INI)).unwrap_or_default();
+    let Some(source) = default_profile_path(&ini, data_directory).filter(|path| path.exists())
+    else {
         return Ok(());
     };
     for file in FIREFOX_SESSION_FILES {
@@ -160,7 +161,7 @@ fn empty_directory(directory: &Path) -> Result<()> {
 
 /// Readies the profile of the browser the options target.
 pub(crate) fn setup_profile(options: &DevOptions, host: &HostEnvironment) -> Result<()> {
-    let profile = &options.profile_dir;
+    let profile = &options.profile_directory;
     if !options.is_profile_kept {
         // A directory the caller named is theirs: only the server's own temporary one is emptied
         return if options.is_profile_temporary() {
@@ -175,9 +176,12 @@ pub(crate) fn setup_profile(options: &DevOptions, host: &HostEnvironment) -> Res
     }
     create_directory(profile)?;
     if options.browser.is_firefox() {
-        seed_firefox_profile(&firefox_data_dir(host), profile)?;
+        seed_firefox_profile(&firefox_data_directory(host), profile)?;
     } else {
-        seed_chromium_profile(&chromium_user_data_dir(options.browser, host), profile)?;
+        seed_chromium_profile(
+            &chromium_user_data_directory(options.browser, host),
+            profile,
+        )?;
     }
     fs::write(&sentinel, "").map_err(OutputError::with_path(&sentinel))
 }
@@ -188,13 +192,13 @@ pub(crate) async fn clean_leftover_instances(
     options: &DevOptions,
     host: &HostEnvironment,
 ) -> Result<()> {
-    processes::stop_on_profile(host.platform, options.browser, &options.profile_dir).await
+    processes::stop_on_profile(host.platform, options.browser, &options.profile_directory).await
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::output::options::tests::resolve;
+    use crate::output::profile::*;
 
     const INI_WITH_INSTALL: &str = "[Profile0]\nName=old\nIsRelative=1\nPath=Profiles/old\nDefault=1\n\n[Install4F96D1932A9F858E]\nDefault=Profiles/live\nLocked=1\n";
 

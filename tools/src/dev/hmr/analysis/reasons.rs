@@ -4,7 +4,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 
-use super::side_effects::find_side_effect;
+use crate::dev::hmr::analysis::side_effects::find_side_effect;
 use crate::dev::hmr::chunks::{ChunkType, OutputChunk};
 use crate::dev::hmr::config::{without_query, ProjectPaths};
 use crate::dev::hmr::error::Result;
@@ -31,7 +31,7 @@ fn describe_chunk(paths: &ProjectPaths, chunk: &OutputChunk) -> ChunkInfo {
         source_id: chunk
             .facade_module_id
             .as_deref()
-            .and_then(|id| paths.src_id_of(id)),
+            .and_then(|id| paths.source_id_of(id)),
         entry_name: if chunk.is_entry {
             chunk.name.clone()
         } else {
@@ -133,11 +133,13 @@ impl ReloadReasoner {
             let Some(info) = self.infos.get(&current).cloned() else {
                 continue;
             };
-            if info.is_svelte || !visited.insert(current.clone()) {
+            let is_boundary_or_seen = info.is_svelte || !visited.insert(current.clone());
+            if is_boundary_or_seen {
                 continue;
             }
             if let Some(reason) = self.own_reason(&info)? {
-                return Ok(Some(if current == file_name {
+                let is_own_chunk = current == file_name;
+                return Ok(Some(if is_own_chunk {
                     reason
                 } else {
                     let via = info.source_id.as_deref().unwrap_or(&current);

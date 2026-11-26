@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::time::{timeout_at, Instant};
 
-use super::replies::AddonList;
 use crate::firefox::framed::Framed;
+use crate::firefox::rdp::replies::AddonList;
 use crate::firefox::{FirefoxError, Result};
 
 /// The header every packet is routed by; the rest of it is read per request.
@@ -116,9 +116,9 @@ impl Rdp {
         &mut self,
         actor: &ActorId,
         kind: RequestKind,
-        params: &P,
+        parameters: &P,
     ) -> Result<()> {
-        let packet = encode_request(actor, kind, params)?;
+        let packet = encode_request(actor, kind, parameters)?;
         self.framed.write(&packet).await
     }
 
@@ -127,9 +127,9 @@ impl Rdp {
         &mut self,
         actor: &ActorId,
         kind: RequestKind,
-        params: &P,
+        parameters: &P,
     ) -> Result<Message> {
-        self.send(actor, kind, params).await?;
+        self.send(actor, kind, parameters).await?;
         self.wait_from(actor, self.reply_timeout).await
     }
 
@@ -141,8 +141,8 @@ impl Rdp {
         text: &str,
         limit: Duration,
     ) -> Result<Message> {
-        let params = EvaluateParams::new(text).not_eager();
-        self.evaluate_with(console, params, limit).await
+        let parameters = EvaluateParams::new(text).not_eager();
+        self.evaluate_with(console, parameters, limit).await
     }
 
     /// Like [`Self::evaluate`], awaiting the promise the text resolves to (top-level `await`).
@@ -152,18 +152,18 @@ impl Rdp {
         text: &str,
         limit: Duration,
     ) -> Result<Message> {
-        let params = EvaluateParams::new(text).not_eager().awaiting();
-        self.evaluate_with(console, params, limit).await
+        let parameters = EvaluateParams::new(text).not_eager().awaiting();
+        self.evaluate_with(console, parameters, limit).await
     }
 
     async fn evaluate_with(
         &mut self,
         console: &ActorId,
-        params: EvaluateParams<'_>,
+        parameters: EvaluateParams<'_>,
         limit: Duration,
     ) -> Result<Message> {
         let ack = self
-            .request(console, RequestKind::EvaluateJsAsync, &params)
+            .request(console, RequestKind::EvaluateJsAsync, &parameters)
             .await?;
         let Some(result_id) = ack.result_id.clone() else {
             return Ok(ack);

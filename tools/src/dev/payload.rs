@@ -125,8 +125,8 @@ fn write_text(path: &Path, text: &str) -> Result<()> {
     fs::write(path, text).map_err(OutputError::with_path(path))
 }
 
-fn patch_page(output_dir: &Path, entry: &Entrypoint) -> Result<()> {
-    let path = output_dir.join(&entry.built_file);
+fn patch_page(output_directory: &Path, entry: &Entrypoint) -> Result<()> {
+    let path = output_directory.join(&entry.built_file);
     let original = read_text(&path)?;
     let loader_tag = format!(
         "<script type=\"module\" src=\"/{HMR_OUT_SUBDIR}/{}/{HMR_PAGE_LOADER_FILE}\"></script>",
@@ -142,8 +142,8 @@ fn patch_page(output_dir: &Path, entry: &Entrypoint) -> Result<()> {
     write_text(&path, &format!("{patched}<!-- {} -->\n", hash.as_str()))
 }
 
-fn patch_content_script(output_dir: &Path, entry: &Entrypoint) -> Result<()> {
-    let path = output_dir.join(&entry.built_file);
+fn patch_content_script(output_directory: &Path, entry: &Entrypoint) -> Result<()> {
+    let path = output_directory.join(&entry.built_file);
     let original = read_text(&path)?;
     write_text(&path, &content_loader_source(&entry.name, &original))
 }
@@ -158,8 +158,8 @@ fn origin_pattern(pattern: &str) -> String {
 }
 
 /// Makes the HMR modules importable by the pages the hot content scripts run on.
-fn expose_modules(output_dir: &Path, hot_entries: &[Entrypoint]) -> Result<()> {
-    let mut manifest = ExtensionManifest::read(output_dir)?;
+fn expose_modules(output_directory: &Path, hot_entries: &[Entrypoint]) -> Result<()> {
+    let mut manifest = ExtensionManifest::read(output_directory)?;
     let mut matches: Vec<String> = Vec::new();
     for script in manifest.content_scripts()? {
         let is_hot = hot_entries.iter().any(|entry| {
@@ -182,24 +182,27 @@ fn expose_modules(output_dir: &Path, hot_entries: &[Entrypoint]) -> Result<()> {
         "resources": [format!("{HMR_OUT_SUBDIR}/*")],
         "matches": matches,
     }))?;
-    manifest.write(output_dir)
+    manifest.write(output_directory)
 }
 
 /// Runs once after every extension build: points the hot entrypoints at their HMR modules.
-pub(crate) fn patch_built_output(output_dir: &Path, hot_entries: &[Entrypoint]) -> Result<()> {
+pub(crate) fn patch_built_output(
+    output_directory: &Path,
+    hot_entries: &[Entrypoint],
+) -> Result<()> {
     for entry in hot_entries {
         match entry.kind {
-            EntryKind::Page => patch_page(output_dir, entry)?,
-            EntryKind::ContentScript => patch_content_script(output_dir, entry)?,
+            EntryKind::Page => patch_page(output_directory, entry)?,
+            EntryKind::ContentScript => patch_content_script(output_directory, entry)?,
             EntryKind::Cold => {}
         }
     }
-    expose_modules(output_dir, hot_entries)
+    expose_modules(output_directory, hot_entries)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::payload::*;
 
     #[test]
     fn module_scripts_and_stylesheets_are_stripped() {

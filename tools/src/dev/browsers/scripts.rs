@@ -56,7 +56,7 @@ pub(super) fn page_refresh(plan: &PageRefreshPlan) -> serde_json::Result<String>
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::browsers::scripts::*;
 
     #[test]
     fn a_script_is_the_asset_called_with_its_json_argument() -> serde_json::Result<()> {

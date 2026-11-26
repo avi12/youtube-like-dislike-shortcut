@@ -1,6 +1,6 @@
 use serde_json::json;
 
-use super::*;
+use crate::firefox::rdp::client::*;
 
 #[test]
 fn a_message_needs_a_string_sender() {

@@ -6,13 +6,13 @@ use std::path::{Path, PathBuf};
 
 use tokio::fs;
 
-use super::output::{finish_build, BuiltEntry, ContentState, FinishInput};
-use super::protocol::{WorkerJob, MODE_DEVELOPMENT};
-use super::worker::{run_worker, Transforms};
 use crate::dev::hmr::analysis::wxt_resolution::{
     entry_input, read_auto_imports, read_path_aliases, virtual_modules, PathAlias, VirtualModules,
 };
 use crate::dev::hmr::chunks::{GraphCollector, ModuleRecord};
+use crate::dev::hmr::compile::output::{finish_build, BuiltEntry, ContentState, FinishInput};
+use crate::dev::hmr::compile::protocol::{WorkerJob, MODE_DEVELOPMENT};
+use crate::dev::hmr::compile::worker::{run_worker, Transforms};
 use crate::dev::hmr::config::{without_query, ProjectPaths, HMR_OUT_SUBDIR, HMR_RUNTIME_GLOBAL};
 use crate::dev::hmr::entries::{discover, EntryKind, Entrypoint};
 use crate::dev::hmr::error::Result;
@@ -27,7 +27,7 @@ pub(crate) struct HmrRequest {
     /// The project (the repository root).
     pub(crate) project_root: PathBuf,
     /// The extension build output the HMR modules are added under.
-    pub(crate) output_dir: PathBuf,
+    pub(crate) output_directory: PathBuf,
     /// The browser the build targets.
     pub(crate) browser: DevBrowser,
     /// The in-page runtime, written as `runtime.js`.
@@ -66,7 +66,7 @@ impl SharedJobParts {
     ) -> Result<crate::dev::hmr::chunks::BuildOutput> {
         let job = WorkerJob {
             project_root: self.paths.root(),
-            src_prefix: self.paths.src_prefix(),
+            source_prefix: self.paths.source_prefix(),
             runtime_global: HMR_RUNTIME_GLOBAL,
             mode: MODE_DEVELOPMENT,
             browser: self.browser,
@@ -111,7 +111,7 @@ fn reachable_sources(
     }
     visited
         .iter()
-        .filter_map(|module| paths.src_id_of(module))
+        .filter_map(|module| paths.source_id_of(module))
         .collect()
 }
 
@@ -129,7 +129,8 @@ fn split_entries(
         let is_mounting_components = sources
             .iter()
             .any(|source| source.ends_with(SVELTE_EXTENSION));
-        if entry.kind != EntryKind::Cold && is_mounting_components {
+        let is_hot = entry.kind != EntryKind::Cold && is_mounting_components;
+        if is_hot {
             hot.push(entry);
             continue;
         }
@@ -141,9 +142,9 @@ fn split_entries(
 /// Builds the HMR modules and the manifest the in-page runtime polls under `<output>/hmr/`.
 pub(crate) async fn build_hmr(request: &HmrRequest) -> Result<HmrBuild> {
     let paths = ProjectPaths::new(&request.project_root);
-    let output_directory = request.output_dir.join(HMR_OUT_SUBDIR);
+    let output_directory = request.output_directory.join(HMR_OUT_SUBDIR);
     fs::create_dir_all(&output_directory).await?;
-    let entries = discover(&request.project_root, &request.output_dir)?;
+    let entries = discover(&request.project_root, &request.output_directory)?;
     let shared = SharedJobParts {
         aliases: read_path_aliases(&paths)?,
         output_directory: output_directory.to_string_lossy().replace('\\', "/"),
@@ -204,7 +205,7 @@ pub(crate) async fn build_hmr(request: &HmrRequest) -> Result<HmrBuild> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::hmr::compile::build::*;
 
     fn record(id: &str, importers: &[&str]) -> ModuleRecord {
         ModuleRecord {

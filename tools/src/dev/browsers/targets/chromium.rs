@@ -122,14 +122,17 @@ impl ChromiumTarget {
     /// Waits for a worker other than the `stale` ones the reload is tearing down.
     async fn wait_for_fresh_worker(&self, extension_id: &str, stale: &[TargetId]) -> Result<()> {
         let deadline = Instant::now() + SERVICE_WORKER_WAIT;
-        while Instant::now() < deadline {
+        loop {
+            let is_expired = Instant::now() >= deadline;
+            if is_expired {
+                return Err(BrowserError::Timeout("the extension's service worker"));
+            }
             let workers = self.list_worker_ids(extension_id).await;
             if workers.iter().any(|id| !stale.contains(id)) {
                 return Ok(());
             }
             tokio::time::sleep(SERVICE_WORKER_POLL).await;
         }
-        Err(BrowserError::Timeout("the extension's service worker"))
     }
 
     /// Always through the extensions page: `runtime.reload()` from the worker makes a branded
@@ -151,7 +154,9 @@ impl ChromiumTarget {
         }
         let mut reloaded = 0;
         for target in self.client.list_targets().await? {
-            if is_matching_tab(&target, &plan.tab_patterns) && reload_page(&target).await {
+            let is_reloaded =
+                is_matching_tab(&target, &plan.tab_patterns) && reload_page(&target).await;
+            if is_reloaded {
                 reloaded += 1;
             }
         }
@@ -166,14 +171,16 @@ impl ChromiumTarget {
         let is_any_page_affected = !plan.shared_asset_files.is_empty();
         let mut refreshed = Vec::new();
         for target in self.client.list_targets().await? {
-            if target.kind != TargetKind::Page || !target.url.starts_with(&prefix) {
+            let is_unrelated = target.kind != TargetKind::Page || !target.url.starts_with(&prefix);
+            if is_unrelated {
                 continue;
             }
             let Some(name) = page_name_of(&target.url).map(str::to_owned) else {
                 continue;
             };
             let is_affected = is_any_page_affected || plan.page_names.contains(&name);
-            if is_affected && reload_page(&target).await {
+            let is_refreshed = is_affected && reload_page(&target).await;
+            if is_refreshed {
                 refreshed.push(name);
             }
         }
@@ -193,7 +200,7 @@ impl ReloadTarget for ChromiumTarget {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::browsers::targets::chromium::*;
 
     fn target(kind: &str, url: &str) -> Result<CdpTarget> {
         Ok(serde_json::from_value(serde_json::json!({

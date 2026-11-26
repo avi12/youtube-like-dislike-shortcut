@@ -151,7 +151,7 @@ pub(super) async fn stop_on_profile(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::output::profile::processes::*;
 
     fn process(pid: u32, command_line: &str) -> RunningProcess {
         RunningProcess {
@@ -160,13 +160,16 @@ mod tests {
         }
     }
 
+    const DEV_SERVER: u32 = 3;
+    const UNRELATED_BROWSER: u32 = 4;
+
     #[test]
     fn only_browsers_naming_this_profile_match() {
         let processes = [
             process(1, r"msedge.exe --user-data-dir=C:\p\edge --lang=en"),
             process(2, r"msedge.exe --user-data-dir=C:\p\edge-temporary"),
-            process(3, r"devtool.exe dev --profile-dir C:\p\edge"),
-            process(4, "msedge.exe"),
+            process(DEV_SERVER, r"devtool.exe dev --profile-dir C:\p\edge"),
+            process(UNRELATED_BROWSER, "msedge.exe"),
         ];
         let pids = pids_on_profile(&processes, DevBrowser::Edge, r"C:\p\edge", false);
         assert_eq!(pids, [1]);

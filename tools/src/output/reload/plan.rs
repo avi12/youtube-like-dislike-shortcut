@@ -12,9 +12,9 @@ use std::path::Path;
 use serde::Serialize;
 use serde_json::Value;
 
-use super::snapshot::BuildSnapshot;
 use crate::output::error::Result;
 use crate::output::manifest::MANIFEST_FILE;
+use crate::output::reload::snapshot::BuildSnapshot;
 
 const LOCALES_DIR_PREFIX: &str = "_locales/";
 const CONTENT_SCRIPTS_DIR_PREFIX: &str = "content-scripts/";
@@ -92,7 +92,8 @@ fn collect_strings(value: &Value, strings: &mut BTreeSet<String>) {
 /// Read only when the extension loads: the manifest, the files it names directly (icons) and the
 /// locale catalogs.
 fn is_load_time_file(file: &str, manifest_strings: &BTreeSet<String>) -> bool {
-    if file == MANIFEST_FILE || file.starts_with(LOCALES_DIR_PREFIX) {
+    let is_manifest_or_locale = file == MANIFEST_FILE || file.starts_with(LOCALES_DIR_PREFIX);
+    if is_manifest_or_locale {
         return true;
     }
     let extension = Path::new(file).extension().and_then(|text| text.to_str());

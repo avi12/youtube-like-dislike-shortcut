@@ -61,9 +61,11 @@ fn find_matching_paren(code: &str, open_paren_index: usize) -> Option<usize> {
     let mut bytes = code.bytes().enumerate().skip(open_paren_index);
     while let Some((index, byte)) = bytes.next() {
         if let Some(quote) = open_quote {
-            if byte == b'\\' {
+            let is_escape = byte == b'\\';
+            let is_closing_quote = byte == quote;
+            if is_escape {
                 bytes.next();
-            } else if byte == quote {
+            } else if is_closing_quote {
                 open_quote = None;
             }
             continue;
@@ -73,7 +75,8 @@ fn find_matching_paren(code: &str, open_paren_index: usize) -> Option<usize> {
             b'(' => depth += 1,
             b')' => {
                 depth = depth.saturating_sub(1);
-                if depth == 0 {
+                let is_closing_paren = depth == 0;
+                if is_closing_paren {
                     return Some(index);
                 }
             }
@@ -142,7 +145,9 @@ impl StatePatterns {
                 continue;
             };
             let open_paren_index = whole.end() - 1;
-            if open_paren_index < content_start || open_paren_index > content_end {
+            let is_outside_script =
+                open_paren_index < content_start || open_paren_index > content_end;
+            if is_outside_script {
                 continue;
             }
             let Some(close_paren_index) = find_matching_paren(code, open_paren_index) else {

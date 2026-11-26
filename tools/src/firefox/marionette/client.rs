@@ -1,4 +1,4 @@
-//! A Marionette client: `[0, id, name, params]` commands answered by `[1, id, error, result]`,
+//! A Marionette client: `[0, id, name, parameters]` commands answered by `[1, id, error, result]`,
 //! over the same length-prefixed JSON framing as RDP.
 
 use std::time::Duration;
@@ -54,7 +54,8 @@ impl Marionette {
             else {
                 continue;
             };
-            if answered != id {
+            let is_other_reply = answered != id;
+            if is_other_reply {
                 continue;
             }
             if !error.is_null() {
@@ -67,11 +68,11 @@ impl Marionette {
     async fn send<T: DeserializeOwned>(
         &mut self,
         name: CommandName,
-        params: &(impl Serialize + Sync),
+        parameters: &(impl Serialize + Sync),
     ) -> Result<T> {
         let id = self.next_id;
         self.next_id += 1;
-        let command = (REQUEST_MESSAGE, id, name, params);
+        let command = (REQUEST_MESSAGE, id, name, parameters);
         self.framed.send(&command).await?;
         timeout(COMMAND_TIMEOUT, self.exchange(id))
             .await

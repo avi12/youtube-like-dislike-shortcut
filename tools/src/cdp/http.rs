@@ -7,7 +7,7 @@ use dev_hot::types::Port;
 use dev_hot::Error;
 use serde::Deserialize;
 
-use super::error::{CdpError, Result};
+use crate::cdp::error::{CdpError, Result};
 
 const HTTP_TIMEOUT: Duration = Duration::from_secs(5);
 const GET_ATTEMPTS: usize = 3;

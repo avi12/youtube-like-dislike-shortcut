@@ -6,8 +6,8 @@ use std::path::{Path, PathBuf};
 
 use tokio::process::Child;
 
-use super::cft::ensure_chrome;
-use super::BrowserLaunch;
+use crate::dev::launcher::browser::cft::ensure_chrome;
+use crate::dev::launcher::browser::BrowserLaunch;
 use crate::dev::launcher::error::{LauncherError, Result};
 use crate::output::options::{DevBrowser, DevOptions, HostEnvironment, OsPlatform};
 use crate::output::profile::CHROMIUM_PROFILE_DIRECTORY;
@@ -49,10 +49,10 @@ fn find_installed(browser: DevBrowser, host: &HostEnvironment) -> Result<PathBuf
     installed.ok_or_else(|| LauncherError::Browser(format!("could not find {}", browser.name())))
 }
 
-fn chromium_args(options: &DevOptions, output_dir: &Path) -> Vec<String> {
+fn chromium_args(options: &DevOptions, output_directory: &Path) -> Vec<String> {
     let mut args = vec![
-        format!("--user-data-dir={}", options.profile_dir.display()),
-        format!("--load-extension={}", output_dir.display()),
+        format!("--user-data-dir={}", options.profile_directory.display()),
+        format!("--load-extension={}", output_directory.display()),
         format!("--lang={}", options.lang),
         "--remote-debugging-address=127.0.0.1".to_owned(),
         format!("--remote-debugging-port={}", options.cdp_port),
@@ -75,22 +75,23 @@ pub(super) async fn launch(launch: BrowserLaunch<'_>) -> Result<Child> {
     let BrowserLaunch {
         options,
         host,
-        output_dir,
+        output_directory,
     } = launch;
-    let executable = if options.browser == DevBrowser::Chrome {
+    let is_chrome_for_testing = options.browser == DevBrowser::Chrome;
+    let executable = if is_chrome_for_testing {
         ensure_chrome(&options.project_root, host.platform).await?
     } else {
         find_installed(options.browser, host)?
     };
     Invocation::new(executable)
-        .args(chromium_args(options, output_dir))
+        .args(chromium_args(options, output_directory))
         .spawn_kill_on_drop()
         .map_err(Into::into)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::launcher::browser::chromium::*;
     use crate::output::options::tests::resolve;
 
     fn args_of(arguments: &[&str]) -> Result<Vec<String>> {

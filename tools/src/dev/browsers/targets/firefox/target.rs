@@ -6,10 +6,12 @@ use std::time::Duration;
 use dev_hot::types::Port;
 use serde_json::Value;
 
-use super::background::{evaluate_in_background, run_script_in_background, BackgroundAddress};
 use crate::dev::browsers::error::{BrowserError, Result};
 use crate::dev::browsers::scripts::{self, RUNTIME_RELOAD};
 use crate::dev::browsers::target::{BoxFuture, ReloadTarget};
+use crate::dev::browsers::targets::firefox::background::{
+    evaluate_in_background, run_script_in_background, BackgroundAddress,
+};
 use crate::output::reload::{ExtensionReloadPlan, PageRefreshPlan};
 
 const BACKGROUND_RETRY_ATTEMPTS: u32 = 5;

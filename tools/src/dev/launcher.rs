@@ -100,24 +100,25 @@ async fn start(args: &RunArgs) -> Result<()> {
     let host = DevHost::new(options.clone());
     host.build_extension().await?;
     let first_build = host.rebuild_hmr().await?;
-    let output_dir = options.output_dir();
-    log_event(&format!("Build complete: {}", output_dir.display()));
+    let output_directory = options.output_directory();
+    log_event(&format!("Build complete: {}", output_directory.display()));
 
     let running = launch(BrowserLaunch {
         options: &options,
         host: &environment,
-        output_dir: &output_dir,
+        output_directory: &output_directory,
     })
     .await?;
     log_event(&format!(
         "{name} launched with extension sideloaded (debug port {}, profile {})",
         options.cdp_port,
-        options.profile_dir.display()
+        options.profile_directory.display()
     ));
-    host.attach(running.reload_target(&output_dir)?).await?;
+    host.attach(running.reload_target(&output_directory)?)
+        .await?;
     let deps = Deps {
         host,
-        workspace: DiskWorkspace::new(output_dir, options.project_root.join(INSTALL_MARKER)),
+        workspace: DiskWorkspace::new(output_directory, options.project_root.join(INSTALL_MARKER)),
         rules: PathRules {
             install_marker: Some(RelPath::new(INSTALL_MARKER)),
             hmr_sources: first_build.hmr_source_files.into_iter().collect(),
@@ -151,12 +152,12 @@ async fn serve(
         log_event("Browser closed. Exiting.");
     }
     shutdown.cancel();
-    if !matches!(stop, Stop::HotLoop)
-        && tokio::time::timeout(HOT_LOOP_STOP_TIMEOUT, hot_loop)
-            .await
-            .is_err()
-    {
-        log_event("The running rebuild did not stop in time - abandoning it");
+    let is_hot_loop_running = !matches!(stop, Stop::HotLoop);
+    if is_hot_loop_running {
+        let stopped = tokio::time::timeout(HOT_LOOP_STOP_TIMEOUT, hot_loop).await;
+        if stopped.is_err() {
+            log_event("The running rebuild did not stop in time - abandoning it");
+        }
     }
     // Only the process this launcher started
     if let Err(error) = running.child.kill().await {
@@ -193,7 +194,7 @@ async fn wait_for_ctrl_c() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::launcher::*;
 
     #[test]
     fn a_taken_port_is_refused() -> Result<()> {

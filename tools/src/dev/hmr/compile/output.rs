@@ -8,12 +8,12 @@ use std::sync::{Mutex, PoisonError};
 
 use base64::Engine;
 
-use super::versions::{
+use crate::dev::hmr::analysis::hot_sources::{describe_hot_sources, EntryBuild, HotSources};
+use crate::dev::hmr::chunks::{ChunkType, GraphCollector, OutputChunk};
+use crate::dev::hmr::compile::versions::{
     compute_final_versions, describe_chunks, hash_vendor_chunks, HmrChunk, ImportStamper,
     ServedVersions,
 };
-use crate::dev::hmr::analysis::hot_sources::{describe_hot_sources, EntryBuild, HotSources};
-use crate::dev::hmr::chunks::{ChunkType, GraphCollector, OutputChunk};
 use crate::dev::hmr::config::{
     short_hash, HmrManifest, ManifestEntry, ProjectPaths, HMR_MANIFEST_FILE, HMR_OUT_SUBDIR,
     HMR_PAGE_LOADER_FILE, HMR_RUNTIME_FILE,
@@ -91,7 +91,8 @@ fn write_if_changed(output_directory: &Path, file_name: &str, bytes: &[u8]) -> R
     let mut written = WRITTEN_HASHES
         .lock()
         .unwrap_or_else(PoisonError::into_inner);
-    if written.get(file_name) == Some(&hash) {
+    let is_already_written = written.get(file_name) == Some(&hash);
+    if is_already_written {
         return Ok(());
     }
     let path = output_directory.join(file_name);
@@ -229,7 +230,8 @@ fn describe_entries(
             .manifest
             .modules
             .extend(component_modules(paths, &item.chunks, versions));
-        if item.entry.kind == EntryKind::Page {
+        let is_page = item.entry.kind == EntryKind::Page;
+        if is_page {
             let loader = format!("{name}/{HMR_PAGE_LOADER_FILE}");
             let url = format!("{HMR_OUT_SUBDIR}/{file}");
             described
@@ -409,7 +411,7 @@ pub(super) fn finish_build(input: FinishInput) -> Result<Finished> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::hmr::compile::output::*;
 
     #[test]
     fn style_blocks_are_what_a_style_change_is_judged_by() {

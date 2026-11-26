@@ -1,7 +1,7 @@
 use serde_json::json;
 
-use super::*;
 use crate::output::manifest::ExtensionManifest;
+use crate::output::reload::plan::*;
 
 const BASE_FILES: [(&str, &str); 7] = [
     ("manifest.json", "1"),

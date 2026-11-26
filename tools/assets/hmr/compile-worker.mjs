@@ -98,7 +98,7 @@ function wxtResolutionPlugin() {
       return virtual.modules[id] ?? null;
     },
     async transform(code, id) {
-      const isScript = /\.(?:ts|js)$/.test(withoutQuery(id)) && id.replaceAll("\\", "/").startsWith(job.srcPrefix);
+      const isScript = /\.(?:ts|js)$/.test(withoutQuery(id)) && id.replaceAll("\\", "/").startsWith(job.sourcePrefix);
       if (!isScript) {
         return null;
       }

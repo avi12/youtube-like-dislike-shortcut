@@ -77,7 +77,7 @@ struct Channel {
     version: String,
 }
 
-fn build_dir(cache: &Path, platform: CftPlatform, version: &str) -> PathBuf {
+fn build_directory(cache: &Path, platform: CftPlatform, version: &str) -> PathBuf {
     cache.join(format!("{}-{version}", platform.slug()))
 }
 
@@ -141,7 +141,8 @@ async fn download(platform: CftPlatform, version: &str, destination: &Path) -> R
         .args([url])
         .capture_checked()
         .await?;
-    let extraction = if platform == CftPlatform::Linux64 {
+    let is_zip_without_tar = platform == CftPlatform::Linux64;
+    let extraction = if is_zip_without_tar {
         Invocation::new(UNZIP_PROGRAM)
             .args(["-q", "-o"])
             .args([&archive])
@@ -170,7 +171,7 @@ pub(super) async fn ensure_chrome(project_root: &Path, os_platform: OsPlatform) 
             )
         });
     };
-    let directory = build_dir(&cache, platform, &version);
+    let directory = build_directory(&cache, platform, &version);
     let executable = directory.join(platform.executable_relative());
     if executable.is_file() {
         return Ok(executable);
@@ -189,7 +190,7 @@ pub(super) async fn ensure_chrome(project_root: &Path, os_platform: OsPlatform) 
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::launcher::browser::cft::*;
 
     #[test]
     fn versions_compare_numerically() {
@@ -203,7 +204,7 @@ mod tests {
         let platform = CftPlatform::detect(OsPlatform::Windows);
         for version in ["148.0.1.0", "149.0.2.0"] {
             let executable =
-                build_dir(&cache, platform, version).join(platform.executable_relative());
+                build_directory(&cache, platform, version).join(platform.executable_relative());
             std::fs::create_dir_all(executable.parent().unwrap()).unwrap();
             std::fs::write(&executable, "").unwrap();
         }

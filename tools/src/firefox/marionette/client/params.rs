@@ -15,7 +15,8 @@ struct NoCapabilities {}
 #[derive(Debug, Serialize)]
 pub(super) struct InstallAddon<'path> {
     path: &'path str,
-    temporary: bool,
+    #[serde(rename = "temporary")]
+    is_temporary: bool,
 }
 
 impl<'path> InstallAddon<'path> {
@@ -23,7 +24,7 @@ impl<'path> InstallAddon<'path> {
     pub(super) const fn temporary(path: &'path str) -> Self {
         Self {
             path,
-            temporary: true,
+            is_temporary: true,
         }
     }
 }

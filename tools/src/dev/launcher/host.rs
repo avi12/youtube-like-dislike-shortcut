@@ -8,11 +8,11 @@ use dev_hot::orchestrator::{HmrOutcome, Host};
 use tokio::sync::Mutex;
 use tokio::time::Instant;
 
-use super::build::{build_extension, build_hmr_modules};
-use super::error::Result;
-use super::log::{format_elapsed, log_event};
 use crate::dev::browsers::ReloadTarget;
 use crate::dev::hmr::{ContentState, HMR_OUT_SUBDIR};
+use crate::dev::launcher::build::{build_extension, build_hmr_modules};
+use crate::dev::launcher::error::Result;
+use crate::dev::launcher::log::{format_elapsed, log_event};
 use crate::dev::payload::patch_built_output;
 use crate::output::manifest::ExtensionManifest;
 use crate::output::options::DevOptions;
@@ -58,11 +58,14 @@ fn describe_content_change(
         .iter()
         .zip(next.values())
         .find_map(|((name, old), new)| {
-            let reason = if old.styles_hash != new.styles_hash {
+            let is_style_changed = old.styles_hash != new.styles_hash;
+            let is_code_changed = old.version != new.version;
+            let is_graph_changed = old.vendor_hash != new.vendor_hash;
+            let reason = if is_style_changed {
                 "a component style changed, which its page also holds as a static stylesheet"
-            } else if old.version != new.version {
+            } else if is_code_changed {
                 "code outside its components changed"
-            } else if old.vendor_hash != new.vendor_hash {
+            } else if is_graph_changed {
                 "its dependency graph changed"
             } else {
                 return None;
@@ -106,7 +109,10 @@ impl DevHost {
 
     fn snapshot(&self) -> Result<BuildSnapshot> {
         let skipped = format!("{HMR_OUT_SUBDIR}/");
-        Ok(take_build_snapshot(&self.options.output_dir(), &skipped)?)
+        Ok(take_build_snapshot(
+            &self.options.output_directory(),
+            &skipped,
+        )?)
     }
 
     /// Hands over the launched browser, which runs the current build. A kept profile can hold a
@@ -118,7 +124,7 @@ impl DevHost {
         if !self.options.is_profile_kept {
             return Ok(());
         }
-        let manifest = ExtensionManifest::read(&self.options.output_dir())?;
+        let manifest = ExtensionManifest::read(&self.options.output_directory())?;
         let plan = ExtensionReloadPlan {
             reasons: vec![PROFILE_REUSED_REASON.to_owned()],
             tab_patterns: manifest.content_script_matches()?,
@@ -134,7 +140,7 @@ impl DevHost {
         let build = build_hmr_modules(&self.options).await?;
         let mut state = self.state.lock().await;
         let full_reload_reason = if state.is_unpatched {
-            patch_built_output(&self.options.output_dir(), &build.hot_entries)?;
+            patch_built_output(&self.options.output_directory(), &build.hot_entries)?;
             state.is_unpatched = false;
             state.content_scripts = build.content_scripts;
             None
@@ -180,7 +186,7 @@ impl Host for DevHost {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::launcher::host::*;
 
     fn states(version: &str, styles: &str) -> BTreeMap<String, ContentState> {
         BTreeMap::from([(

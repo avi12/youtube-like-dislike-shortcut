@@ -14,13 +14,13 @@ const NO_VERSION: &str = "0";
 const VENDOR_PATH_SEPARATOR: &str = "|";
 const VENDOR_ENTRY_TERMINATOR: u8 = 0;
 /// A relative `from "./x"`, `import("./x")` or `import "./x"` specifier, in either quote style.
-const RELATIVE_IMPORT_PATTERN: &str = r#"((?-u:\b)from\s*|(?-u:\b)import\s*\(\s*|(?-u:\b)import\s*)(?:"(\.\.?/[^"']+)"|'(\.\.?/[^"']+)')"#;
+const RELATIVE_IMPORT_PATTERN: &str = r#"(?<keyword>(?-u:\b)from\s*|(?-u:\b)import\s*\(\s*|(?-u:\b)import\s*)(?:"(?<double>\.\.?/[^"']+)"|'(?<single>\.\.?/[^"']+)')"#;
 
 /// One code chunk as the version computation sees it.
 #[derive(Debug, Clone)]
 pub(super) struct HmrChunk {
     pub(super) code: String,
-    pub(super) src_hash: String,
+    pub(super) source_digest: String,
     pub(super) is_svelte: bool,
     pub(super) is_vendor: bool,
     pub(super) dependencies: Vec<String>,
@@ -49,7 +49,7 @@ pub(super) fn describe_chunks(
     for chunk in chunks.iter().filter(|chunk| chunk.kind == ChunkType::Chunk) {
         let code = codes.get(&chunk.file_name).cloned().unwrap_or_default();
         let is_vendor = chunk.module_ids.iter().all(|id| !paths.is_source(id));
-        let src_hash = if is_vendor {
+        let source_digest = if is_vendor {
             vendor_chunk_hash(&chunk.module_ids, &code)
         } else {
             short_hash(code.as_bytes())
@@ -63,7 +63,7 @@ pub(super) fn describe_chunks(
                     .is_some_and(|id| id.ends_with(SVELTE_EXTENSION)),
                 dependencies: chunk.dependencies().cloned().collect(),
                 code,
-                src_hash,
+                source_digest,
                 is_vendor,
             },
         );
@@ -84,9 +84,9 @@ fn version_of(
         return NO_VERSION.to_owned();
     };
     if !visiting.insert(file_name.to_owned()) {
-        return chunk.src_hash.clone();
+        return chunk.source_digest.clone();
     }
-    let mut parts = vec![chunk.src_hash.clone()];
+    let mut parts = vec![chunk.source_digest.clone()];
     for dependency in &chunk.dependencies {
         if chunks.get(dependency).is_some_and(|found| found.is_svelte) {
             continue;
@@ -119,7 +119,7 @@ pub(super) fn hash_vendor_chunks(chunks: &BTreeMap<String, HmrChunk>, folder: &s
     let mut entries: Vec<String> = chunks
         .iter()
         .filter(|(file_name, chunk)| chunk.is_vendor && file_name.starts_with(folder))
-        .map(|(file_name, chunk)| format!("{file_name}:{}", chunk.src_hash))
+        .map(|(file_name, chunk)| format!("{file_name}:{}", chunk.source_digest))
         .collect();
     entries.sort();
     let mut joined = Vec::new();
@@ -220,9 +220,11 @@ impl ImportStamper {
         self.pattern
             .replace_all(&chunk.code, |captures: &Captures<'_>| {
                 let whole = captures.get(0).map_or("", |found| found.as_str());
-                let (Some(prefix), Some(specifier)) =
-                    (captures.get(1), captures.get(2).or_else(|| captures.get(3)))
-                else {
+                let double_quoted = captures.name("double");
+                let (Some(prefix), Some(specifier)) = (
+                    captures.name("keyword"),
+                    double_quoted.or_else(|| captures.name("single")),
+                ) else {
                     return whole.to_owned();
                 };
                 let target = normalize_posix(&format!("{from_directory}/{}", specifier.as_str()));
@@ -230,7 +232,8 @@ impl ImportStamper {
                 if !stampable {
                     return whole.to_owned();
                 }
-                let quote = if captures.get(2).is_some() { '"' } else { '\'' };
+                let is_double_quoted = double_quoted.is_some();
+                let quote = if is_double_quoted { '"' } else { '\'' };
                 let version = versions.get(&target).map_or("undefined", String::as_str);
                 format!(
                     "{}{quote}{}?v={version}{quote}",
@@ -244,12 +247,12 @@ impl ImportStamper {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::dev::hmr::compile::versions::*;
 
     fn chunk(code: &str, dependencies: &[&str], is_svelte: bool) -> HmrChunk {
         HmrChunk {
             code: code.to_owned(),
-            src_hash: short_hash(code.as_bytes()),
+            source_digest: short_hash(code.as_bytes()),
             is_svelte,
             is_vendor: false,
             dependencies: dependencies.iter().map(|name| (*name).to_owned()).collect(),

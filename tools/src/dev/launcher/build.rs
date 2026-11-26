@@ -3,10 +3,10 @@
 
 use std::path::PathBuf;
 
-use super::error::Result;
-use super::log::log_event;
-use super::wxt_worker::{run_wxt_build, WxtBuildRequest};
 use crate::dev::hmr::{build_hmr, HmrBuild, HmrRequest};
+use crate::dev::launcher::error::Result;
+use crate::dev::launcher::log::log_event;
+use crate::dev::launcher::wxt_worker::{run_wxt_build, WxtBuildRequest};
 use crate::dev::payload::runtime_source;
 use crate::output::options::{DevOptions, BUILD_MODE, MANIFEST_VERSION};
 
@@ -16,7 +16,7 @@ pub(super) async fn build_extension(options: &DevOptions) -> Result<()> {
         browser: options.browser.name(),
         mode: BUILD_MODE,
         manifest_version: MANIFEST_VERSION,
-        out_dir: &options.out_dir,
+        out_directory: &options.out_directory,
     })
     .await
 }
@@ -24,10 +24,10 @@ pub(super) async fn build_extension(options: &DevOptions) -> Result<()> {
 /// The hot entrypoints run from these modules, so every WXT build, which empties the output dir, is
 /// followed by this.
 pub(super) async fn build_hmr_modules(options: &DevOptions) -> Result<HmrBuild> {
-    let output_dir: PathBuf = options.output_dir();
+    let output_directory: PathBuf = options.output_directory();
     let request = HmrRequest {
         project_root: options.project_root.clone(),
-        output_dir,
+        output_directory,
         browser: options.browser,
         runtime_source: runtime_source()?,
     };

@@ -18,7 +18,8 @@ const WXT_DIR: &str = ".wxt";
 const VIRTUAL_PREFIX: &str = "\0devtool:";
 const WXT_IMPORTS_SPECIFIER: &str = "#imports";
 const VIRTUAL_SPECIFIER_PREFIX: &str = "virtual:";
-const AUTO_IMPORT_LINE: &str = r"const (\w+): typeof import\('([^']+)'\)\.(\w+)";
+const AUTO_IMPORT_LINE: &str =
+    r"const (?<name>\w+): typeof import\('(?<source>[^']+)'\)\.(?<exported>\w+)";
 const CONTENT_SCRIPT_CONTEXT_MODULE: &str = "wxt/utils/content-script-context";
 
 /// `#imports` is WXT's auto-import barrel, unresolvable outside the WXT build: its value
@@ -180,7 +181,8 @@ fn resolve_posix(base: &str, relative: &str) -> String {
         match part {
             "." => {}
             ".." => {
-                if parts.len() > 1 {
+                let is_below_root = parts.len() > 1;
+                if is_below_root {
                     parts.pop();
                 }
             }
@@ -191,7 +193,7 @@ fn resolve_posix(base: &str, relative: &str) -> String {
     parts.join("/")
 }
 
-fn aliases_of(wxt_dir: &str, tsconfig: Tsconfig) -> Vec<PathAlias> {
+fn aliases_of(wxt_directory: &str, tsconfig: Tsconfig) -> Vec<PathAlias> {
     tsconfig
         .compiler_options
         .paths
@@ -202,7 +204,7 @@ fn aliases_of(wxt_dir: &str, tsconfig: Tsconfig) -> Vec<PathAlias> {
             Some(PathAlias {
                 prefix: pattern.trim_end_matches('*').to_owned(),
                 is_wildcard: pattern.ends_with('*'),
-                target_base: resolve_posix(wxt_dir, target.trim_end_matches('*')),
+                target_base: resolve_posix(wxt_directory, target.trim_end_matches('*')),
             })
         })
         .collect()
@@ -210,13 +212,13 @@ fn aliases_of(wxt_dir: &str, tsconfig: Tsconfig) -> Vec<PathAlias> {
 
 /// The path aliases WXT generated, in declaration order.
 pub(crate) fn read_path_aliases(paths: &ProjectPaths) -> Result<Vec<PathAlias>> {
-    let wxt_dir = paths.absolute(WXT_DIR);
-    let path = Path::new(&wxt_dir).join("tsconfig.json");
+    let wxt_directory = paths.absolute(WXT_DIR);
+    let path = Path::new(&wxt_directory).join("tsconfig.json");
     let text = fs::read_to_string(&path).map_err(|source| HmrError::Read {
         path: path.clone(),
         source,
     })?;
-    Ok(aliases_of(&wxt_dir, serde_json::from_str(&text)?))
+    Ok(aliases_of(&wxt_directory, serde_json::from_str(&text)?))
 }
 
 /// The names WXT auto-imports, from its generated declarations.
@@ -229,10 +231,11 @@ pub(crate) fn read_auto_imports(paths: &ProjectPaths) -> Result<Vec<AutoImport>>
     Ok(Regex::new(AUTO_IMPORT_LINE)?
         .captures_iter(&declarations)
         .filter_map(|captures| {
+            let text = |group: &str| Some(captures.name(group)?.as_str().to_owned());
             Some(AutoImport {
-                name: captures.get(1)?.as_str().to_owned(),
-                source: captures.get(2)?.as_str().to_owned(),
-                exported: captures.get(3)?.as_str().to_owned(),
+                name: text("name")?,
+                source: text("source")?,
+                exported: text("exported")?,
             })
         })
         .collect())
@@ -271,7 +274,9 @@ fn is_declared(code: &str, name: &str) -> Result<bool> {
 pub(crate) fn source_with_auto_imports(code: &str, auto_imports: &[AutoImport]) -> Result<String> {
     let mut imports = Vec::new();
     for auto_import in auto_imports {
-        if is_used(code, &auto_import.name) && !is_declared(code, &auto_import.name)? {
+        let is_import_missing =
+            is_used(code, &auto_import.name) && !is_declared(code, &auto_import.name)?;
+        if is_import_missing {
             imports.push(format!(
                 "import {{ {} as {} }} from \"{}\";",
                 auto_import.exported, auto_import.name, auto_import.source

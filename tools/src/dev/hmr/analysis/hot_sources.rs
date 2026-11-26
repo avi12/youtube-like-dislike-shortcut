@@ -12,7 +12,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
-use super::reasons::ReloadReasoner;
+use crate::dev::hmr::analysis::reasons::ReloadReasoner;
 use crate::dev::hmr::chunks::{ChunkType, GraphCollector, OutputChunk};
 use crate::dev::hmr::config::ProjectPaths;
 use crate::dev::hmr::entries::EntryKind;
@@ -100,7 +100,8 @@ fn describe_styles(entry: &EntryBuild<'_>, found: &mut HotSources) {
         if entry.graph.queried_css.contains(css_id) {
             continue;
         }
-        if entry.kind != EntryKind::Page {
+        let is_content_style = entry.kind != EntryKind::Page;
+        if is_content_style {
             found.reject(css_id, CONTENT_STYLE_REASON);
             continue;
         }
@@ -110,7 +111,8 @@ fn describe_styles(entry: &EntryBuild<'_>, found: &mut HotSources) {
             styles.push(asset);
         }
     }
-    if entry.kind == EntryKind::Page {
+    let is_page = entry.kind == EntryKind::Page;
+    if is_page {
         found.page_styles.insert(entry.name.to_owned(), styles);
     }
 }
@@ -142,7 +144,7 @@ pub(crate) fn describe_hot_sources(
 mod tests {
     use std::path::Path;
 
-    use super::*;
+    use crate::dev::hmr::analysis::hot_sources::*;
     use crate::dev::hmr::chunks::ModuleRecord;
 
     #[test]

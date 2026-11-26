@@ -12,8 +12,8 @@ use std::sync::Arc;
 use dev_hot::types::Port;
 use tokio::process::Child;
 
-use super::error::Result;
 use crate::dev::browsers::{ChromiumTarget, FirefoxTarget, FirefoxTargetConfig, ReloadTarget};
+use crate::dev::launcher::error::Result;
 use crate::output::manifest::ExtensionManifest;
 use crate::output::options::{DevOptions, HostEnvironment};
 
@@ -22,7 +22,7 @@ use crate::output::options::{DevOptions, HostEnvironment};
 pub(super) struct BrowserLaunch<'a> {
     pub(super) options: &'a DevOptions,
     pub(super) host: &'a HostEnvironment,
-    pub(super) output_dir: &'a Path,
+    pub(super) output_directory: &'a Path,
 }
 
 /// How a running browser is reached.
@@ -42,9 +42,9 @@ pub(super) struct RunningBrowser {
 }
 
 impl RunningBrowser {
-    /// The reload target of this browser, running the extension built in `output_dir`.
-    pub(super) fn reload_target(&self, output_dir: &Path) -> Result<Arc<dyn ReloadTarget>> {
-        let manifest = ExtensionManifest::read(output_dir)?;
+    /// The reload target of this browser, running the extension built in `output_directory`.
+    pub(super) fn reload_target(&self, output_directory: &Path) -> Result<Arc<dyn ReloadTarget>> {
+        let manifest = ExtensionManifest::read(output_directory)?;
         Ok(match self.endpoint {
             DebugEndpoint::Cdp(port) => {
                 Arc::new(ChromiumTarget::new(Port::new(port)?, manifest.name()?))
