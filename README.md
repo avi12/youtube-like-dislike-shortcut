@@ -82,9 +82,8 @@ profile, a kept one seeded from your own browser's bookmarks (Firefox: session f
 debugging port is 9225 (Firefox: Marionette on 2828); `bun run dev --help` lists the options.
 
 The dev server is two Rust crates, adapted from
-[youtube-downloader](https://github.com/avi12/youtube-downloader) (Apache License 2.0, see
-[dev-server/LICENSE](dev-server/LICENSE)): [dev-server](dev-server) (file watching, rebuild decisions
-and the debugging protocols) and [tools](tools) (the `devtool` binary: builds, HMR, browsers).
+[youtube-downloader](https://github.com/avi12/youtube-downloader): [dev-server](dev-server) (file
+watching, rebuild decisions and the debugging protocols) and [tools](tools) (the `devtool` binary: builds, HMR, browsers).
 Test them with `bun run dev-server:test` and `bun run tools:test`.
 
 ## Build

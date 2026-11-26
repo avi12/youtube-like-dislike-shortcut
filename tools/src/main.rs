@@ -1,8 +1,8 @@
 //! `devtool`: the extension's dev server.
 //!
-//! Adapted from the `tools` crate of youtube-downloader (Apache License 2.0, see
-//! `../dev-server/LICENSE`). `devtool dev` builds the extension, launches one browser with it
-//! sideloaded and keeps both current while the hot loop of `dev_hot` watches the source:
+//! Adapted from the `tools` crate of youtube-downloader. `devtool dev` builds the extension,
+//! launches one browser with it sideloaded
+//! and keeps both current while the hot loop of `dev_hot` watches the source:
 //! - `.svelte` components hot swap in place, in the popup and in content script UIs
 //! - anything else is rebuilt and compared with the previous build file by file: a change only
 //!   extension pages see refreshes them, any other one reloads the extension and the tabs its
