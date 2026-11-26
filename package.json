@@ -8,13 +8,17 @@
   "repository": "https://github.com/avi12/youtube-like-dislike-shortcut",
   "type": "module",
   "scripts": {
-    "dev": "tsx scripts/dev-server.ts",
-    "dev:with-profile": "tsx scripts/dev-server.ts --browser chrome --with-profile",
-    "dev:rtl": "bunx cross-env LANG=he tsx scripts/dev-server.ts",
-    "dev:edge": "tsx scripts/dev-server.ts --browser edge",
-    "dev:edge:with-profile": "tsx scripts/dev-server.ts --browser edge --with-profile",
-    "dev:firefox": "tsx scripts/dev-server.ts --browser firefox",
-    "dev:firefox:with-profile": "tsx scripts/dev-server.ts --browser firefox --with-profile",
+    "devtool": "cargo run --release --quiet --manifest-path tools/Cargo.toml --",
+    "dev": "bun run devtool dev",
+    "dev:with-profile": "bun run devtool dev --browser chrome --with-profile",
+    "dev:rtl": "bunx cross-env LANG=he bun run dev",
+    "dev:chrome": "bun run devtool dev --browser chrome",
+    "dev:edge": "bun run devtool dev --browser edge",
+    "dev:edge:with-profile": "bun run devtool dev --browser edge --with-profile",
+    "dev:firefox": "bun run devtool dev --browser firefox",
+    "dev:firefox:with-profile": "bun run devtool dev --browser firefox --with-profile",
+    "dev:opera": "bun run devtool dev --browser opera",
+    "dev:opera:with-profile": "bun run devtool dev --browser opera --with-profile",
     "dev:wxt": "wxt",
     "build": "wxt build --mode prod",
     "build:opera": "bun run build -b opera",
@@ -28,7 +32,9 @@
     "typecheck": "tsrs --noEmit --fast",
     "lint:fix": "avi12-lint --fix",
     "postinstall": "wxt prepare",
-    "lint": "avi12-lint"
+    "lint": "avi12-lint",
+    "dev-server:test": "cargo test --manifest-path dev-server/Cargo.toml",
+    "tools:test": "cargo test --manifest-path tools/Cargo.toml"
   },
   "dependencies": {
     "@webext-core/messaging": "^4.0.0",
@@ -40,7 +46,6 @@
     "@types/chrome": "^0.3.5",
     "@types/node": "^26.6.5",
     "@wxt-dev/module-svelte": "2.0.5",
-    "chokidar": "^5.0.0",
     "concurrently": "^10.0.6",
     "crx3": "2.0.0",
     "eslint": "^10.13.0",
@@ -60,7 +65,6 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.4",
-    "web-ext-run": "^0.2.4",
     "wxt": "0.21.4"
   },
   "overrides": {
