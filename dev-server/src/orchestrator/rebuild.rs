@@ -5,11 +5,11 @@ use std::time::Duration;
 
 use tokio::time::{sleep, Instant};
 
-use super::schedule::StaticBundle;
-use super::{Host, Orchestrator, SWAP_SETTLE};
 use crate::changes::classifier::RebuildPlan;
 use crate::changes::workspace::Workspace;
 use crate::error::Result;
+use crate::orchestrator::schedule::StaticBundle;
+use crate::orchestrator::{Host, Orchestrator, SWAP_SETTLE};
 
 impl<H: Host, W: Workspace> Orchestrator<H, W> {
     pub(super) async fn execute(&mut self, plan: RebuildPlan) -> Result<()> {

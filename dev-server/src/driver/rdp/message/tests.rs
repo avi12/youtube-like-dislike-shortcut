@@ -1,10 +1,10 @@
 use serde_json::json;
 
-use super::*;
+use crate::driver::rdp::message::*;
 use crate::driver::rdp::PacketDecoder;
 
-fn sent<P: Serialize>(kind: RequestKind, params: &P) -> Result<Vec<Value>> {
-    PacketDecoder::default().push(&encode_request(&ActorId::new("a1"), kind, params)?)
+fn sent<P: Serialize>(kind: RequestKind, parameters: &P) -> Result<Vec<Value>> {
+    PacketDecoder::default().push(&encode_request(&ActorId::new("a1"), kind, parameters)?)
 }
 
 #[test]

@@ -7,7 +7,7 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use super::packet::encode_packet;
+use crate::driver::rdp::packet::encode_packet;
 use crate::error::Result;
 
 const ROOT_ACTOR: &str = "root";
@@ -138,7 +138,8 @@ impl WatchTargetsParams {
 /// The console syntax an evaluation maps, such as top-level `await`.
 #[derive(Debug, Clone, Copy, Serialize)]
 struct MappedSyntax {
-    r#await: bool,
+    #[serde(rename = "await")]
+    is_awaited: bool,
 }
 
 /// The parameters of `evaluateJSAsync`.
@@ -171,7 +172,7 @@ impl<'text> EvaluateParams<'text> {
     /// Reports the settled value of the promise the text resolves to.
     #[must_use]
     pub const fn awaiting(mut self) -> Self {
-        self.mapped = Some(MappedSyntax { r#await: true });
+        self.mapped = Some(MappedSyntax { is_awaited: true });
         self
     }
 }
@@ -182,10 +183,10 @@ struct Request<'request, P> {
     #[serde(rename = "type")]
     kind: RequestKind,
     #[serde(flatten)]
-    params: &'request P,
+    parameters: &'request P,
 }
 
-/// Encodes the packet of one request to `to`; `params` must serialize to an object.
+/// Encodes the packet of one request to `to`; `parameters` must serialize to an object.
 ///
 /// ```
 /// use dev_hot::driver::rdp::message::{encode_request, ActorId, NoParams, RequestKind};
@@ -197,9 +198,13 @@ struct Request<'request, P> {
 pub fn encode_request<P: Serialize>(
     to: &ActorId,
     kind: RequestKind,
-    params: &P,
+    parameters: &P,
 ) -> Result<Vec<u8>> {
-    encode_packet(&Request { to, kind, params })
+    encode_packet(&Request {
+        to,
+        kind,
+        parameters,
+    })
 }
 
 /// The privileged script that wakes the suspended event page of an extension.

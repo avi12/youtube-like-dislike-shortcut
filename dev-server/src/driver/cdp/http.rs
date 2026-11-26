@@ -71,7 +71,8 @@ pub async fn request(port: Port, verb: Verb, path: &str, limit: Duration) -> Res
         stream.write_all(head.as_bytes()).await?;
         let mut raw = Vec::new();
         while !is_response_complete(&raw) {
-            if stream.read_buf(&mut raw).await? == 0 {
+            let is_connection_closed = stream.read_buf(&mut raw).await? == 0;
+            if is_connection_closed {
                 break;
             }
         }
@@ -91,7 +92,8 @@ fn body(raw: &[u8]) -> Result<String> {
         .lines()
         .next()
         .and_then(|line| line.split_whitespace().nth(1));
-    if status != Some(Status::Success.code()) {
+    let is_failure = status != Some(Status::Success.code());
+    if is_failure {
         return Err(Error::Protocol(format!(
             "unexpected HTTP status {status:?}"
         )));
@@ -106,11 +108,13 @@ fn body(raw: &[u8]) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::driver::cdp::http::*;
+
+    const DEBUG_PORT: u16 = 9229;
 
     #[test]
     fn the_host_header_carries_the_port() {
-        let port = Port::new(9229).ok();
+        let port = Port::new(DEBUG_PORT).ok();
         let request = port.map(|port| head_of(Verb::Get, "/json/list", port));
         assert!(request.is_some_and(|text| text.contains("Host: 127.0.0.1:9229\r\n")));
     }

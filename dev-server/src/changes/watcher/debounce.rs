@@ -6,7 +6,7 @@ use tokio::sync::mpsc;
 use tokio::time::{interval, sleep_until, Instant, MissedTickBehavior};
 use tokio_util::sync::CancellationToken;
 
-use super::{ChangeBatch, ChangeEvent};
+use crate::changes::watcher::{ChangeBatch, ChangeEvent};
 
 /// A batch waits at most this many windows, however steadily events keep arriving.
 const MAX_WAIT_WINDOWS: u32 = 10;
@@ -127,7 +127,7 @@ pub(super) async fn run_loop(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::changes::watcher::debounce::*;
     use crate::changes::watcher::ChangeKind;
     use crate::types::RelPath;
 
@@ -171,6 +171,11 @@ mod tests {
         assert_eq!(debouncer.flush(), None);
     }
 
+    const QUEUE_CAPACITY: usize = 8;
+    const TICK: Duration = Duration::from_millis(500);
+    /// Short enough that the quiet window is still open.
+    const MOST_OF_THE_WINDOW: Duration = Duration::from_millis(700);
+
     fn harness(
         on_tick: impl FnMut() -> Vec<ChangeEvent> + Send + 'static,
     ) -> (
@@ -178,15 +183,15 @@ mod tests {
         mpsc::Receiver<ChangeBatch>,
         CancellationToken,
     ) {
-        let (raw_sender, raw_receiver) = mpsc::channel(8);
-        let (batch_sender, batch_receiver) = mpsc::channel(8);
+        let (raw_sender, raw_receiver) = mpsc::channel(QUEUE_CAPACITY);
+        let (batch_sender, batch_receiver) = mpsc::channel(QUEUE_CAPACITY);
         let shutdown = CancellationToken::new();
         tokio::spawn(run_loop(
             raw_receiver,
             batch_sender,
             LoopTiming {
                 debounce: WINDOW,
-                tick: Duration::from_millis(500),
+                tick: TICK,
             },
             on_tick,
             shutdown.clone(),
@@ -198,9 +203,9 @@ mod tests {
     async fn each_event_restarts_the_quiet_window() {
         let (raw, mut batches, _shutdown) = harness(Vec::new);
         assert!(raw.send(event("a", ChangeKind::Modified)).await.is_ok());
-        tokio::time::sleep(Duration::from_millis(700)).await;
+        tokio::time::sleep(MOST_OF_THE_WINDOW).await;
         assert!(raw.send(event("b", ChangeKind::Modified)).await.is_ok());
-        tokio::time::sleep(Duration::from_millis(700)).await;
+        tokio::time::sleep(MOST_OF_THE_WINDOW).await;
         assert!(batches.try_recv().is_err());
         let batch = batches.recv().await;
         assert_eq!(batch.map(|found| found.events.len()), Some(2));

@@ -55,7 +55,7 @@ impl CdpTarget {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::driver::cdp::target::*;
     use crate::error::Result;
 
     #[test]

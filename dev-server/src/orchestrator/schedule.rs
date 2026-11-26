@@ -2,7 +2,7 @@
 
 use tokio::time::Instant;
 
-use super::STATIC_CATCH_UP_IDLE;
+use crate::orchestrator::STATIC_CATCH_UP_IDLE;
 
 /// Whether the extension build output still matches the source: a hot swap rebuilds only the HMR
 /// modules, so the bundle is caught up once the edits go quiet.

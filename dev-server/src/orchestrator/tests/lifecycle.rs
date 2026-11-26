@@ -1,6 +1,6 @@
 //! Retries and shutdown.
 
-use super::harness::start;
+use crate::orchestrator::tests::harness::start;
 
 #[tokio::test(start_paused = true)]
 async fn a_transient_file_lock_retries_the_build() {

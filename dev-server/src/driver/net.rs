@@ -70,7 +70,7 @@ pub(super) fn is_response_complete(raw: &[u8]) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::driver::net::*;
 
     #[test]
     fn a_response_is_complete_once_its_content_length_arrived() {

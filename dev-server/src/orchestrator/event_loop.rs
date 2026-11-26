@@ -5,10 +5,10 @@ use std::ops::ControlFlow;
 use tokio::sync::mpsc;
 use tokio::time::{sleep_until, Instant};
 
-use super::{Host, Orchestrator};
 use crate::changes::classifier::{classify_path, plan_rebuild, PathClass};
 use crate::changes::watcher::ChangeBatch;
 use crate::changes::workspace::Workspace;
+use crate::orchestrator::{Host, Orchestrator};
 use crate::types::RelPath;
 
 async fn sleep_until_some(deadline: Option<Instant>) {
@@ -57,7 +57,8 @@ impl<H: Host, W: Workspace> Orchestrator<H, W> {
 
     async fn ingest_path(&mut self, path: &RelPath) {
         let class = classify_path(&self.rules, path);
-        if class == PathClass::InstallMarker {
+        let is_install_change = class == PathClass::InstallMarker;
+        if is_install_change {
             let hash = self
                 .files
                 .installed_lockfile_hash()

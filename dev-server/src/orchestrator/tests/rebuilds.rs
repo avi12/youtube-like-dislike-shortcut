@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use tokio::time::sleep;
 
-use super::harness::{start, HOT_FILE, INSTALL_MARKER};
+use crate::orchestrator::tests::harness::{start, HOT_FILE, INSTALL_MARKER};
 use crate::orchestrator::SWAP_SETTLE;
 use crate::types::ContentHash;
 

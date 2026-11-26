@@ -8,12 +8,13 @@ use tokio::task::JoinHandle;
 use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
 
-use super::fakes::{DiskState, FakeFiles, FakeHost, Log};
 use crate::changes::classifier::PathRules;
 use crate::changes::watcher::{ChangeBatch, ChangeEvent, ChangeKind};
+use crate::orchestrator::tests::fakes::{DiskState, FakeFiles, FakeHost, Log};
 use crate::orchestrator::{run, Deps};
 use crate::types::RelPath;
 
+const QUEUE_CAPACITY: usize = 16;
 const LONG_ENOUGH: Duration = Duration::from_secs(20);
 pub(super) const HOT_FILE: &str = "src/a.svelte";
 pub(super) const INSTALL_MARKER: &str = "bun.lock";
@@ -30,7 +31,7 @@ pub(super) async fn start(setup: impl FnOnce(&mut DiskState)) -> Harness {
     let log = Log::default();
     let disk = Arc::<Mutex<DiskState>>::default();
     setup(&mut disk.lock().unwrap());
-    let (changes, change_receiver) = mpsc::channel(16);
+    let (changes, change_receiver) = mpsc::channel(QUEUE_CAPACITY);
     let deps = Deps {
         host: FakeHost {
             log: log.clone(),

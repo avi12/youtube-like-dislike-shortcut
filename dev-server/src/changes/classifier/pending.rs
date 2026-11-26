@@ -1,6 +1,6 @@
 //! The latch of a debounce window and the plan it drains into.
 
-use super::PathClass;
+use crate::changes::classifier::PathClass;
 
 /// What a debounce window has collected so far.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]

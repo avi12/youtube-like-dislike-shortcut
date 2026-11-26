@@ -61,12 +61,14 @@ impl PacketDecoder {
 mod tests {
     use serde_json::json;
 
-    use super::*;
+    use crate::driver::rdp::packet::*;
+
+    const INSIDE_THE_LENGTH_PREFIX_AND_BODY: usize = 5;
 
     #[test]
     fn a_packet_split_across_reads_is_reassembled() -> Result<()> {
         let bytes = encode_packet(&json!({"from":"root","applicationType":"browser"}))?;
-        let (head, tail) = bytes.split_at(5);
+        let (head, tail) = bytes.split_at(INSIDE_THE_LENGTH_PREFIX_AND_BODY);
         let mut decoder = PacketDecoder::default();
         assert_eq!(decoder.push(head)?, Vec::<Value>::new());
         assert_eq!(

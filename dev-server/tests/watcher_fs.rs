@@ -11,8 +11,11 @@ use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
 
 const WAIT: Duration = Duration::from_secs(20);
+const POLL_INTERVAL: Duration = Duration::from_millis(50);
+const DEBOUNCE: Duration = Duration::from_millis(100);
+const FIRST_SCAN_WAIT: Duration = Duration::from_millis(250);
 
-fn scratch_dir(name: &str) -> PathBuf {
+fn scratch_directory(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("dev-hot-watcher-{name}-{}", std::process::id()))
 }
 
@@ -20,8 +23,8 @@ fn config(root: &Path) -> WatchConfig {
     WatchConfig {
         root: root.to_path_buf(),
         paths: vec![RelPath::new("src"), RelPath::new(".env.local")],
-        poll_interval: Duration::from_millis(50),
-        debounce: Duration::from_millis(100),
+        poll_interval: POLL_INTERVAL,
+        debounce: DEBOUNCE,
     }
 }
 
@@ -38,13 +41,13 @@ async fn next_paths(batches: &mut tokio::sync::mpsc::Receiver<ChangeBatch>) -> V
 
 #[tokio::test]
 async fn reports_edits_and_late_files_relative_to_the_root() -> Result<()> {
-    let root = scratch_dir("fs");
+    let root = scratch_directory("fs");
     std::fs::create_dir_all(root.join("src"))?;
     std::fs::write(root.join("src").join("a.ts"), b"1")?;
     let shutdown = CancellationToken::new();
     let mut batches = spawn(config(&root), shutdown.clone())?;
     // Polling compares modified times: let the baseline age past the filesystem clock tick
-    tokio::time::sleep(Duration::from_millis(250)).await;
+    tokio::time::sleep(FIRST_SCAN_WAIT).await;
 
     std::fs::write(root.join("src").join("a.ts"), b"2 and longer")?;
     assert_eq!(next_paths(&mut batches).await, ["src/a.ts"]);

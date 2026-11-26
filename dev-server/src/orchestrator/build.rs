@@ -4,10 +4,10 @@ use std::future::Future;
 
 use tokio::time::sleep;
 
-use super::schedule::StaticBundle;
-use super::{HmrOutcome, Host, Orchestrator, BUILD_RETRY_DELAY, MAX_BUILD_ATTEMPTS};
 use crate::changes::workspace::Workspace;
 use crate::error::{Error, Result};
+use crate::orchestrator::schedule::StaticBundle;
+use crate::orchestrator::{HmrOutcome, Host, Orchestrator, BUILD_RETRY_DELAY, MAX_BUILD_ATTEMPTS};
 
 /// The file system errors a held file causes; builds are idempotent, so they are retried.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

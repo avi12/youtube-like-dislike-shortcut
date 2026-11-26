@@ -22,15 +22,15 @@ pub trait Workspace: Send + Sync {
 /// The [`Workspace`] on the real disk.
 #[derive(Debug, Clone)]
 pub struct DiskWorkspace {
-    output_dir: Arc<Path>,
+    output_directory: Arc<Path>,
     installed_lockfile: Arc<Path>,
 }
 
 impl DiskWorkspace {
     /// A workspace over a build output directory and the dependency lockfile.
-    pub fn new(output_dir: PathBuf, installed_lockfile: PathBuf) -> Self {
+    pub fn new(output_directory: PathBuf, installed_lockfile: PathBuf) -> Self {
         Self {
-            output_dir: output_dir.into(),
+            output_directory: output_directory.into(),
             installed_lockfile: installed_lockfile.into(),
         }
     }
@@ -53,14 +53,14 @@ impl Workspace for DiskWorkspace {
     }
 
     async fn has_build_output(&self) -> Result<bool> {
-        let manifest = self.output_dir.join(MANIFEST_FILE_NAME);
+        let manifest = self.output_directory.join(MANIFEST_FILE_NAME);
         blocking(move || Ok(manifest.try_exists()?)).await
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::changes::workspace::*;
 
     #[tokio::test]
     async fn a_missing_build_and_lockfile_read_as_absent() -> Result<()> {

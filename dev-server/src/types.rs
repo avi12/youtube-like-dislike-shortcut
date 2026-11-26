@@ -112,7 +112,7 @@ impl ContentHash {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::types::*;
 
     #[test]
     fn port_rejects_zero() {
