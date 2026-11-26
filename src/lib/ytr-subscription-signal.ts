@@ -1,3 +1,7 @@
+import { isCustomEvent } from "@/lib/dom-guards";
+import { z } from "@/lib/zod";
+import { createGuard } from "@/lib/zod-guard";
+
 export enum SubscriptionDecision {
   CLAIMED = "claimed",
   RELEASED = "released"
@@ -11,11 +15,7 @@ declare global {
   }
 }
 
-function isSubscriptionDecision(
-  value: SubscriptionDecision | string | null | undefined
-): value is SubscriptionDecision {
-  return value === SubscriptionDecision.CLAIMED || value === SubscriptionDecision.RELEASED;
-}
+const isSubscriptionDecision = createGuard(z.enum(SubscriptionDecision));
 
 export function announceSubscriptionDecision(decision: SubscriptionDecision) {
   window.ytrSubscriptionDecision = decision;
@@ -33,7 +33,7 @@ export function getSubscriptionDecision() {
 
 export function onSubscriptionDecision(callback: (decision: SubscriptionDecision | undefined) => void) {
   function handler(event: Event) {
-    if (!(event instanceof CustomEvent)) {
+    if (!isCustomEvent(event)) {
       return;
     }
 

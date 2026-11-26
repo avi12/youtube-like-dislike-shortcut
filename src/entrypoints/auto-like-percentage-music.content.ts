@@ -1,6 +1,7 @@
 import { mount, unmount } from "svelte";
 
 import { storage } from "#imports";
+import { isAnchorElement, isElement, isHtmlElement, isVideoElement } from "@/lib/dom-guards";
 import { getIsCurrentSurfaceEnabled, watchIsCurrentSurfaceEnabled } from "@/lib/surfaces";
 import {
   DomAttribute,
@@ -45,7 +46,7 @@ function getTrackVideoId() {
   }
 
   const elTrackLink = document.querySelector(SELECTORS.TRACK_LINK_MUSIC);
-  if (!(elTrackLink instanceof HTMLAnchorElement)) {
+  if (!isAnchorElement(elTrackLink)) {
     return "";
   }
 
@@ -97,7 +98,7 @@ function watchForInitialRating() {
         mutation.type === "childList" ||
         (mutation.type === "attributes" &&
           mutation.attributeName === DomAttribute.ARIA_PRESSED &&
-          mutation.target instanceof Element &&
+          isElement(mutation.target) &&
           Boolean(mutation.target.closest(SELECTORS.TOGGLE_BUTTONS_MUSIC_VIDEO)))
     );
     const isButtonPresent = Boolean(document.querySelector(anyButtonSelector));
@@ -122,7 +123,7 @@ function watchForInitialRating() {
   document.addEventListener(
     "loadedmetadata",
     event => {
-      if (event.target instanceof HTMLVideoElement) {
+      if (isVideoElement(event.target)) {
         applyState();
       }
     },
@@ -288,7 +289,7 @@ export default defineContentScript({
         }
 
         const { target: elTarget } = event;
-        const isTargetVideo = elTarget instanceof HTMLVideoElement;
+        const isTargetVideo = isVideoElement(elTarget);
         if (!isTargetVideo) {
           return;
         }
@@ -332,7 +333,7 @@ export default defineContentScript({
 
     function markUserInteractedIfRateButton(event: Event) {
       const { target: elTarget } = event;
-      const isTargetElement = elTarget instanceof HTMLElement;
+      const isTargetElement = isHtmlElement(elTarget);
       if (!isTargetElement) {
         return;
       }

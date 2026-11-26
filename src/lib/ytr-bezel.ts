@@ -1,3 +1,4 @@
+import { isHtmlElement } from "@/lib/dom-guards";
 import { createIconElement, svgs } from "@/lib/icons";
 import { type Rating } from "@/lib/types";
 import { SELECTORS } from "@/lib/utils-initials";
@@ -22,7 +23,7 @@ function getPlayButtonIconSize() {
 }
 
 function getBezelHost() {
-  return document.fullscreenElement instanceof HTMLElement ? document.fullscreenElement : document.body;
+  return isHtmlElement(document.fullscreenElement) ? document.fullscreenElement : document.body;
 }
 
 export function showRateBezel({ rating, isRated }: { rating: Rating; isRated: boolean }) {

@@ -1,4 +1,5 @@
 import { storage } from "#imports";
+import { isElement } from "@/lib/dom-guards";
 import { getEnabledSurfaces, watchEnabledSurfaces } from "@/lib/surfaces";
 import {
   addNavigationListener,
@@ -106,7 +107,7 @@ async function handleUserSubscribed() {
 
 function markUserSubscribeClick(event: Event) {
   const { target: elTarget } = event;
-  if (!(elTarget instanceof Element)) {
+  if (!isElement(elTarget)) {
     return;
   }
 
