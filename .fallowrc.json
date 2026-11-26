@@ -22,6 +22,7 @@
     "crx3",
     "postcss-html",
     "lint-config",
+    "@ast-grep/cli",
     "stylelint-config-ccb",
     "typescript-eslint",
     "globals"
