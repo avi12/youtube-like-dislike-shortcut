@@ -46,18 +46,46 @@ The repo includes `.mcp.json` with two MCP servers for browser automation:
 
 ## Requirements
 
-Install [Node.js](https://nodejs.org) and [Bun](https://bun.com) 1.4.5 11+, then: `bun install`
+Install [Node.js](https://nodejs.org), [Bun](https://bun.com) 1.4.5 and, for the dev server, [Rust](https://rustup.rs), then: `bun install`
 
 ## Dev
 
 | Browser                | Command                            |
 | ---------------------- | ---------------------------------- |
-| Chrome                 | `bun run dev`                      |
+| Edge (default)         | `bun run dev`                      |
+| Edge (with profile)    | `bun run dev:edge:with-profile`    |
+| Chrome                 | `bun run dev:chrome`               |
 | Chrome (with profile)  | `bun run dev:with-profile`         |
 | Opera                  | `bun run dev:opera`                |
 | Opera (with profile)   | `bun run dev:opera:with-profile`   |
 | Firefox                | `bun run dev:firefox`              |
 | Firefox (with profile) | `bun run dev:firefox:with-profile` |
+| Edge, in Hebrew        | `bun run dev:rtl`                  |
+
+The dev server builds the extension (production mode, into `build/<browser>-mv3-prod`), launches the
+browser with it sideloaded and watches `src/`, `wxt.config.ts`, `bun.lock` and the env files. Each
+save gets the smallest update that is correct:
+
+| What changed                                                  | What happens                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------- |
+| A popup component or popup stylesheet                         | Swapped in place, `$state` kept                      |
+| The markup or script of a content script's Svelte component   | Swapped in place, the YouTube tab stays as it is     |
+| Something only the popup loads, outside what can swap         | The open popup pages reload                          |
+| Anything else (content scripts, background, manifest, styles) | The extension and the tabs its scripts run in reload |
+
+Content scripts register listeners they never remove, so they are never re-injected in place.
+
+Chrome runs as Chrome for Testing (downloaded into `.chrome-for-testing/` on first use), since branded
+Chrome no longer sideloads from the command line. Profiles live beside the repository, in
+`../youtube-like-dislike-shortcut-profiles/`: a temporary one that starts empty on every run, or with
+profile, a kept one seeded from your own browser's bookmarks (Firefox: session files). The remote
+debugging port is 9225 (Firefox: Marionette on 2828); `bun run dev --help` lists the options.
+
+The dev server is two Rust crates, adapted from
+[youtube-downloader](https://github.com/avi12/youtube-downloader) (Apache License 2.0, see
+[dev-server/LICENSE](dev-server/LICENSE)): [dev-server](dev-server) (file watching, rebuild decisions
+and the debugging protocols) and [tools](tools) (the `devtool` binary: builds, HMR, browsers).
+Test them with `bun run dev-server:test` and `bun run tools:test`.
 
 ## Build
 

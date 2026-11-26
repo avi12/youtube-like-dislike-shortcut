@@ -31,7 +31,7 @@ if there is a callback arrow function, don't explicitly assign a type to the par
 avoid using hardcoded strings, use enums instead.  
 Avoid using `setTimeout` unless absolutely necessary.  
 If you need to use a hardcoded number or a string, first try to use an enum, and if no enum exists, either make the enum if it makes sense, or put in a descriptive variable.  
-The dev server script (scripts/dev-server.ts) is configured such that on every file modification under src/, the extension is automatically rebuilt and reloaded and every YouTube page is reloaded, allowing proper content scripts reinjections.  
+The dev server is two Rust crates: `dev-server/` (library: watcher, rebuild loop, debugging protocol types) and `tools/` (the `devtool` binary that `bun run dev` runs: WXT and HMR builds, browser launch, reload targets). On every change under src/ the popup and the Svelte component of a content script hot swap in place; every other change rebuilds and reloads the extension together with the tabs its content scripts run in (content scripts register listeners they never remove, so they are never re-injected). Dev-only patches are applied to the build output, never to src/. A change to the dev server needs `cargo clippy --all-targets` and `cargo test` in each crate.
 Avoid comments unless absolutely necessary, prefer using descriptive variables and functions.
 
 Variable naming rules:
