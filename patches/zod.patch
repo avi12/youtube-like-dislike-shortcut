@@ -1,0 +1,26 @@
+diff --git a/v4/core/util.js b/v4/core/util.js
+index b53c7a0..e7d7a90 100644
+--- a/v4/core/util.js
++++ b/v4/core/util.js
+@@ -220,18 +220,9 @@ export const allowsEval = /* @__PURE__*/ cached(() => {
+     if (globalConfig.jitless) {
+         return false;
+     }
+-    // @ts-ignore
+-    if (typeof navigator !== "undefined" && navigator?.userAgent?.includes("Cloudflare")) {
+-        return false;
+-    }
+-    try {
+-        const F = Function;
+-        new F("");
+-        return true;
+-    }
+-    catch (_) {
+-        return false;
+-    }
++    // The eval probe (new Function("")) is stripped here so addons-linter raises no
++    // DANGEROUS_EVAL warning; jitless mode already forces this to false at runtime.
++    return false;
+ });
+ export function isPlainObject(o) {
+     if (isObject(o) === false)

@@ -5,6 +5,7 @@ import { defineConfig } from "wxt";
 
 import packageJson from "./package.json" with { type: "json" };
 import { MusicCommand } from "./src/lib/ytmusic-command";
+import { z } from "./src/lib/zod";
 
 function parseGitignoreAsExcludes() {
   return readFileSync(".gitignore", "utf-8")
@@ -14,13 +15,15 @@ function parseGitignoreAsExcludes() {
     .map(pattern => (pattern.endsWith("/") ? `${pattern}**` : pattern));
 }
 
-const url = packageJson.repository;
-const authorMatch = packageJson.author.match(/(.+) <(.+)>/);
-if (!authorMatch) {
-  throw new Error("package.json author must read 'Name <email>'");
-}
+const AUTHOR_PATTERN = /^(?<name>.+) <(?<email>.+)>$/;
 
-const [, author, email] = authorMatch;
+const { repository: url } = z.object({ repository: z.url() }).parse(packageJson);
+const { name: author, email } = z
+  .object({
+    name: z.string(),
+    email: z.email()
+  })
+  .parse(packageJson.author.match(AUTHOR_PATTERN)?.groups);
 
 const sharedPermissions: Browser.runtime.ManifestPermission[] = ["storage"];
 
