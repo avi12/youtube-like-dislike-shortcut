@@ -1,10 +1,10 @@
 import {
   type ButtonViewModelContainer,
   type InnertubeContext,
-  type InnertubeNextResponse,
+  type RateParamField,
   type ToggleButtonViewModelContainer,
-  type YtInitialData
-} from "@/lib/types";
+  watchDataSchema
+} from "@/lib/innertube";
 import { RateAction, type RateContext } from "@/lib/ytr-messaging";
 
 const LIKE_API_URLS: Record<RateAction, string> = {
@@ -15,9 +15,7 @@ const LIKE_API_URLS: Record<RateAction, string> = {
 
 const NEXT_API_URL = "/youtubei/v1/next";
 
-export type RateParamField = "likeParams" | "dislikeParams" | "removeLikeParams";
-
-const RATE_PARAM_FIELD: Record<RateAction, RateParamField> = {
+export const RATE_PARAM_FIELD: Record<RateAction, RateParamField> = {
   [RateAction.LIKE]: "likeParams",
   [RateAction.DISLIKE]: "dislikeParams",
   [RateAction.REMOVELIKE]: "removeLikeParams"
@@ -96,12 +94,13 @@ function pickParamFromToggle({
   );
 }
 
-export function findRateParamInInnertube({ root, field }: { root: YtInitialData | undefined; field: RateParamField }) {
-  if (!root) {
+export function findRateParamInInnertube({ root, field }: { root: unknown; field: RateParamField }) {
+  const { data } = watchDataSchema.safeParse(root);
+  if (!data) {
     return undefined;
   }
 
-  const { contents: rootContents, playerOverlays } = root;
+  const { contents: rootContents, playerOverlays } = data;
   const { contents = [] } = rootContents?.twoColumnWatchNextResults?.results?.results ?? {};
   for (const content of contents) {
     const { topLevelButtons = [] } = content.videoPrimaryInfoRenderer?.videoActions?.menuRenderer ?? {};
@@ -173,9 +172,9 @@ export async function fetchRateParamsFromNext({
     return undefined;
   }
 
-  const parsed: InnertubeNextResponse | null = await response.json().catch(() => null);
+  const root: unknown = await response.json().catch(() => null);
   const param = findRateParamInInnertube({
-    root: parsed ?? undefined,
+    root,
     field: RATE_PARAM_FIELD[action]
   });
   console.debug("[ytr-fetch] /next", {

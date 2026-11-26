@@ -1,10 +1,17 @@
-import { type RateAction, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
+import { YoutubePathname } from "@/lib/utils-initials";
+import { isRateRequest, type RateAction, rateContextResultSchema, YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { executeRateRequest, fetchRateParamsFromNext } from "@/lib/ytr-rate-fetch";
 import { buildSapisidAuthorization } from "@/lib/ytr-sapisid";
 
+// The answer comes from the page's MAIN world, which any page script can forge
+async function requestRateContext(action: RateAction) {
+  const response = await ytrMessenger.sendMessage(YtrMessage.GET_RATE_CONTEXT, action).catch(() => null);
+  return rateContextResultSchema.safeParse(response).data;
+}
+
 async function rateVideoOnPage(action: RateAction) {
-  const result = await ytrMessenger.sendMessage(YtrMessage.GET_RATE_CONTEXT, action).catch(() => null);
-  if (!result?.context || !result.params) {
+  const result = await requestRateContext(action);
+  if (!result?.params) {
     return {
       success: false,
       error: "No video context"
@@ -47,8 +54,8 @@ async function rateVideoOnPage(action: RateAction) {
 }
 
 async function rateInEmbed(action: RateAction) {
-  const result = await ytrMessenger.sendMessage(YtrMessage.GET_RATE_CONTEXT, action).catch(() => null);
-  if (!result?.context) {
+  const result = await requestRateContext(action);
+  if (!result) {
     return {
       success: false,
       error: "No embed context"
@@ -103,9 +110,14 @@ async function rateInEmbed(action: RateAction) {
 }
 
 function init() {
-  browser.runtime.onMessage.addListener(({ action }) =>
-    location.pathname.startsWith("/embed/") ? rateInEmbed(action) : rateVideoOnPage(action)
-  );
+  browser.runtime.onMessage.addListener((message: unknown) => {
+    if (!isRateRequest(message)) {
+      return;
+    }
+
+    const { action } = message;
+    return location.pathname.startsWith(YoutubePathname.EMBED) ? rateInEmbed(action) : rateVideoOnPage(action);
+  });
 }
 
 export default defineContentScript({

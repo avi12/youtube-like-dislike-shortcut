@@ -8,6 +8,7 @@ import { getWatchedSeconds } from "@/lib/watch-progress";
 import { getRatedButton, rateVideo } from "@/lib/ytr-buttons";
 import { YtrMessage, ytrMessenger } from "@/lib/ytr-messaging";
 import { getSubscriptionDecision, onSubscriptionDecision } from "@/lib/ytr-subscription-signal";
+import { z } from "@/lib/zod";
 
 import CsuiAutoLikePercent from "./auto-like-percentage.content/CsuiAutoLikePercent.svelte";
 import {
@@ -226,7 +227,7 @@ export default defineContentScript({
     // The player's data-change event is the only prompt signal; the observer below re-checks
     // so a track that started behind an ad still resets once the ad is over
     ytrMessenger.onMessage(YtrMessage.TRACK_VIDEO_ID_CHANGED, ({ data }) => {
-      playerVideoId = data;
+      playerVideoId = z.string().parse(data);
       handleIfTrackChanged();
     });
 

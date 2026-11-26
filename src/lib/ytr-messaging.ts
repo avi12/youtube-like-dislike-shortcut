@@ -1,6 +1,8 @@
 import { defineCustomEventMessaging } from "@webext-core/messaging/page";
 
-import { type InnertubeContext } from "@/lib/types";
+import { innertubeContextSchema } from "@/lib/innertube";
+import { z } from "@/lib/zod";
+import { createGuard } from "@/lib/zod-guard";
 
 export enum RateAction {
   LIKE = "like",
@@ -8,30 +10,36 @@ export enum RateAction {
   REMOVELIKE = "removelike"
 }
 
+export const rateActionSchema = z.enum(RateAction);
+
 export enum YtrMessage {
   GET_RATE_CONTEXT = "ytr-rate:getRateContext",
   TRACK_VIDEO_ID_CHANGED = "ytr-rate:trackVideoIdChanged"
 }
 
-interface RateResult {
-  success: boolean;
-  videoId?: string;
-  error?: string;
-}
+const rateResultSchema = z.object({
+  success: z.boolean(),
+  videoId: z.string().optional(),
+  error: z.string().optional()
+});
 
-interface RateContextResult {
-  context: RateContext;
-  params?: string;
-}
+const rateContextSchema = z.object({
+  videoId: z.string(),
+  clientNameNumber: z.number(),
+  clientVersion: z.string(),
+  innertubeContext: innertubeContextSchema,
+  delegatedSessionId: z.string(),
+  sessionIndex: z.string()
+});
 
-export interface RateContext {
-  videoId: string;
-  clientNameNumber: number;
-  clientVersion: string;
-  innertubeContext: InnertubeContext;
-  delegatedSessionId: string;
-  sessionIndex: string;
-}
+export type RateContext = z.infer<typeof rateContextSchema>;
+
+export const rateContextResultSchema = z.object({
+  context: rateContextSchema,
+  params: z.string().optional()
+});
+
+type RateContextResult = z.infer<typeof rateContextResultSchema>;
 
 interface YtrProtocol {
   [YtrMessage.GET_RATE_CONTEXT]: (action: RateAction) => RateContextResult | null;
@@ -40,21 +48,9 @@ interface YtrProtocol {
 
 export const ytrMessenger = defineCustomEventMessaging<YtrProtocol>({ namespace: "ytr" });
 
-export interface RateRequest {
-  action: RateAction;
-}
+export const isRateRequest = createGuard(z.object({ action: rateActionSchema }));
 
-export function isRateRequest(message: unknown): message is RateRequest {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "action" in message &&
-    (message.action === RateAction.LIKE ||
-      message.action === RateAction.DISLIKE ||
-      message.action === RateAction.REMOVELIKE)
-  );
-}
-
-export function sendRateRequest(action: RateAction) {
-  return browser.runtime.sendMessage<RateRequest, RateResult>({ action });
+export async function sendRateRequest(action: RateAction) {
+  const response: unknown = await browser.runtime.sendMessage({ action });
+  return rateResultSchema.parse(response);
 }
