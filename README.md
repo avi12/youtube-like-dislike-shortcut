@@ -46,39 +46,39 @@ The repo includes `.mcp.json` with two MCP servers for browser automation:
 
 ## Requirements
 
-Install [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io) 11+, then: `pnpm install`
+Install [Node.js](https://nodejs.org) and [Bun](https://bun.com) 1.4.5 11+, then: `bun install`
 
 ## Dev
 
-| Browser                | Command                         |
-| ---------------------- | ------------------------------- |
-| Chrome                 | `pnpm dev`                      |
-| Chrome (with profile)  | `pnpm dev:with-profile`         |
-| Opera                  | `pnpm dev:opera`                |
-| Opera (with profile)   | `pnpm dev:opera:with-profile`   |
-| Firefox                | `pnpm dev:firefox`              |
-| Firefox (with profile) | `pnpm dev:firefox:with-profile` |
+| Browser                | Command                            |
+| ---------------------- | ---------------------------------- |
+| Chrome                 | `bun run dev`                      |
+| Chrome (with profile)  | `bun run dev:with-profile`         |
+| Opera                  | `bun run dev:opera`                |
+| Opera (with profile)   | `bun run dev:opera:with-profile`   |
+| Firefox                | `bun run dev:firefox`              |
+| Firefox (with profile) | `bun run dev:firefox:with-profile` |
 
 ## Build
 
-| Browser | Command              |
-| ------- | -------------------- |
-| Chrome  | `pnpm build`         |
-| Opera   | `pnpm build:opera`   |
-| Firefox | `pnpm build:firefox` |
+| Browser | Command                 |
+| ------- | ----------------------- |
+| Chrome  | `bun run build`         |
+| Opera   | `bun run build:opera`   |
+| Firefox | `bun run build:firefox` |
 
 ## Package
 
 Packaging builds first, so there is no separate build step to run.
 
-| Browser | Command                |
-| ------- | ---------------------- |
-| Chrome  | `pnpm package`         |
-| Opera   | `pnpm package:opera`   |
-| Firefox | `pnpm package:firefox` |
-| All     | `pnpm package:all`     |
+| Browser | Command                   |
+| ------- | ------------------------- |
+| Chrome  | `bun run package`         |
+| Opera   | `bun run package:opera`   |
+| Firefox | `bun run package:firefox` |
+| All     | `bun run package:all`     |
 
-`pnpm crx` packages Chrome and signs it into a `.crx` for GitHub releases. The signing key is created
+`bun run crx` packages Chrome and signs it into a `.crx` for GitHub releases. The signing key is created
 in the gitignored `keys/` folder on the first run - keep it, since it fixes the extension ID
 
 ## Contribution
