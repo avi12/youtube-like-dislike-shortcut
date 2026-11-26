@@ -7,10 +7,10 @@
  *      which would lose their state - we reload only top-level YouTube pages)
  *
  * Usage:
- *   pnpm dev                       - Edge (default)
- *   pnpm dev --browser chrome      - Chrome
- *   pnpm dev --browser firefox     - Firefox MV3
- *   pnpm dev --browser opera       - Opera
+ *   bun run dev                       - Edge (default)
+ *   bun run dev --browser chrome      - Chrome
+ *   bun run dev --browser firefox     - Firefox MV3
+ *   bun run dev --browser opera       - Opera
  *
  * Pass --with-profile to copy the user's real browser profile on first run
  */
