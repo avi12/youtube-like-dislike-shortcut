@@ -10,9 +10,10 @@
     "src/entrypoints/ytr-rate-api.content.ts",
     "src/entrypoints/auto-like-percentage.content/index.ts",
     "src/entrypoints/auto-like-in-subscription.content.ts",
-    "src/entrypoints/auto-like-percentage-music.content/index.ts"
+    "src/entrypoints/auto-like-percentage-music.content/index.ts",
+    "tools/assets/**/*.mjs"
   ],
-  "ignorePatterns": [".claude/**", "tests/**", "scripts/**"],
+  "ignorePatterns": [".claude/**", "tests/**", "scripts/**", "tools/assets/browsers/**", "tools/assets/payload/**"],
   "ignoreDependencies": [
     "#imports",
     "@sveltejs/vite-plugin-svelte",

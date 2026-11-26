@@ -111,7 +111,7 @@ export default defineConfig({
   outDir: "build",
   outDirTemplate: "{{browser}}-mv{{manifestVersion}}-{{mode}}",
   zip: {
-    excludeSources: parseGitignoreAsExcludes(),
+    excludeSources: [...parseGitignoreAsExcludes(), "dev-server/**", "tools/**"],
     artifactTemplate: "{{name}}-{{version}}-{{browser}}.zip",
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
