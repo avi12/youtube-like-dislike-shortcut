@@ -25,7 +25,11 @@
     ".wxt/**",
     "build/**",
     "user-profiles/**",
-    "keys/**"
+    "keys/**",
+    "**/target/**",
+    ".chrome-for-testing/**",
+    "tools/assets/browsers/**",
+    "tools/assets/payload/**"
   ],
   "overrides": [
     {

@@ -12,6 +12,10 @@ stats.html
 stats-*.json
 .wxt/
 
+# Dev server (Rust build output and the downloaded browser)
+target/
+.chrome-for-testing/
+
 # Chrome .crx signing key (scripts/pack-crx.ts) - fixes the extension ID, never commit
 keys/
 

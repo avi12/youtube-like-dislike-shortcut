@@ -1,6 +1,6 @@
 {
   "extends": ["lint-config/stylelint"],
-  "ignoreFiles": [".claude/**", "build/**", "user-profiles/**", ".output/**"],
+  "ignoreFiles": [".claude/**", "build/**", "user-profiles/**", ".output/**", "**/target/**", ".chrome-for-testing/**"],
   "overrides": [
     {
       "files": ["src/entrypoints/auto-like-percentage.content/CsuiAutoLikePercent.svelte"],
