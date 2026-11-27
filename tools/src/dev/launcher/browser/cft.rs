@@ -21,6 +21,9 @@ const CURL_PROGRAM: &str = "curl";
 const TAR_PROGRAM: &str = "tar";
 const UNZIP_PROGRAM: &str = "unzip";
 const ARM_ARCHITECTURE: &str = "aarch64";
+const ACL_PROGRAM: &str = "icacls";
+/// Read and execute for both `AppContainer` groups, which Chrome's sandbox runs its processes as.
+const SANDBOX_GRANTS: [&str; 2] = ["*S-1-15-2-1:(OI)(CI)(RX)", "*S-1-15-2-2:(OI)(CI)(RX)"];
 
 /// The Chrome for Testing platform names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -160,6 +163,19 @@ async fn download(platform: CftPlatform, version: &str, destination: &Path) -> R
     Ok(())
 }
 
+/// An installer grants the sandbox access to its own folder; an extracted archive has none, so every
+/// page stays blank.
+async fn allow_sandbox_access(directory: &Path) -> Result<()> {
+    Invocation::new(ACL_PROGRAM)
+        .args([directory])
+        .args(["/grant"])
+        .args(SANDBOX_GRANTS)
+        .args(["/T", "/Q"])
+        .capture_checked()
+        .await?;
+    Ok(())
+}
+
 /// The Chrome for Testing executable, downloading the newest stable build when it is missing.
 pub(super) async fn ensure_chrome(project_root: &Path, os_platform: OsPlatform) -> Result<PathBuf> {
     let platform = CftPlatform::detect(os_platform);
@@ -181,6 +197,10 @@ pub(super) async fn ensure_chrome(project_root: &Path, os_platform: OsPlatform) 
         platform.slug()
     ));
     download(platform, &version, &directory).await?;
+    let is_windows_build = platform == CftPlatform::Win64;
+    if is_windows_build {
+        allow_sandbox_access(&directory).await?;
+    }
     log_event(&format!(
         "Chrome for Testing installed at {}",
         executable.display()
