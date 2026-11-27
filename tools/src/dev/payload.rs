@@ -1,6 +1,7 @@
 //! What runs inside the browser - the HMR runtime and the loaders - and the dev patches that point a
 //! build at them. None of it ships: `wxt build` and `wxt zip` never see it.
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
 
@@ -12,12 +13,16 @@ use crate::dev::hmr::{
     HMR_RUNTIME_FILE,
 };
 use crate::output::error::{OutputError, Result};
-use crate::output::manifest::ExtensionManifest;
+use crate::output::manifest::{ExtensionManifest, ManifestList};
 use dev_hot::types::ContentHash;
 
 const RUNTIME: &str = include_str!("../../assets/payload/runtime.js");
 const PAGE_LOADER: &str = include_str!("../../assets/payload/page-loader.js");
 const CONTENT_LOADER: &str = include_str!("../../assets/payload/content-loader.js");
+const TEARDOWN_REGISTRY: &str = include_str!("../../assets/payload/teardown-registry.js");
+/// What re-injecting the content scripts into open frames needs, added to dev builds only.
+const REINJECTION_PERMISSIONS: [&str; 2] = ["scripting", "webNavigation"];
+const CONTENT_SCRIPTS_PREFIX: &str = "content-scripts/";
 const POLL_INTERVAL_MS: u32 = 250;
 const SCRIPT_OPEN: &str = "<script";
 const SCRIPT_CLOSE: &str = "</script>";
@@ -142,10 +147,49 @@ fn patch_page(output_directory: &Path, entry: &Entrypoint) -> Result<()> {
     write_text(&path, &format!("{patched}<!-- {} -->\n", hash.as_str()))
 }
 
-fn patch_content_script(output_directory: &Path, entry: &Entrypoint) -> Result<()> {
+/// Puts a hot content script's loader in place of its bundle, and its global styles in place of its
+/// static stylesheet.
+fn patch_content_script(
+    output_directory: &Path,
+    entry: &Entrypoint,
+    static_style: &str,
+) -> Result<()> {
     let path = output_directory.join(&entry.built_file);
     let original = read_text(&path)?;
-    write_text(&path, &content_loader_source(&entry.name, &original))
+    write_text(&path, &content_loader_source(&entry.name, &original))?;
+    let style_path = path.with_extension("css");
+    if style_path.is_file() {
+        write_text(&style_path, static_style)?;
+    }
+    Ok(())
+}
+
+/// The teardown registry, then the script, run only where it is not running yet. The last value is
+/// `undefined`: injection would otherwise wait for the promise a script ends in, which may never
+/// settle.
+fn guarded_source(name: &str, source: &str) -> String {
+    let name = Value::from(name);
+    format!(
+        "{TEARDOWN_REGISTRY}if (globalThis.devtoolRegistry.begin({name})) {{\n{source}\n}}\n;undefined;\n"
+    )
+}
+
+/// Wraps every content script, of both worlds, so a newer build can undo it and run in its place.
+fn guard_content_scripts(output_directory: &Path, manifest: &ExtensionManifest) -> Result<()> {
+    let files: BTreeSet<String> = manifest
+        .content_scripts()?
+        .into_iter()
+        .flat_map(|script| script.scripts)
+        .collect();
+    for file in files {
+        let path = output_directory.join(&file);
+        let name = file
+            .strip_prefix(CONTENT_SCRIPTS_PREFIX)
+            .unwrap_or(&file)
+            .trim_end_matches(".js");
+        write_text(&path, &guarded_source(name, &read_text(&path)?))?;
+    }
+    Ok(())
 }
 
 /// A match pattern narrowed to its origin, the only paths `web_accessible_resources` accepts.
@@ -157,47 +201,58 @@ fn origin_pattern(pattern: &str) -> String {
     format!("{scheme}://{host}/*")
 }
 
-/// Makes the HMR modules importable by the pages the hot content scripts run on.
-fn expose_modules(output_directory: &Path, hot_entries: &[Entrypoint]) -> Result<()> {
-    let mut manifest = ExtensionManifest::read(output_directory)?;
-    let mut matches: Vec<String> = Vec::new();
+/// The permissions re-injection needs, and the HMR modules made importable by the pages the hot
+/// content scripts run on.
+fn patch_manifest(manifest: &mut ExtensionManifest, hot_entries: &[Entrypoint]) -> Result<()> {
+    let mut hot_origins: Vec<Value> = Vec::new();
+    let mut origins: Vec<Value> = Vec::new();
     for script in manifest.content_scripts()? {
         let is_hot = hot_entries.iter().any(|entry| {
             entry.kind == EntryKind::ContentScript && script.scripts.contains(&entry.built_file)
         });
-        if !is_hot {
-            continue;
-        }
-        for pattern in script.matches {
-            let origin = origin_pattern(&pattern);
-            if !matches.contains(&origin) {
-                matches.push(origin);
+        for pattern in &script.matches {
+            let origin = Value::from(origin_pattern(pattern));
+            let is_new_hot_origin = is_hot && !hot_origins.contains(&origin);
+            if is_new_hot_origin {
+                hot_origins.push(origin.clone());
             }
+            origins.push(origin);
         }
     }
-    if matches.is_empty() {
+    let permissions = REINJECTION_PERMISSIONS.map(Value::from).to_vec();
+    manifest.extend_list(ManifestList::Permissions, permissions)?;
+    manifest.extend_list(ManifestList::HostPermissions, origins)?;
+    if hot_origins.is_empty() {
         return Ok(());
     }
-    manifest.add_web_accessible_resource(json!({
+    let resources = json!({
         "resources": [format!("{HMR_OUT_SUBDIR}/*")],
-        "matches": matches,
-    }))?;
-    manifest.write(output_directory)
+        "matches": hot_origins,
+    });
+    manifest.extend_list(ManifestList::WebAccessibleResources, vec![resources])
 }
 
-/// Runs once after every extension build: points the hot entrypoints at their HMR modules.
+/// Runs once after every extension build: points the hot entrypoints at their HMR modules, makes
+/// every content script replaceable and adds the dev permissions.
 pub(crate) fn patch_built_output(
     output_directory: &Path,
     hot_entries: &[Entrypoint],
+    static_styles: &BTreeMap<String, String>,
 ) -> Result<()> {
     for entry in hot_entries {
         match entry.kind {
             EntryKind::Page => patch_page(output_directory, entry)?,
-            EntryKind::ContentScript => patch_content_script(output_directory, entry)?,
+            EntryKind::ContentScript => {
+                let style = static_styles.get(&entry.name).map_or("", String::as_str);
+                patch_content_script(output_directory, entry, style)?;
+            }
             EntryKind::Cold => {}
         }
     }
-    expose_modules(output_directory, hot_entries)
+    let mut manifest = ExtensionManifest::read(output_directory)?;
+    guard_content_scripts(output_directory, &manifest)?;
+    patch_manifest(&mut manifest, hot_entries)?;
+    manifest.write(output_directory)
 }
 
 #[cfg(test)]
@@ -230,6 +285,40 @@ mod tests {
         assert!(content.contains(r#""watcher""#));
         assert!(!format!("{page}{content}").contains("@@"));
         assert!(runtime_source()?.starts_with("const HMR_CONFIG = {\"manifestPath\""));
+        Ok(())
+    }
+
+    #[test]
+    fn a_guarded_script_never_ends_in_its_own_promise() {
+        let source = guarded_source(
+            "watcher",
+            "var main = run();
+main;",
+        );
+        assert!(source.contains(r#"devtoolRegistry.begin("watcher")"#));
+        assert!(source.ends_with(
+            "}
+;undefined;
+"
+        ));
+    }
+
+    #[test]
+    fn dev_builds_may_inject_into_every_frame_a_content_script_matches() -> Result<()> {
+        let mut manifest = ExtensionManifest(json!({
+            "permissions": ["storage"],
+            "content_scripts": [{"js": ["content-scripts/a.js"], "matches": ["*://x/embed/*"]}]
+        }));
+        patch_manifest(&mut manifest, &[])?;
+        assert_eq!(
+            manifest.0.pointer("/permissions"),
+            Some(&json!(["storage", "scripting", "webNavigation"]))
+        );
+        assert_eq!(
+            manifest.0.pointer("/host_permissions"),
+            Some(&json!(["*://x/*"]))
+        );
+        assert_eq!(manifest.0.pointer("/web_accessible_resources"), None);
         Ok(())
     }
 }

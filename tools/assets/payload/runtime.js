@@ -10,7 +10,7 @@
 //    callback
 //  - swaps a page's global stylesheets in place
 //  - when a swap can't be applied (a re-import failed, a callback threw, a page's dependency graph
-//    was re-split) it reloads the page, which loads the freshly built modules
+//    was re-split) an extension page reloads itself; a content script keeps running what it has
 //  - keeps component and module `$state` across a swap (the registry under `state`)
 //
 // What a content script runs outside its components is never swapped here: the dev server reloads
@@ -205,8 +205,15 @@ globalThis.devHmr = {
   state
 };
 
+// Only an extension page reloads itself. A tab never does: like Vite after a failed fetch, a content
+// script keeps what it runs until the next save applies
 /** @param {string} reason */
 function reloadPage(reason) {
+  if (!hostedPage) {
+    console.warn(`${LOG_PREFIX} not applied, the running code stays until the next save: ${reason}`);
+    return;
+  }
+
   console.info(`${LOG_PREFIX} reloading the page: ${reason}`);
   location.reload();
 }

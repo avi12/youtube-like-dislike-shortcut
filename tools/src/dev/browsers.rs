@@ -6,5 +6,5 @@ mod scripts;
 mod target;
 mod targets;
 
-pub(crate) use self::target::ReloadTarget;
+pub(crate) use self::target::{Reinjection, ReloadTarget};
 pub(crate) use self::targets::{ChromiumTarget, FirefoxTarget, FirefoxTargetConfig};

@@ -13,7 +13,7 @@ use serde::Serialize;
 use serde_json::Value;
 
 use crate::output::error::Result;
-use crate::output::manifest::MANIFEST_FILE;
+use crate::output::manifest::{url_regex, ContentScriptWorld, ExtensionManifest, MANIFEST_FILE};
 use crate::output::reload::snapshot::BuildSnapshot;
 
 const LOCALES_DIR_PREFIX: &str = "_locales/";
@@ -48,12 +48,24 @@ impl fmt::Display for PageRefreshPlan {
     }
 }
 
-/// Reload the extension, then the tabs its content scripts run in.
+/// One manifest content script as it is injected into the open frames.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct Injection {
+    pub(crate) files: Vec<String>,
+    pub(crate) style_sheets: Vec<String>,
+    pub(crate) world: ContentScriptWorld,
+    pub(crate) is_all_frames: bool,
+    /// Regular expressions of the frame URLs the script runs in.
+    pub(crate) url_patterns: Vec<String>,
+}
+
+/// Reload the extension, then run every content script anew in the frames already open. Tabs are
+/// never reloaded.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ExtensionReloadPlan {
     pub(crate) reasons: Vec<String>,
-    /// The match patterns of every content script, before and after the change.
-    pub(crate) tab_patterns: Vec<String>,
+    pub(crate) injections: Vec<Injection>,
 }
 
 /// What a rebuild needs from the browser.
@@ -63,7 +75,7 @@ pub(crate) enum ReloadPlan {
     None,
     /// Refresh the open extension pages.
     RefreshPages(PageRefreshPlan),
-    /// Reload the extension and its tabs.
+    /// Reload the extension and re-inject its content scripts.
     ReloadExtension(ExtensionReloadPlan),
 }
 
@@ -185,17 +197,29 @@ pub(crate) fn plan_reload(before: &BuildSnapshot, after: &BuildSnapshot) -> Resu
     if reasons.is_empty() {
         return Ok(ReloadPlan::RefreshPages(plan_page_refresh(after, &changed)));
     }
-    let mut tab_patterns = after.manifest.content_script_matches()?;
-    // A removed content script still runs in its tabs until they reload
-    for pattern in before.manifest.content_script_matches()? {
-        if !tab_patterns.contains(&pattern) {
-            tab_patterns.push(pattern);
-        }
-    }
     Ok(ReloadPlan::ReloadExtension(ExtensionReloadPlan {
         reasons,
-        tab_patterns,
+        injections: list_injections(&after.manifest)?,
     }))
+}
+
+/// Every content script of a manifest.
+pub(crate) fn list_injections(manifest: &ExtensionManifest) -> Result<Vec<Injection>> {
+    Ok(manifest
+        .content_scripts()?
+        .into_iter()
+        .map(|script| Injection {
+            url_patterns: script
+                .matches
+                .iter()
+                .map(|pattern| url_regex(pattern))
+                .collect(),
+            files: script.scripts,
+            style_sheets: script.style_sheets,
+            world: script.world,
+            is_all_frames: script.is_all_frames,
+        })
+        .collect())
 }
 
 #[cfg(test)]

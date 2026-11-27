@@ -78,13 +78,13 @@ fn an_unnamed_public_asset_refreshes_the_pages() -> Result<()> {
 }
 
 #[test]
-fn a_background_change_reloads_the_extension_and_its_tabs() -> Result<()> {
+fn a_background_change_reloads_the_extension_and_reinjects_the_scripts() -> Result<()> {
     let plan = plan_for(&[("background.js", "2")])?;
     assert_eq!(
         plan,
         ReloadPlan::ReloadExtension(ExtensionReloadPlan {
             reasons: vec!["background changed".to_owned()],
-            tab_patterns: vec!["*://x/*".to_owned()],
+            injections: list_injections(&snapshot(&[]).manifest)?,
         })
     );
     Ok(())

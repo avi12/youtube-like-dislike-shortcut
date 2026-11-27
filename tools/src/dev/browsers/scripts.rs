@@ -3,9 +3,9 @@
 
 use serde::Serialize;
 
-use crate::output::reload::{ExtensionReloadPlan, PageRefreshPlan};
+use crate::output::reload::{ExtensionReloadPlan, Injection, PageRefreshPlan};
 
-const TAB_RELOAD: &str = include_str!("../../../assets/browsers/tab-reload.js");
+const TAB_REINJECT: &str = include_str!("../../../assets/browsers/tab-reinject.js");
 const PAGE_REFRESH: &str = include_str!("../../../assets/browsers/page-refresh.js");
 const EXTENSION_RELOAD: &str = include_str!("../../../assets/browsers/extension-reload.js");
 const EXTENSION_ID_BY_NAME: &str = include_str!("../../../assets/browsers/extension-id-by-name.js");
@@ -31,9 +31,34 @@ pub(super) fn extension_id_by_name(name: &str) -> serde_json::Result<String> {
     invoke(EXTENSION_ID_BY_NAME, &name)
 }
 
-/// Run in the Firefox background: reloads the tabs a content script runs in.
-pub(super) fn tab_reload(plan: &ExtensionReloadPlan) -> serde_json::Result<String> {
-    invoke(TAB_RELOAD, &plan.tab_patterns)
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ReinjectConfig<'plan> {
+    scripts: &'plan [Injection],
+    is_injecting: bool,
+}
+
+/// Run in the background: undoes the content scripts running in the open frames.
+pub(super) fn tab_teardown(plan: &ExtensionReloadPlan) -> serde_json::Result<String> {
+    invoke(
+        TAB_REINJECT,
+        &ReinjectConfig {
+            scripts: &plan.injections,
+            is_injecting: false,
+        },
+    )
+}
+
+/// Run in the reloaded background: undoes the content scripts in the open frames and runs the new
+/// ones there.
+pub(super) fn tab_reinject(plan: &ExtensionReloadPlan) -> serde_json::Result<String> {
+    invoke(
+        TAB_REINJECT,
+        &ReinjectConfig {
+            scripts: &plan.injections,
+            is_injecting: true,
+        },
+    )
 }
 
 #[derive(Serialize)]

@@ -5,7 +5,7 @@ use std::fs;
 use std::path::Path;
 
 pub(crate) use dev_hot::changes::MANIFEST_FILE_NAME as MANIFEST_FILE;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
 use crate::output::error::{OutputError, Result};
@@ -14,12 +14,27 @@ const ALL_URLS_PATTERN: &str = "<all_urls>";
 const ANY_HOST: &str = "*";
 const ANY_SUBDOMAIN_PREFIX: &str = "*.";
 const SCHEME_SEPARATOR: &str = "://";
-const PATTERN_SCHEMES: [&str; 7] = ["*", "http", "https", "ws", "wss", "file", "ftp"];
-const ANY_WEB_SCHEMES: [&str; 2] = ["http", "https"];
-const WEB_ACCESSIBLE_RESOURCES_KEY: &str = "web_accessible_resources";
+
+/// The manifest lists the dev server appends to.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ManifestList {
+    Permissions,
+    HostPermissions,
+    WebAccessibleResources,
+}
+
+impl ManifestList {
+    const fn key(self) -> &'static str {
+        match self {
+            Self::Permissions => "permissions",
+            Self::HostPermissions => "host_permissions",
+            Self::WebAccessibleResources => "web_accessible_resources",
+        }
+    }
+}
 
 /// The world a content script runs in.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub(crate) enum ContentScriptWorld {
     /// The extension's isolated world.
     #[default]
@@ -39,6 +54,10 @@ pub(crate) struct ContentScriptEntry {
     pub(crate) matches: Vec<String>,
     #[serde(default)]
     pub(crate) world: ContentScriptWorld,
+    #[serde(default, rename = "css")]
+    pub(crate) style_sheets: Vec<String>,
+    #[serde(default, rename = "all_frames")]
+    pub(crate) is_all_frames: bool,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -123,104 +142,78 @@ impl ExtensionManifest {
             .collect())
     }
 
-    /// The match patterns of every content script, each named once.
-    pub(crate) fn content_script_matches(&self) -> Result<Vec<String>> {
-        let mut patterns: Vec<String> = Vec::new();
-        for pattern in self
-            .content_scripts()?
-            .into_iter()
-            .flat_map(|entry| entry.matches)
-        {
-            if !patterns.contains(&pattern) {
-                patterns.push(pattern);
-            }
-        }
-        Ok(patterns)
-    }
-
-    /// Appends an entry to `web_accessible_resources`, creating the list when missing.
-    pub(crate) fn add_web_accessible_resource(&mut self, entry: Value) -> Result<()> {
-        let invalid = || {
-            OutputError::Invalid(format!(
-                "manifest key {WEB_ACCESSIBLE_RESOURCES_KEY} is not an array"
-            ))
-        };
-        self.0
+    /// Appends the entries a list does not hold yet, creating the list when missing.
+    pub(crate) fn extend_list(&mut self, list: ManifestList, entries: Vec<Value>) -> Result<()> {
+        let invalid =
+            || OutputError::Invalid(format!("manifest key {} is not an array", list.key()));
+        let items = self
+            .0
             .as_object_mut()
             .ok_or_else(invalid)?
-            .entry(WEB_ACCESSIBLE_RESOURCES_KEY)
+            .entry(list.key())
             .or_insert_with(|| Value::Array(Vec::new()))
             .as_array_mut()
-            .ok_or_else(invalid)?
-            .push(entry);
+            .ok_or_else(invalid)?;
+        for entry in entries {
+            if !items.contains(&entry) {
+                items.push(entry);
+            }
+        }
         Ok(())
     }
 }
 
-/// Whether `glob` (where `*` is any run of characters) matches the whole `text`.
-fn glob_matches(glob: &str, text: &str) -> bool {
-    let Some((head, tail)) = glob.split_once('*') else {
-        return glob == text;
-    };
-    let Some(rest) = text.strip_prefix(head) else {
-        return false;
-    };
-    rest.char_indices()
-        .map(|(index, _)| index)
-        .chain([rest.len()])
-        .any(|index| glob_matches(tail, rest.get(index..).unwrap_or_default()))
+/// A glob where `*` is any run of characters, as regular expression source.
+fn glob_regex(glob: &str) -> String {
+    glob.split('*')
+        .map(regex::escape)
+        .collect::<Vec<_>>()
+        .join(".*")
 }
 
-fn is_host_matching(pattern_host: &str, host: &str) -> bool {
-    let is_any_host = pattern_host == ANY_HOST;
+fn host_regex(host: &str) -> String {
+    let is_any_host = host == ANY_HOST;
     if is_any_host {
-        return true;
+        return "[^/]*".to_owned();
     }
-    let Some(domain) = pattern_host.strip_prefix(ANY_SUBDOMAIN_PREFIX) else {
-        return pattern_host == host;
-    };
-    host == domain || host.ends_with(&format!(".{domain}"))
+    host.strip_prefix(ANY_SUBDOMAIN_PREFIX).map_or_else(
+        || regex::escape(host),
+        |domain| format!("([^/]+[.])?{}", regex::escape(domain)),
+    )
 }
 
-fn is_scheme_matching(pattern_scheme: &str, scheme: &str) -> bool {
-    let is_any_web_scheme = pattern_scheme == "*";
-    if is_any_web_scheme {
-        return ANY_WEB_SCHEMES.contains(&scheme);
-    }
-    pattern_scheme == scheme
-}
-
-/// Splits `scheme://host/path` into its parts; the path keeps its leading slash.
-fn split_url(text: &str) -> Option<(&str, &str, &str)> {
-    let (scheme, rest) = text.split_once(SCHEME_SEPARATOR)?;
-    let slash = rest.find('/')?;
-    let (host, path) = rest.split_at_checked(slash)?;
-    Some((scheme, host, path))
-}
-
-/// Chrome's match pattern semantics, as far as a tab URL needs them.
-pub(crate) fn matches_url_pattern(url: &str, pattern: &str) -> bool {
+/// Chrome's match pattern semantics as a regular expression over a frame's URL.
+pub(crate) fn url_regex(pattern: &str) -> String {
     let is_every_url = pattern == ALL_URLS_PATTERN;
-    if is_every_url {
-        return true;
-    }
-    let Some((scheme, host, path)) = split_url(pattern) else {
-        return false;
+    let parts = pattern
+        .split_once(SCHEME_SEPARATOR)
+        .and_then(|(scheme, rest)| Some((scheme, rest.split_at_checked(rest.find('/')?)?)));
+    let Some((scheme, (host, path))) = parts.filter(|_| !is_every_url) else {
+        return "^(https?|file|ftp)://".to_owned();
     };
-    let Some((url_scheme, url_host, url_path)) = split_url(url) else {
-        return false;
+    let is_any_web_scheme = scheme == "*";
+    let scheme = if is_any_web_scheme {
+        "https?".to_owned()
+    } else {
+        regex::escape(scheme)
     };
-    PATTERN_SCHEMES.contains(&scheme)
-        && is_scheme_matching(scheme, url_scheme)
-        && is_host_matching(host, url_host)
-        && glob_matches(path, url_path)
+    format!(
+        "^{scheme}{SCHEME_SEPARATOR}{}{}(#.*)?$",
+        host_regex(host),
+        glob_regex(path)
+    )
 }
 
 #[cfg(test)]
 mod tests {
+    use regex::Regex;
     use serde_json::json;
 
     use crate::output::manifest::*;
+
+    fn is_matching(url: &str, pattern: &str) -> bool {
+        Regex::new(&url_regex(pattern)).is_ok_and(|regex| regex.is_match(url))
+    }
 
     #[test]
     fn subdomain_wildcard_matches_bare_and_nested_hosts() {
@@ -228,23 +221,20 @@ mod tests {
         for url in [
             "https://youtube.com/watch?v=1",
             "https://www.youtube.com/",
-            "http://music.youtube.com/a",
+            "http://music.youtube.com/a#t",
         ] {
-            assert!(matches_url_pattern(url, pattern), "{url}");
+            assert!(is_matching(url, pattern), "{url}");
         }
-        assert!(!matches_url_pattern("https://notyoutube.com/a", pattern));
-        assert!(!matches_url_pattern("ftp://youtube.com/a", pattern));
+        assert!(!is_matching("https://notyoutube.com/a", pattern));
+        assert!(!is_matching("ftp://youtube.com/a", pattern));
     }
 
     #[test]
     fn paths_and_all_urls() {
         let embed = "https://www.youtube.com/embed/*";
-        assert!(matches_url_pattern(
-            "https://www.youtube.com/embed/x",
-            embed
-        ));
-        assert!(!matches_url_pattern("https://www.youtube.com/watch", embed));
-        assert!(matches_url_pattern("file:///tmp/a", ALL_URLS_PATTERN));
+        assert!(is_matching("https://www.youtube.com/embed/x", embed));
+        assert!(!is_matching("https://www.youtube.com/watch", embed));
+        assert!(is_matching("file:///tmp/a", ALL_URLS_PATTERN));
     }
 
     #[test]
@@ -263,7 +253,6 @@ mod tests {
             [ContentScriptWorld::Main, ContentScriptWorld::Isolated]
         );
         assert_eq!(manifest.background_files()?, ["background.js"]);
-        assert_eq!(manifest.content_script_matches()?, ["*://x/*", "*://y/*"]);
         assert!(manifest.gecko_id().is_err());
         Ok(())
     }

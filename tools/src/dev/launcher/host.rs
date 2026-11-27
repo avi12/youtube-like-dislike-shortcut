@@ -8,7 +8,7 @@ use dev_hot::orchestrator::{HmrOutcome, Host};
 use tokio::sync::Mutex;
 use tokio::time::Instant;
 
-use crate::dev::browsers::ReloadTarget;
+use crate::dev::browsers::{Reinjection, ReloadTarget};
 use crate::dev::hmr::{ContentState, HMR_OUT_SUBDIR};
 use crate::dev::launcher::build::{build_extension, build_hmr_modules};
 use crate::dev::launcher::error::Result;
@@ -16,10 +16,11 @@ use crate::dev::launcher::log::{format_elapsed, log_event};
 use crate::dev::payload::patch_built_output;
 use crate::output::manifest::ExtensionManifest;
 use crate::output::options::DevOptions;
-use crate::output::sync::sync_directory;
 use crate::output::reload::{
-    plan_reload, take_build_snapshot, BuildSnapshot, ExtensionReloadPlan, ReloadPlan,
+    list_injections, plan_reload, take_build_snapshot, BuildSnapshot, ExtensionReloadPlan,
+    ReloadPlan,
 };
+use crate::output::sync::sync_directory;
 
 const NO_CHANGES: &str = "No output changes - skipped reload";
 const PROFILE_REUSED_REASON: &str = "a kept profile may run what it cached before this build";
@@ -59,12 +60,9 @@ fn describe_content_change(
         .iter()
         .zip(next.values())
         .find_map(|((name, old), new)| {
-            let is_style_changed = old.styles_hash != new.styles_hash;
             let is_code_changed = old.version != new.version;
             let is_graph_changed = old.vendor_hash != new.vendor_hash;
-            let reason = if is_style_changed {
-                "a component style changed, which its page also holds as a static stylesheet"
-            } else if is_code_changed {
+            let reason = if is_code_changed {
                 "code outside its components changed"
             } else if is_graph_changed {
                 "its dependency graph changed"
@@ -75,9 +73,21 @@ fn describe_content_change(
         })
 }
 
-fn describe_reload(plan: &ExtensionReloadPlan, tab_count: usize) -> String {
+fn describe_reload(plan: &ExtensionReloadPlan, reinjection: &Reinjection) -> String {
     let reasons = plan.reasons.join("; ");
-    format!("Reloaded extension ({reasons}) and {tab_count} tab(s)")
+    let Reinjection {
+        tab_count,
+        frame_count,
+        failures,
+    } = reinjection;
+    let injection_failures = if failures.is_empty() {
+        String::new()
+    } else {
+        format!(" - injection failed: {}", failures.join("; "))
+    };
+    format!(
+        "Reloaded extension ({reasons}) - content scripts replaced in {frame_count} frame(s) of {tab_count} tab(s), no tab reloaded{injection_failures}"
+    )
 }
 
 async fn apply(target: &dyn ReloadTarget, plan: &ReloadPlan) -> Result<String> {
@@ -93,8 +103,8 @@ async fn apply(target: &dyn ReloadTarget, plan: &ReloadPlan) -> Result<String> {
             format!("{refresh} changed - {pages}; extension and tabs untouched")
         }
         ReloadPlan::ReloadExtension(reload) => {
-            let tab_count = target.reload_extension(reload).await.map_err(host_error)?;
-            describe_reload(reload, tab_count)
+            let reinjection = target.reload_extension(reload).await.map_err(host_error)?;
+            describe_reload(reload, &reinjection)
         }
     };
     Ok(outcome)
@@ -128,10 +138,10 @@ impl DevHost {
         let manifest = ExtensionManifest::read(&self.options.output_directory())?;
         let plan = ExtensionReloadPlan {
             reasons: vec![PROFILE_REUSED_REASON.to_owned()],
-            tab_patterns: manifest.content_script_matches()?,
+            injections: list_injections(&manifest)?,
         };
         match target.reload_extension(&plan).await {
-            Ok(tab_count) => log_event(&describe_reload(&plan, tab_count)),
+            Ok(reinjection) => log_event(&describe_reload(&plan, &reinjection)),
             Err(error) => tracing::warn!("Could not reload the extension: {error}"),
         }
         Ok(())
@@ -144,6 +154,7 @@ impl DevHost {
             patch_built_output(
                 &self.options.staged_output_directory(),
                 &build.hot_entries,
+                &build.static_styles,
             )?;
             state.is_unpatched = false;
             state.content_scripts = build.content_scripts;
@@ -196,25 +207,22 @@ impl Host for DevHost {
 mod tests {
     use crate::dev::launcher::host::*;
 
-    fn states(version: &str, styles: &str) -> BTreeMap<String, ContentState> {
+    fn states(version: &str) -> BTreeMap<String, ContentState> {
         BTreeMap::from([(
             "watcher".to_owned(),
             ContentState {
                 version: version.to_owned(),
                 vendor_hash: "v".to_owned(),
-                styles_hash: styles.to_owned(),
             },
         )])
     }
 
     #[test]
     fn only_component_edits_leave_the_content_scripts_swappable() {
-        let running = states("1", "s");
-        assert_eq!(describe_content_change(&running, &states("1", "s")), None);
-        let code = describe_content_change(&running, &states("2", "s"));
+        let running = states("1");
+        assert_eq!(describe_content_change(&running, &states("1")), None);
+        let code = describe_content_change(&running, &states("2"));
         assert!(code.is_some_and(|reason| reason.contains("outside its components")));
-        let style = describe_content_change(&running, &states("1", "t"));
-        assert!(style.is_some_and(|reason| reason.contains("style")));
         assert!(describe_content_change(&running, &BTreeMap::new()).is_some());
     }
 }

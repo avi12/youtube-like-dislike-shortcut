@@ -8,18 +8,19 @@ use std::time::Duration;
 use dev_hot::driver::cdp::protocol::{Method, NoParams};
 use dev_hot::driver::cdp::{CdpClient, CdpTarget, TargetId, TargetKind};
 use dev_hot::types::Port;
+use serde_json::Value;
 use tokio::time::Instant;
 
 use self::extensions_page::evaluate_on_extensions_page;
 use crate::cdp::Session;
 use crate::dev::browsers::error::{BrowserError, Result};
 use crate::dev::browsers::scripts;
-use crate::dev::browsers::target::{BoxFuture, ReloadTarget};
-use crate::output::manifest::matches_url_pattern;
+use crate::dev::browsers::target::{BoxFuture, Reinjection, ReloadTarget};
 use crate::output::reload::{ExtensionReloadPlan, PageRefreshPlan};
 
 const SERVICE_WORKER_WAIT: Duration = Duration::from_secs(10);
 const SERVICE_WORKER_POLL: Duration = Duration::from_millis(200);
+const REINJECT_ATTEMPTS: u32 = 3;
 const EXTENSION_URL_PREFIX: &str = "chrome-extension://";
 const HTML_SUFFIX: &str = ".html";
 
@@ -48,13 +49,6 @@ fn page_name_of(url: &str) -> Option<&str> {
     let path = url.strip_prefix(EXTENSION_URL_PREFIX)?.split_once('/')?.1;
     let file = path.split(['?', '#']).next()?;
     file.strip_suffix(HTML_SUFFIX)?.rsplit('/').next()
-}
-
-fn is_matching_tab(target: &CdpTarget, patterns: &[String]) -> bool {
-    target.kind == TargetKind::Page
-        && patterns
-            .iter()
-            .any(|pattern| matches_url_pattern(&target.url, pattern))
 }
 
 /// Reloads one page target; false when no session could be opened on it or it refused.
@@ -110,26 +104,32 @@ impl ChromiumTarget {
         Ok(id.to_owned())
     }
 
-    async fn list_worker_ids(&self, extension_id: &str) -> Vec<TargetId> {
+    async fn list_workers(&self, extension_id: &str) -> Vec<CdpTarget> {
         let targets = self.client.list_targets().await.unwrap_or_default();
         targets
             .into_iter()
             .filter(|target| is_worker_of(target, extension_id))
-            .map(|target| target.id)
             .collect()
     }
 
     /// Waits for a worker other than the `stale` ones the reload is tearing down.
-    async fn wait_for_fresh_worker(&self, extension_id: &str, stale: &[TargetId]) -> Result<()> {
+    async fn wait_for_fresh_worker(
+        &self,
+        extension_id: &str,
+        stale: &[TargetId],
+    ) -> Result<CdpTarget> {
         let deadline = Instant::now() + SERVICE_WORKER_WAIT;
         loop {
             let is_expired = Instant::now() >= deadline;
             if is_expired {
                 return Err(BrowserError::Timeout("the extension's service worker"));
             }
-            let workers = self.list_worker_ids(extension_id).await;
-            if workers.iter().any(|id| !stale.contains(id)) {
-                return Ok(());
+            let workers = self.list_workers(extension_id).await;
+            let fresh = workers
+                .into_iter()
+                .find(|worker| !stale.contains(&worker.id));
+            if let Some(worker) = fresh {
+                return Ok(worker);
             }
             tokio::time::sleep(SERVICE_WORKER_POLL).await;
         }
@@ -143,24 +143,56 @@ impl ChromiumTarget {
         Ok(())
     }
 
-    async fn reload_extension_now(&self, plan: &ExtensionReloadPlan) -> Result<usize> {
+    /// The fresh worker may still be starting, so its first evaluations can fail.
+    async fn evaluate_in_worker(&self, worker: &CdpTarget, expression: &str) -> Result<Value> {
+        let url = worker
+            .debugger_url()
+            .ok_or_else(|| BrowserError::Protocol("the worker has no debugger URL".to_owned()))?;
+        let mut session = Session::open(url).await?;
+        let outcome = session.evaluate(expression).await;
+        session.close().await;
+        Ok(outcome?)
+    }
+
+    async fn reload_extension_now(&self, plan: &ExtensionReloadPlan) -> Result<Reinjection> {
         let id = self.resolve_extension_id().await?;
-        let stale = self.list_worker_ids(&id).await;
+        let stale: Vec<TargetId> = self
+            .list_workers(&id)
+            .await
+            .into_iter()
+            .map(|worker| worker.id)
+            .collect();
         self.reload_extension_process(&id).await?;
         // A reload that leaves the extension disabled is undone by a second one
-        if self.wait_for_fresh_worker(&id, &stale).await.is_err() {
+        let worker = if let Ok(worker) = self.wait_for_fresh_worker(&id, &stale).await {
+            worker
+        } else {
             self.reload_extension_process(&id).await?;
-            self.wait_for_fresh_worker(&id, &stale).await?;
-        }
-        let mut reloaded = 0;
-        for target in self.client.list_targets().await? {
-            let is_reloaded =
-                is_matching_tab(&target, &plan.tab_patterns) && reload_page(&target).await;
-            if is_reloaded {
-                reloaded += 1;
+            self.wait_for_fresh_worker(&id, &stale).await?
+        };
+        let source = scripts::tab_reinject(plan)?;
+        let value = self.reinject(&id, worker, &source).await?;
+        Ok(serde_json::from_value(value)?)
+    }
+
+    /// A worker caught while it starts can leave an evaluation unanswered. Re-injecting undoes what
+    /// ran before it runs again, so it is safe to ask the live worker once more.
+    async fn reinject(&self, id: &str, worker: CdpTarget, source: &str) -> Result<Value> {
+        let mut worker = worker;
+        let mut attempt = 1;
+        loop {
+            let error = match self.evaluate_in_worker(&worker, source).await {
+                Ok(value) => return Ok(value),
+                Err(error) => error,
+            };
+            let is_out_of_attempts = attempt >= REINJECT_ATTEMPTS;
+            if is_out_of_attempts {
+                return Err(error);
             }
+            tracing::warn!("Re-injecting the content scripts failed, trying again: {error}");
+            attempt += 1;
+            worker = self.wait_for_fresh_worker(id, &[]).await?;
         }
-        Ok(reloaded)
     }
 
     async fn refresh_pages_now(&self, plan: &PageRefreshPlan) -> Result<Vec<String>> {
@@ -189,7 +221,7 @@ impl ChromiumTarget {
 }
 
 impl ReloadTarget for ChromiumTarget {
-    fn reload_extension<'a>(&'a self, plan: &'a ExtensionReloadPlan) -> BoxFuture<'a, usize> {
+    fn reload_extension<'a>(&'a self, plan: &'a ExtensionReloadPlan) -> BoxFuture<'a, Reinjection> {
         Box::pin(self.reload_extension_now(plan))
     }
 
@@ -215,18 +247,6 @@ mod tests {
         assert!(!is_worker_of(&worker, "other"));
         let page = target("page", "chrome-extension://abc/popup.html")?;
         assert!(!is_worker_of(&page, "abc"));
-        Ok(())
-    }
-
-    #[test]
-    fn only_top_level_pages_matching_a_pattern_are_tabs() -> Result<()> {
-        let patterns = ["https://www.youtube.com/*".to_owned()];
-        let tab = target("page", "https://www.youtube.com/watch?v=1")?;
-        assert!(is_matching_tab(&tab, &patterns));
-        let frame = target("iframe", "https://www.youtube.com/embed/1")?;
-        assert!(!is_matching_tab(&frame, &patterns));
-        let other = target("page", "https://example.com/")?;
-        assert!(!is_matching_tab(&other, &patterns));
         Ok(())
     }
 

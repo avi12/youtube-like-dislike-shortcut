@@ -23,8 +23,6 @@ use crate::dev::hmr::error::{HmrError, Result};
 use crate::dev::payload::page_loader_source;
 
 const SVELTE_EXTENSION: &str = ".svelte";
-const STYLE_OPEN: &str = "<style";
-const STYLE_CLOSE: &str = "</style>";
 
 /// The source hash of each module whose edit can't hot swap, as of the previous build of this
 /// process.
@@ -52,8 +50,6 @@ pub(crate) struct ContentState {
     /// The version of the entry module: everything reached without passing through a component.
     pub(crate) version: String,
     pub(crate) vendor_hash: String,
-    /// The components' `<style>` blocks, which the running UI also holds as a static stylesheet.
-    pub(crate) styles_hash: String,
 }
 
 /// Everything the post-processing of one build needs.
@@ -70,6 +66,8 @@ pub(super) struct Finished {
     pub(super) swappable_files: BTreeSet<String>,
     pub(super) logs: Vec<String>,
     pub(super) content_scripts: BTreeMap<String, ContentState>,
+    /// The stylesheet each hot content script's static one is replaced with.
+    pub(super) static_styles: BTreeMap<String, String>,
 }
 
 fn chunk_codes(chunks: &[OutputChunk]) -> BTreeMap<String, String> {
@@ -134,30 +132,6 @@ fn forget_writes_when_directory_was_emptied(output_directory: &Path) {
         .clear();
 }
 
-/// The text of every `<style>` block of a component's source.
-fn style_blocks(source: &str) -> String {
-    source
-        .split(STYLE_OPEN)
-        .skip(1)
-        .filter_map(|rest| rest.split_once(STYLE_CLOSE))
-        .map(|(block, _)| block)
-        .collect()
-}
-
-fn hash_component_styles(paths: &ProjectPaths, graph: &GraphCollector) -> Result<String> {
-    let mut styles = String::new();
-    for source_id in graph
-        .files
-        .iter()
-        .filter(|file| file.ends_with(SVELTE_EXTENSION))
-    {
-        let path = PathBuf::from(paths.absolute(source_id));
-        let source = fs::read_to_string(&path).map_err(|source| HmrError::Read { path, source })?;
-        styles.push_str(&style_blocks(&source));
-    }
-    Ok(short_hash(styles.as_bytes()))
-}
-
 fn component_modules(
     paths: &ProjectPaths,
     chunks: &[OutputChunk],
@@ -191,10 +165,26 @@ fn entry_file(built: &BuiltEntry) -> Result<&str> {
         .ok_or_else(|| HmrError::Worker(format!("no entry module for {}", built.entry.name)))
 }
 
+/// The imported stylesheets of a build. A component's own styles are not among them: the HMR build
+/// injects those from the component itself, where an edit can replace them.
+fn global_styles(chunks: &[OutputChunk]) -> String {
+    chunks
+        .iter()
+        .filter(|chunk| {
+            chunk.kind == ChunkType::Asset
+                && Path::new(&chunk.file_name)
+                    .extension()
+                    .is_some_and(|extension| extension == "css")
+        })
+        .filter_map(|chunk| chunk.source.as_deref())
+        .collect()
+}
+
 /// What describes the entries once every module has its served version.
 struct Described {
     manifest: HmrManifest,
     content_scripts: BTreeMap<String, ContentState>,
+    static_styles: BTreeMap<String, String>,
     /// Page loader files, relative to the HMR output folder, and their sources.
     page_loaders: BTreeMap<String, String>,
 }
@@ -209,6 +199,7 @@ fn describe_entries(
     let mut described = Described {
         manifest: HmrManifest::default(),
         content_scripts: BTreeMap::new(),
+        static_styles: BTreeMap::new(),
         page_loaders: BTreeMap::new(),
     };
     for item in built {
@@ -238,12 +229,14 @@ fn describe_entries(
                 .page_loaders
                 .insert(loader, page_loader_source(name, &url));
         } else {
+            described
+                .static_styles
+                .insert(name.clone(), global_styles(&item.chunks));
             described.content_scripts.insert(
                 name.clone(),
                 ContentState {
                     version: versions.get(file).cloned().unwrap_or_default(),
                     vendor_hash: vendor_hash.clone(),
-                    styles_hash: hash_component_styles(paths, &item.graph)?,
                 },
             );
         }
@@ -406,17 +399,6 @@ pub(super) fn finish_build(input: FinishInput) -> Result<Finished> {
         swappable_files: hot_sources.swappable_files,
         logs,
         content_scripts: described.content_scripts,
+        static_styles: described.static_styles,
     })
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::dev::hmr::compile::output::*;
-
-    #[test]
-    fn style_blocks_are_what_a_style_change_is_judged_by() {
-        let source = "<script></script><p>a</p><style>\n  p { color: red }\n</style>";
-        assert_eq!(style_blocks(source), ">\n  p { color: red }\n");
-        assert_eq!(style_blocks("<p>a</p>"), "");
-    }
 }

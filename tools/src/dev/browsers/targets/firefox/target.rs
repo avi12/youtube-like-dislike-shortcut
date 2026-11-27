@@ -1,14 +1,14 @@
-//! The Firefox reload target: `runtime.reload()` through the background, then the tabs through the
-//! restarted background.
+//! The Firefox reload target: `runtime.reload()` through the background, then the content scripts
+//! re-injected by the restarted background.
 
 use std::time::Duration;
 
 use dev_hot::types::Port;
 use serde_json::Value;
 
-use crate::dev::browsers::error::{BrowserError, Result};
+use crate::dev::browsers::error::Result;
 use crate::dev::browsers::scripts::{self, RUNTIME_RELOAD};
-use crate::dev::browsers::target::{BoxFuture, ReloadTarget};
+use crate::dev::browsers::target::{BoxFuture, Reinjection, ReloadTarget};
 use crate::dev::browsers::targets::firefox::background::{
     evaluate_in_background, run_script_in_background, BackgroundAddress,
 };
@@ -58,18 +58,22 @@ impl FirefoxTarget {
         }
     }
 
-    async fn reload_extension_now(&self, plan: &ExtensionReloadPlan) -> Result<usize> {
+    async fn reload_extension_now(&self, plan: &ExtensionReloadPlan) -> Result<Reinjection> {
+        // Firefox destroys a reloaded add-on's sandboxes without any cleanup, which would leave
+        // its UI behind, so the running scripts are undone first
+        if let Err(error) =
+            evaluate_in_background(self.address(), &scripts::tab_teardown(plan)?).await
+        {
+            tracing::warn!("Could not undo the running content scripts: {error}");
+        }
         // The reload ends the background before it can answer
         if let Err(error) = run_script_in_background(self.address(), RUNTIME_RELOAD.trim()).await {
             tracing::debug!("the reloading background did not answer: {error}");
         }
         let value = self
-            .evaluate_once_restarted(&scripts::tab_reload(plan)?)
+            .evaluate_once_restarted(&scripts::tab_reinject(plan)?)
             .await?;
-        value
-            .as_u64()
-            .and_then(|count| usize::try_from(count).ok())
-            .ok_or_else(|| BrowserError::Protocol(format!("not a tab count: {value}")))
+        Ok(serde_json::from_value(value)?)
     }
 
     async fn refresh_pages_now(&self, plan: &PageRefreshPlan) -> Result<Vec<String>> {
@@ -79,7 +83,7 @@ impl FirefoxTarget {
 }
 
 impl ReloadTarget for FirefoxTarget {
-    fn reload_extension<'a>(&'a self, plan: &'a ExtensionReloadPlan) -> BoxFuture<'a, usize> {
+    fn reload_extension<'a>(&'a self, plan: &'a ExtensionReloadPlan) -> BoxFuture<'a, Reinjection> {
         Box::pin(self.reload_extension_now(plan))
     }
 

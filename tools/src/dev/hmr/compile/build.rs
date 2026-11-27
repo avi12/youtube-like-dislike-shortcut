@@ -45,6 +45,8 @@ pub(crate) struct HmrBuild {
     pub(crate) hot_entries: Vec<Entrypoint>,
     /// What each hot content script was built from, which the running pages cannot swap.
     pub(crate) content_scripts: BTreeMap<String, ContentState>,
+    /// The stylesheet each hot content script's static one is replaced with.
+    pub(crate) static_styles: BTreeMap<String, String>,
 }
 
 /// What every worker build of one HMR build shares.
@@ -200,6 +202,7 @@ pub(crate) async fn build_hmr(request: &HmrRequest) -> Result<HmrBuild> {
         logs: finished.logs,
         hot_entries: hot,
         content_scripts: finished.content_scripts,
+        static_styles: finished.static_styles,
     })
 }
 

@@ -14,7 +14,7 @@ use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
 use crate::cdp::error::{CdpError, Result};
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
-const REPLY_TIMEOUT: Duration = Duration::from_secs(30);
+const REPLY_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// The `message` of a failed command.
 #[derive(Debug, Deserialize)]
