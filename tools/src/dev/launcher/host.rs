@@ -16,6 +16,7 @@ use crate::dev::launcher::log::{format_elapsed, log_event};
 use crate::dev::payload::patch_built_output;
 use crate::output::manifest::ExtensionManifest;
 use crate::output::options::DevOptions;
+use crate::output::sync::sync_directory;
 use crate::output::reload::{
     plan_reload, take_build_snapshot, BuildSnapshot, ExtensionReloadPlan, ReloadPlan,
 };
@@ -140,13 +141,20 @@ impl DevHost {
         let build = build_hmr_modules(&self.options).await?;
         let mut state = self.state.lock().await;
         let full_reload_reason = if state.is_unpatched {
-            patch_built_output(&self.options.output_directory(), &build.hot_entries)?;
+            patch_built_output(
+                &self.options.staged_output_directory(),
+                &build.hot_entries,
+            )?;
             state.is_unpatched = false;
             state.content_scripts = build.content_scripts;
             None
         } else {
             describe_content_change(&state.content_scripts, &build.content_scripts)
         };
+        sync_directory(
+            &self.options.staged_output_directory(),
+            &self.options.output_directory(),
+        )?;
         Ok(HmrOutcome {
             hmr_source_files: build.source_modules,
             full_reload_reason,

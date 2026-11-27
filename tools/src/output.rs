@@ -6,3 +6,4 @@ pub(crate) mod manifest;
 pub(crate) mod options;
 pub(crate) mod profile;
 pub(crate) mod reload;
+pub(crate) mod sync;

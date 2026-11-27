@@ -32,9 +32,10 @@ use crate::output::profile::{clean_leftover_instances, setup_profile};
 /// Bun's lockfile, whose change may mean the installed dependencies changed.
 const INSTALL_MARKER: &str = "bun.lock";
 /// The build inputs: the source, the config, the lockfile and the env files of the build mode.
-const WATCHED_PATHS: [&str; 7] = [
+const WATCHED_PATHS: [&str; 8] = [
     "src",
     "wxt.config.ts",
+    "package.json",
     INSTALL_MARKER,
     ".env",
     ".env.local",
@@ -118,7 +119,10 @@ async fn start(args: &RunArgs) -> Result<()> {
         .await?;
     let deps = Deps {
         host,
-        workspace: DiskWorkspace::new(output_directory, options.project_root.join(INSTALL_MARKER)),
+        workspace: DiskWorkspace::new(
+            options.staged_output_directory(),
+            options.project_root.join(INSTALL_MARKER),
+        ),
         rules: PathRules {
             install_marker: Some(RelPath::new(INSTALL_MARKER)),
             hmr_sources: first_build.hmr_source_files.into_iter().collect(),

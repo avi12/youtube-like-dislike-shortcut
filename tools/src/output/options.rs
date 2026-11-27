@@ -15,6 +15,8 @@ const DEFAULT_CDP_PORT: u16 = 9225;
 /// Firefox's own remote debugging port.
 const DEFAULT_FIREFOX_REMOTE_PORT: u16 = 9230;
 const DEFAULT_OUT_DIR: &str = "build";
+/// Where builds are written before they are synced into the directory the browser loads.
+const STAGING_DIRECTORY: &str = ".staging";
 /// The WXT build mode, which is also the suffix of the output directory.
 pub(crate) const BUILD_MODE: &str = "prod";
 pub(crate) const MANIFEST_VERSION: u8 = 3;
@@ -156,10 +158,24 @@ impl DevOptions {
         !self.is_profile_kept && !self.is_profile_directory_named
     }
 
-    /// Where WXT writes this browser's build, matching the config's `outDirTemplate`.
+    /// The folder of this browser's build, matching the config's `outDirTemplate`.
+    fn build_folder(&self) -> String {
+        format!("{}-mv{MANIFEST_VERSION}-{BUILD_MODE}", self.browser.name())
+    }
+
+    /// The directory the browser loads, which is never left empty or partial.
     pub(crate) fn output_directory(&self) -> PathBuf {
-        let folder = format!("{}-mv{MANIFEST_VERSION}-{BUILD_MODE}", self.browser.name());
-        self.out_directory.join(folder)
+        self.out_directory.join(self.build_folder())
+    }
+
+    /// WXT's outDir of the dev server.
+    pub(crate) fn staging_root(&self) -> PathBuf {
+        self.out_directory.join(STAGING_DIRECTORY)
+    }
+
+    /// Where this browser's build is written and patched before it goes live.
+    pub(crate) fn staged_output_directory(&self) -> PathBuf {
+        self.staging_root().join(self.build_folder())
     }
 }
 
