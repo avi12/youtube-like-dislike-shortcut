@@ -63,17 +63,22 @@ Install [Node.js](https://nodejs.org), [Bun](https://bun.com) 1.4.5 and, for the
 | Edge, in Hebrew        | `bun run dev:rtl`                  |
 
 The dev server builds the extension (production mode, into `build/<browser>-mv3-prod`), launches the
-browser with it sideloaded and watches `src/`, `wxt.config.ts`, `bun.lock` and the env files. Each
-save gets the smallest update that is correct:
+browser with it sideloaded and watches `src/`, `wxt.config.ts`, `package.json`, `bun.lock` and the env
+files. Open tabs are never reloaded:
 
-| What changed                                                  | What happens                                         |
-| ------------------------------------------------------------- | ---------------------------------------------------- |
-| A popup component or popup stylesheet                         | Swapped in place, `$state` kept                      |
-| The markup or script of a content script's Svelte component   | Swapped in place, the YouTube tab stays as it is     |
-| Something only the popup loads, outside what can swap         | The open popup pages reload                          |
-| Anything else (content scripts, background, manifest, styles) | The extension and the tabs its scripts run in reload |
+| What changed                                                     | What happens                                                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------- |
+| A Svelte component (markup, script or style), popup stylesheet   | Swapped in place                                              |
+| Something only the popup loads, outside what can swap            | The open popup pages reload                                   |
+| Anything else: content scripts of both worlds, background,       | The extension reloads, the running content scripts are undone |
+| manifest, config, env, public files, added or removed entrypoint | and the new ones run in the open tabs and frames              |
+| A build error                                                    | The browser keeps the last good build until the next save     |
 
-Content scripts register listeners they never remove, so they are never re-injected in place.
+Builds are written to `build/.staging` and then synced into the loaded directory, so it is never empty
+or partial. Editor scratch files (`*.tmp.*`, `*~`, swap files) never start a build. A dev-only registry,
+prepended to the built content scripts, records their listeners, observers and timers so they can be
+undone; the `scripting` and `webNavigation` permissions are added to dev builds only. An extension
+reload closes the extension's own pages, such as an open popup tab.
 
 Chrome runs as Chrome for Testing (downloaded into `.chrome-for-testing/` on first use), since branded
 Chrome no longer sideloads from the command line. Profiles live beside the repository, in
