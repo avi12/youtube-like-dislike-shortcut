@@ -121,6 +121,14 @@ export default defineConfig({
     sourcesTemplate: "{{name}}-{{version}}-{{browser}}-source.zip"
   },
   modules: ["@wxt-dev/module-svelte"],
+  svelte: {
+    vite: {
+      // Builds templates with DOM calls, since Firefox's add-on linter flags Svelte's `innerHTML` cloning
+      compilerOptions: {
+        fragments: "tree"
+      }
+    }
+  },
   vite: ({ mode }) => ({
     plugins: [stubCssWhileImportingEntrypoints()],
     build: {
