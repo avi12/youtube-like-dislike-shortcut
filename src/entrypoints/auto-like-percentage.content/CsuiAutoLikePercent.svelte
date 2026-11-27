@@ -17,6 +17,11 @@
     justify-content: center !important;
     align-items: center !important;
     color: unset !important;
+    font-family: var(--yt-ref-typography-values--font-family, Roboto, Arial, sans-serif) !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    font-variant-numeric: tabular-nums !important;
+    white-space: nowrap !important;
   }
 
   :host(ytr-percentage-music[data-append="after"]) {
@@ -32,14 +37,5 @@
     align-self: flex-start !important;
     margin-right: 6px !important;
     line-height: 40px !important;
-  }
-
-  :global(body) {
-    margin: 0;
-    font-family: Roboto, Arial, sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
 </style>
