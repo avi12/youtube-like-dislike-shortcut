@@ -2,13 +2,8 @@
 
 Works on both **YouTube** and **YouTube Music**
 
-Keyboard shortcuts (configurable in the popup):
+<img src="assets/popup.png" width="824" height="615" alt="The extension's popup. Shortcuts: Shift + Equal or NumpadAdd to like, Shift + Minus or NumpadSubtract to dislike, Shift + 0 to un-rate, each with a reset button. Auto-like videos: after watching a chosen percentage (60% here), in subscribed channels, and separate switches for YouTube, YouTube Shorts and YouTube Music. Auto, light and dark themes">
 
-- <kbd>Shift</kbd>+<kbd>Plus</kbd> (on the number row) to like
-- <kbd>Shift</kbd>+<kbd>Minus</kbd> (on the number row) to dislike
-- <kbd>Shift</kbd>+<kbd>0</kbd> (on the number row) to remove your like
-- <kbd>Numpad Plus</kbd> to like
-- <kbd>Numpad Minus</kbd> to dislike
 - Pressing the like/dislike shortcut while the corresponding button is already active will do nothing
 
 Global keyboard shortcuts for YouTube Music (configurable in `chrome://extensions/shortcuts`, no defaults):
@@ -18,13 +13,8 @@ Global keyboard shortcuts for YouTube Music (configurable in `chrome://extension
 
 Additionally:
 
-- Auto-like based on a watch time threshold that you set
-- Auto-like based on whether you're subscribed to the channel (YouTube) or the artist is in your library (YouTube Music)
+- Auto-like by subscription also covers artists in your YouTube Music library
 - The watched percentage is shown next to the like button while auto-like is active
-- <details>
-    <summary>Pop-up page with options</summary>
-    <img src="https://github.com/avi12/youtube-like-dislike-shortcut/assets/6422804/4fd19d7c-cf26-433d-b34d-2104dabb881b" alt="Screenshot">
-  </details>
 
 **This extension does not reveal the videos' dislike counters**
 
