@@ -8,8 +8,8 @@ Like, dislike and un-rate from the keyboard, on both **YouTube** and **YouTube M
 
 ## Install
 
-![Chrome Web Store users](https://badgen.net/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?label=Chrome%20Web%20Store%20users&icon=chrome)
-![Firefox Add-ons users](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=Firefox%20Add-ons%20users&style=flat-square&logo=firefoxbrowser)
+![Chrome Web Store users](https://badgen.net/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?label=Chrome%20Web%20Store%20users&icon=chrome)\
+![Firefox Add-ons users](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=Firefox%20Add-ons%20users&style=flat-square&logo=firefoxbrowser)\
 ![Opera Add-ons users](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Faddons.opera.com%2Fen%2Fextensions%2Fdetails%2Fyoutube-like-dislike-shortcut%2F&search=Downloads%3C%2Fdt%3E%3Cdd%3E%28%5B0-9%2C%5D%2B%29%3C%2Fdd%3E&replace=%241&color=white&label=Opera%20Add-ons%20users&style=flat-square&logo=opera&logoColor=FF1B2D)
 
 ## Good to know
