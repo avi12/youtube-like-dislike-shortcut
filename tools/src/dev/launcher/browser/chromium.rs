@@ -21,6 +21,8 @@ const OPERA_USER_PATH: &str = "Programs/Opera/opera.exe";
 const OPERA_WINDOWS_PATH: &str = "Opera/opera.exe";
 const OPERA_MAC_BINARY: &str = "/Applications/Opera.app/Contents/MacOS/Opera";
 const OPERA_LINUX_PROGRAM: &str = "opera";
+/// Edge otherwise signs a fresh profile into the Windows account.
+const EDGE_NO_IMPLICIT_SIGN_IN: &str = "--disable-features=msImplicitSignin";
 
 fn under_program_files(relative: &str) -> impl Iterator<Item = PathBuf> + '_ {
     PROGRAM_FILES_VARIABLES
@@ -59,7 +61,13 @@ fn chromium_args(options: &DevOptions, output_directory: &Path) -> Vec<String> {
         "--disable-blink-features=AutomationControlled".to_owned(),
         "--no-first-run".to_owned(),
         "--no-default-browser-check".to_owned(),
+        // Synced extensions would run beside the one under development, the store copy included
+        "--disable-sync".to_owned(),
     ];
+    let is_edge = options.browser == DevBrowser::Edge;
+    if is_edge {
+        args.push(EDGE_NO_IMPLICIT_SIGN_IN.to_owned());
+    }
     if options.is_profile_kept {
         args.push(format!("--profile-directory={CHROMIUM_PROFILE_DIRECTORY}"));
     }
@@ -102,6 +110,7 @@ mod tests {
     fn the_extension_is_sideloaded_and_the_start_url_comes_last() -> Result<()> {
         let args = args_of(&[])?;
         assert!(args.contains(&"--load-extension=out".to_owned()));
+        assert!(args.contains(&"--disable-sync".to_owned()));
         assert!(args.contains(&"--remote-debugging-port=9225".to_owned()));
         assert!(args.last().is_some_and(|url| url.starts_with("https://")));
         assert!(!args
