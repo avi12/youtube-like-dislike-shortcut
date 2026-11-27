@@ -8,7 +8,7 @@ Like, dislike and un-rate from the keyboard, on both **YouTube** and **YouTube M
 
 ## Install
 
-![Chrome Web Store users](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fbadgen.net%2Fchrome-web-store%2Fusers%2Ffdkpkpelkkdkjhpacficichkfifijipc%3Flabel%3Dusers&search=%3Ctitle%3Eusers%3A%20%28%5B%5E%3C%5D%2B%29%3C%2Ftitle%3E&replace=%241&labelColor=f1f3f4&color=white&label=Chrome%20Web%20Store%20users&style=flat-square&logo=googlechrome&logoColor=4285F4)\
+![Chrome Web Store users](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fchromewebstore.google.com%2Fdetail%2Ffdkpkpelkkdkjhpacficichkfifijipc&search=%28%5B0-9%5D%5B0-9%2C%5D%2A%29%20users&replace=%241&labelColor=f1f3f4&color=white&label=Chrome%20Web%20Store%20users&style=flat-square&logo=googlechrome&logoColor=4285F4)\
 ![Firefox Add-ons users](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?labelColor=f1f3f4&color=white&label=Firefox%20Add-ons%20users&style=flat-square&logo=firefoxbrowser)\
 ![Opera Add-ons users](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Faddons.opera.com%2Fen%2Fextensions%2Fdetails%2Fyoutube-like-dislike-shortcut%2F&search=Downloads%3C%2Fdt%3E%3Cdd%3E%28%5B0-9%2C%5D%2B%29%3C%2Fdd%3E&replace=%241&labelColor=f1f3f4&color=white&label=Opera%20Add-ons%20users&style=flat-square&logo=opera&logoColor=FF1B2D)
 
