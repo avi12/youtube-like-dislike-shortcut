@@ -8,7 +8,7 @@ Like, dislike and un-rate from the keyboard, on both **YouTube** and **YouTube M
 
 ## Install
 
-![Chrome Web Store users](https://badgen.net/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?label=Chrome%20Web%20Store%20users&icon=chrome)\
+![Chrome Web Store users](https://badgen.net/chrome-web-store/users/fdkpkpelkkdkjhpacficichkfifijipc?label=Chrome%20Web%20Store%20users&icon=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyBmaWxsPSIjNDI4NUY0IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMEM4LjIxIDAgNC44MzEgMS43NTcgMi42MzIgNC41MDFsMy45NTMgNi44NDhBNS40NTQgNS40NTQgMCAwIDEgMTIgNi41NDVoMTAuNjkxQTEyIDEyIDAgMCAwIDEyIDB6TTEuOTMxIDUuNDdBMTEuOTQzIDExLjk0MyAwIDAgMCAwIDEyYzAgNi4wMTIgNC40MiAxMC45OTEgMTAuMTg5IDExLjg2NGwzLjk1My02Ljg0N2E1LjQ1IDUuNDUgMCAwIDEtNi44NjUtMi4yOXptMTMuMzQyIDIuMTY2YTUuNDQ2IDUuNDQ2IDAgMCAxIDEuNDUgNy4wOWwuMDAyLjAwMWgtLjAwMmwtNS4zNDQgOS4yNTdjLjIwNi4wMS40MTMuMDE2LjYyMS4wMTYgNi42MjcgMCAxMi01LjM3MyAxMi0xMiAwLTEuNTQtLjI5LTMuMDExLS44MTgtNC4zNjR6TTEyIDE2LjM2NGE0LjM2NCA0LjM2NCAwIDEgMSAwLTguNzI4IDQuMzY0IDQuMzY0IDAgMCAxIDAgOC43MjhaIi8%2BPC9zdmc%2B)\
 ![Firefox Add-ons users](https://img.shields.io/amo/users/youtube-like-dislike-shortcut?color=white&label=Firefox%20Add-ons%20users&style=flat-square&logo=firefoxbrowser)\
 ![Opera Add-ons users](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Faddons.opera.com%2Fen%2Fextensions%2Fdetails%2Fyoutube-like-dislike-shortcut%2F&search=Downloads%3C%2Fdt%3E%3Cdd%3E%28%5B0-9%2C%5D%2B%29%3C%2Fdd%3E&replace=%241&color=white&label=Opera%20Add-ons%20users&style=flat-square&logo=opera&logoColor=FF1B2D)
 
