@@ -30,7 +30,7 @@ mod paths;
 
 pub use debounce::Debouncer;
 use debounce::{run_loop, LoopTiming};
-pub use paths::relativize;
+pub use paths::{is_temporary_file, relativize};
 
 /// Capacity of the batch channel.
 pub const BATCH_CHANNEL_CAPACITY: usize = 16;
@@ -105,7 +105,8 @@ fn event_handler(
             .paths
             .iter()
             .filter(|path| !path.is_dir())
-            .filter_map(|path| relativize(&root, &watches, path));
+            .filter_map(|path| relativize(&root, &watches, path))
+            .filter(|path| !is_temporary_file(path));
         for path in changes {
             if sender.blocking_send(ChangeEvent { path, kind }).is_err() {
                 return;
