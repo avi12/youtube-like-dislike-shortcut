@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 
 import type { Plugin } from "vite";
 import { defineConfig } from "wxt";
@@ -8,6 +8,11 @@ import { MusicCommand } from "./src/lib/ytmusic-command";
 import { z } from "./src/lib/zod";
 
 function parseGitignoreAsExcludes() {
+  // The sources zip carries no dotfiles, so a build from it has no .gitignore to read
+  if (!existsSync(".gitignore")) {
+    return [];
+  }
+
   return readFileSync(".gitignore", "utf-8")
     .split("\n")
     .map(line => line.trim())
